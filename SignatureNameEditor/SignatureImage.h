@@ -19,7 +19,6 @@ namespace SignatureNameEditor {
 
 		Rect(cv::Rect& cvrect);
 		Rect(int x, int y, int width, int height, bool used);
-		operator cv::Rect();
 		virtual String^ ToString() override;
 	};
 	public ref class SignatureImage

@@ -45,10 +45,10 @@ namespace SignatureNameEditor {
 	private: System::Windows::Forms::PictureBox^  pictureBoxPreview;
 	private: System::Windows::Forms::PictureBox^  pictureBoxTrimming;
 	private: System::Windows::Forms::Button^  buttonScan;
-	private: System::Windows::Forms::GroupBox^  groupBox1;
-	private: System::Windows::Forms::Button^  buttonDone;
 
-	private: System::Windows::Forms::CheckedListBox^  checkedListBoxImages;
+
+
+
 	private: System::ComponentModel::IContainer^  components;
 	private: System::Windows::Forms::StatusStrip^  statusStrip1;
 	private: System::Windows::Forms::ToolStripStatusLabel^  toolStripStatus;
@@ -63,6 +63,10 @@ namespace SignatureNameEditor {
 	private: System::Windows::Forms::ToolStripMenuItem^  saveToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripSeparator1;
 	private: System::Windows::Forms::ToolStripMenuItem^  quitToolStripMenuItem;
+	private: System::Windows::Forms::CheckedListBox^  checkedListBoxImages;
+	private: System::Windows::Forms::Button^  buttonDone;
+	private: System::Windows::Forms::GroupBox^  groupBox1;
+
 	private: System::Windows::Forms::Timer^  timerPreviewUpdate;
 
 	private:
@@ -82,9 +86,6 @@ namespace SignatureNameEditor {
 			this->pictureBoxPreview = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxTrimming = (gcnew System::Windows::Forms::PictureBox());
 			this->buttonScan = (gcnew System::Windows::Forms::Button());
-			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
-			this->buttonDone = (gcnew System::Windows::Forms::Button());
-			this->checkedListBoxImages = (gcnew System::Windows::Forms::CheckedListBox());
 			this->timerPreviewUpdate = (gcnew System::Windows::Forms::Timer(this->components));
 			this->statusStrip1 = (gcnew System::Windows::Forms::StatusStrip());
 			this->toolStripStatus = (gcnew System::Windows::Forms::ToolStripStatusLabel());
@@ -99,12 +100,15 @@ namespace SignatureNameEditor {
 			this->saveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->toolStripSeparator1 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->quitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->checkedListBoxImages = (gcnew System::Windows::Forms::CheckedListBox());
+			this->buttonDone = (gcnew System::Windows::Forms::Button());
+			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBoxPreview))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBoxTrimming))->BeginInit();
-			this->groupBox1->SuspendLayout();
 			this->statusStrip1->SuspendLayout();
 			this->groupBox2->SuspendLayout();
 			this->menuStrip1->SuspendLayout();
+			this->groupBox1->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// pictureBoxPreview
@@ -113,9 +117,10 @@ namespace SignatureNameEditor {
 				| System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->pictureBoxPreview->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			this->pictureBoxPreview->Location = System::Drawing::Point(278, 30);
+			this->pictureBoxPreview->Location = System::Drawing::Point(324, 38);
+			this->pictureBoxPreview->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->pictureBoxPreview->Name = L"pictureBoxPreview";
-			this->pictureBoxPreview->Size = System::Drawing::Size(372, 414);
+			this->pictureBoxPreview->Size = System::Drawing::Size(434, 517);
 			this->pictureBoxPreview->TabIndex = 0;
 			this->pictureBoxPreview->TabStop = false;
 			// 
@@ -124,56 +129,24 @@ namespace SignatureNameEditor {
 			this->pictureBoxTrimming->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->pictureBoxTrimming->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			this->pictureBoxTrimming->Location = System::Drawing::Point(489, 450);
+			this->pictureBoxTrimming->Location = System::Drawing::Point(570, 562);
+			this->pictureBoxTrimming->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->pictureBoxTrimming->Name = L"pictureBoxTrimming";
-			this->pictureBoxTrimming->Size = System::Drawing::Size(251, 56);
+			this->pictureBoxTrimming->Size = System::Drawing::Size(292, 70);
 			this->pictureBoxTrimming->TabIndex = 1;
 			this->pictureBoxTrimming->TabStop = false;
 			// 
 			// buttonScan
 			// 
 			this->buttonScan->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->buttonScan->Location = System::Drawing::Point(278, 450);
+			this->buttonScan->Location = System::Drawing::Point(324, 562);
+			this->buttonScan->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->buttonScan->Name = L"buttonScan";
-			this->buttonScan->Size = System::Drawing::Size(205, 56);
+			this->buttonScan->Size = System::Drawing::Size(239, 70);
 			this->buttonScan->TabIndex = 2;
 			this->buttonScan->Text = L"Scan";
 			this->buttonScan->UseVisualStyleBackColor = true;
 			this->buttonScan->Click += gcnew System::EventHandler(this, &Scan::buttonScan_Click);
-			// 
-			// groupBox1
-			// 
-			this->groupBox1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
-				| System::Windows::Forms::AnchorStyles::Left));
-			this->groupBox1->Controls->Add(this->buttonDone);
-			this->groupBox1->Controls->Add(this->checkedListBoxImages);
-			this->groupBox1->Location = System::Drawing::Point(12, 30);
-			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Size = System::Drawing::Size(260, 476);
-			this->groupBox1->TabIndex = 3;
-			this->groupBox1->TabStop = false;
-			// 
-			// buttonDone
-			// 
-			this->buttonDone->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->buttonDone->Location = System::Drawing::Point(6, 444);
-			this->buttonDone->Name = L"buttonDone";
-			this->buttonDone->Size = System::Drawing::Size(248, 26);
-			this->buttonDone->TabIndex = 2;
-			this->buttonDone->Text = L"Done";
-			this->buttonDone->UseVisualStyleBackColor = true;
-			// 
-			// checkedListBoxImages
-			// 
-			this->checkedListBoxImages->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
-				| System::Windows::Forms::AnchorStyles::Left));
-			this->checkedListBoxImages->FormattingEnabled = true;
-			this->checkedListBoxImages->Location = System::Drawing::Point(6, 18);
-			this->checkedListBoxImages->Name = L"checkedListBoxImages";
-			this->checkedListBoxImages->Size = System::Drawing::Size(248, 410);
-			this->checkedListBoxImages->TabIndex = 0;
-			this->checkedListBoxImages->SelectedIndexChanged += gcnew System::EventHandler(this, &Scan::checkedListBoxImages_SelectedIndexChanged);
-			this->checkedListBoxImages->Enter += gcnew System::EventHandler(this, &Scan::checkedListBoxImages_Enter);
 			// 
 			// timerPreviewUpdate
 			// 
@@ -182,9 +155,10 @@ namespace SignatureNameEditor {
 			// statusStrip1
 			// 
 			this->statusStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->toolStripStatus});
-			this->statusStrip1->Location = System::Drawing::Point(0, 516);
+			this->statusStrip1->Location = System::Drawing::Point(0, 650);
 			this->statusStrip1->Name = L"statusStrip1";
-			this->statusStrip1->Size = System::Drawing::Size(752, 22);
+			this->statusStrip1->Padding = System::Windows::Forms::Padding(1, 0, 16, 0);
+			this->statusStrip1->Size = System::Drawing::Size(877, 22);
 			this->statusStrip1->TabIndex = 4;
 			// 
 			// toolStripStatus
@@ -197,9 +171,11 @@ namespace SignatureNameEditor {
 			this->groupBox2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->groupBox2->Controls->Add(this->checkedListSignatures);
-			this->groupBox2->Location = System::Drawing::Point(656, 30);
+			this->groupBox2->Location = System::Drawing::Point(765, 38);
+			this->groupBox2->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->groupBox2->Name = L"groupBox2";
-			this->groupBox2->Size = System::Drawing::Size(84, 414);
+			this->groupBox2->Padding = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox2->Size = System::Drawing::Size(98, 518);
 			this->groupBox2->TabIndex = 5;
 			this->groupBox2->TabStop = false;
 			this->groupBox2->Text = L"signatures";
@@ -209,17 +185,20 @@ namespace SignatureNameEditor {
 			this->checkedListSignatures->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Left));
 			this->checkedListSignatures->FormattingEnabled = true;
-			this->checkedListSignatures->Location = System::Drawing::Point(6, 18);
+			this->checkedListSignatures->Location = System::Drawing::Point(7, 22);
+			this->checkedListSignatures->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->checkedListSignatures->Name = L"checkedListSignatures";
-			this->checkedListSignatures->Size = System::Drawing::Size(72, 382);
+			this->checkedListSignatures->Size = System::Drawing::Size(83, 472);
 			this->checkedListSignatures->TabIndex = 0;
+			this->checkedListSignatures->SelectedValueChanged += gcnew System::EventHandler(this, &Scan::checkedListSignatures_SelectedValueChanged);
 			// 
 			// buttonUse
 			// 
 			this->buttonUse->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->buttonUse->Location = System::Drawing::Point(278, 450);
+			this->buttonUse->Location = System::Drawing::Point(324, 562);
+			this->buttonUse->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->buttonUse->Name = L"buttonUse";
-			this->buttonUse->Size = System::Drawing::Size(91, 56);
+			this->buttonUse->Size = System::Drawing::Size(106, 70);
 			this->buttonUse->TabIndex = 6;
 			this->buttonUse->Text = L"Use";
 			this->buttonUse->UseVisualStyleBackColor = true;
@@ -229,9 +208,10 @@ namespace SignatureNameEditor {
 			// buttonRescan
 			// 
 			this->buttonRescan->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->buttonRescan->Location = System::Drawing::Point(392, 450);
+			this->buttonRescan->Location = System::Drawing::Point(457, 562);
+			this->buttonRescan->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->buttonRescan->Name = L"buttonRescan";
-			this->buttonRescan->Size = System::Drawing::Size(91, 56);
+			this->buttonRescan->Size = System::Drawing::Size(106, 70);
 			this->buttonRescan->TabIndex = 7;
 			this->buttonRescan->Text = L"Rescan";
 			this->buttonRescan->UseVisualStyleBackColor = true;
@@ -243,7 +223,8 @@ namespace SignatureNameEditor {
 			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) {this->fileToolStripMenuItem});
 			this->menuStrip1->Location = System::Drawing::Point(0, 0);
 			this->menuStrip1->Name = L"menuStrip1";
-			this->menuStrip1->Size = System::Drawing::Size(752, 26);
+			this->menuStrip1->Padding = System::Windows::Forms::Padding(7, 2, 0, 2);
+			this->menuStrip1->Size = System::Drawing::Size(877, 26);
 			this->menuStrip1->TabIndex = 8;
 			this->menuStrip1->Text = L"menuStrip1";
 			// 
@@ -258,34 +239,72 @@ namespace SignatureNameEditor {
 			// openToolStripMenuItem
 			// 
 			this->openToolStripMenuItem->Name = L"openToolStripMenuItem";
-			this->openToolStripMenuItem->Size = System::Drawing::Size(106, 22);
+			this->openToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->openToolStripMenuItem->Text = L"Open";
 			this->openToolStripMenuItem->Click += gcnew System::EventHandler(this, &Scan::openToolStripMenuItem_Click);
 			// 
 			// saveToolStripMenuItem
 			// 
 			this->saveToolStripMenuItem->Name = L"saveToolStripMenuItem";
-			this->saveToolStripMenuItem->Size = System::Drawing::Size(106, 22);
+			this->saveToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->saveToolStripMenuItem->Text = L"Save";
 			this->saveToolStripMenuItem->Click += gcnew System::EventHandler(this, &Scan::saveToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this->toolStripSeparator1->Name = L"toolStripSeparator1";
-			this->toolStripSeparator1->Size = System::Drawing::Size(103, 6);
+			this->toolStripSeparator1->Size = System::Drawing::Size(149, 6);
 			// 
 			// quitToolStripMenuItem
 			// 
 			this->quitToolStripMenuItem->Name = L"quitToolStripMenuItem";
-			this->quitToolStripMenuItem->Size = System::Drawing::Size(106, 22);
+			this->quitToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->quitToolStripMenuItem->Text = L"Quit";
 			this->quitToolStripMenuItem->Click += gcnew System::EventHandler(this, &Scan::quitToolStripMenuItem_Click);
 			// 
+			// checkedListBoxImages
+			// 
+			this->checkedListBoxImages->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
+				| System::Windows::Forms::AnchorStyles::Left));
+			this->checkedListBoxImages->FormattingEnabled = true;
+			this->checkedListBoxImages->Location = System::Drawing::Point(7, 22);
+			this->checkedListBoxImages->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->checkedListBoxImages->Name = L"checkedListBoxImages";
+			this->checkedListBoxImages->Size = System::Drawing::Size(289, 508);
+			this->checkedListBoxImages->TabIndex = 0;
+			this->checkedListBoxImages->SelectedIndexChanged += gcnew System::EventHandler(this, &Scan::checkedListBoxImages_SelectedIndexChanged);
+			this->checkedListBoxImages->Enter += gcnew System::EventHandler(this, &Scan::checkedListBoxImages_Enter);
+			// 
+			// buttonDone
+			// 
+			this->buttonDone->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
+			this->buttonDone->Location = System::Drawing::Point(7, 556);
+			this->buttonDone->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->buttonDone->Name = L"buttonDone";
+			this->buttonDone->Size = System::Drawing::Size(289, 32);
+			this->buttonDone->TabIndex = 2;
+			this->buttonDone->Text = L"Done";
+			this->buttonDone->UseVisualStyleBackColor = true;
+			// 
+			// groupBox1
+			// 
+			this->groupBox1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
+				| System::Windows::Forms::AnchorStyles::Left));
+			this->groupBox1->Controls->Add(this->buttonDone);
+			this->groupBox1->Controls->Add(this->checkedListBoxImages);
+			this->groupBox1->Location = System::Drawing::Point(14, 36);
+			this->groupBox1->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox1->Name = L"groupBox1";
+			this->groupBox1->Padding = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox1->Size = System::Drawing::Size(303, 596);
+			this->groupBox1->TabIndex = 3;
+			this->groupBox1->TabStop = false;
+			// 
 			// Scan
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
+			this->AutoScaleDimensions = System::Drawing::SizeF(7, 15);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(752, 538);
+			this->ClientSize = System::Drawing::Size(877, 672);
 			this->Controls->Add(this->buttonRescan);
 			this->Controls->Add(this->buttonUse);
 			this->Controls->Add(this->groupBox2);
@@ -295,18 +314,21 @@ namespace SignatureNameEditor {
 			this->Controls->Add(this->buttonScan);
 			this->Controls->Add(this->pictureBoxTrimming);
 			this->Controls->Add(this->pictureBoxPreview);
+			this->Font = (gcnew System::Drawing::Font(L"Segoe UI", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+				static_cast<System::Byte>(0)));
 			this->MainMenuStrip = this->menuStrip1;
+			this->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->Name = L"Scan";
 			this->Text = L"Scan";
 			this->Load += gcnew System::EventHandler(this, &Scan::Scan_Load);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBoxPreview))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBoxTrimming))->EndInit();
-			this->groupBox1->ResumeLayout(false);
 			this->statusStrip1->ResumeLayout(false);
 			this->statusStrip1->PerformLayout();
 			this->groupBox2->ResumeLayout(false);
 			this->menuStrip1->ResumeLayout(false);
 			this->menuStrip1->PerformLayout();
+			this->groupBox1->ResumeLayout(false);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -413,6 +435,7 @@ namespace SignatureNameEditor {
 		 }
 	private: System::Void stopTrimming()
 		 {
+			 pictureBoxTrimming->Image = nullptr;
 			 saveSignature();
 			 current_mode = RunMode::None;
 		 }
@@ -534,30 +557,57 @@ namespace SignatureNameEditor {
 		 }
 #pragma endregion
 #pragma region ƒgƒŠƒ~ƒ“ƒO
+	 private: cv::Mat getCurrentScanImage()
+		 {
+			 if (!current_scan_image) throw L"current scan image is null";
+
+			 if (current_scan_image->Image) {
+				 cv::Mat img = *current_scan_image->Image;
+				 if (img.empty()) 
+					 setMessage(L"Current image is empty!");
+				 return img;
+			 } else {
+				 String^ file_name_full = Path::Combine(xml_file_path ? xml_file_path : Directory::GetCurrentDirectory(), current_scan_image->FileName);
+				 const std::string file_name = CVUtil::CLI::convertFileName(file_name_full);
+				 cv::Mat img = cv::imread(file_name);
+				 if (img.empty())
+					 setMessage(String::Format(L"Unable to load image: {0}", file_name_full));
+				 else
+					 setMessage(String::Format(L"Image is loaded: {0}", file_name_full));
+				 return img;
+			 }
+		 }
 	private: System::Void showSignature()
 		 {
 			 if (!current_scan_image)
 				 return;
 
-			 if (current_scan_image->Image) {
-				 CLI::Control::showImage(*current_scan_image->Image, pictureBoxPreview, true);
-			 } else {
-				 String^ file_name_full = Path::Combine(xml_file_path ? xml_file_path : Directory::GetCurrentDirectory(), current_scan_image->FileName);
-				 const std::string file_name = CVUtil::CLI::convertFileName(file_name_full);
-				 cv::Mat img = cv::imread(file_name);
-				 if (!img.empty()) {
-					 CLI::Control::showImage(img, pictureBoxPreview, true);
-					 setMessage(String::Format(L"Image is loaded: {0}", file_name_full));
-				 } else {
-					 setMessage(String::Format(L"Unable to load image: {0}", file_name_full));
-				 }
-			 }
+			 cv::Mat img = getCurrentScanImage();
+			 if (!img.empty())
+				 CLI::Control::showImage(img, pictureBoxPreview, true);
 
 			 checkedListSignatures->BeginUpdate();
 			 for each (Rect^ rect in current_scan_image->TrimmingAreas) {
 				 checkedListSignatures->Items->Add(rect, rect->used);
 			 }
 			 checkedListSignatures->EndUpdate();
+		 }
+	private: System::Void showTrimmingArea()
+		 {
+			 if (!current_scan_image)
+				 return;
+			 if (!checkedListSignatures->SelectedItem)
+				 return;
+
+			 cv::Mat img = getCurrentScanImage();
+			 if (img.empty()) {
+				 setMessage(L"Cannot trim empty image.");
+				 return;
+			 }
+
+			 Rect^ sig_rect = (Rect^)checkedListSignatures->SelectedItem;
+			 cv::Rect cv_rect(sig_rect->x, sig_rect->y, sig_rect->width, sig_rect->height);
+			 CLI::Control::showImage(cv::Mat(img, cv_rect), pictureBoxTrimming, true);
 		 }
 	private: System::Void addSignature()
 		 {
@@ -593,7 +643,6 @@ namespace SignatureNameEditor {
 
 			 try {
 				 saveImages(dialog->FileName);
-				 Close();
 			 } catch (String^ msg) {
 				 setMessage(L"Failed to save file: " + msg);
 			 }
@@ -722,6 +771,14 @@ namespace SignatureNameEditor {
 				 break;
 			 }
 		 }
+	private: System::Void checkedListSignatures_SelectedValueChanged(System::Object^  sender, System::EventArgs^  e)
+		 {
+			 switch (current_mode) {
+			 case RunMode::Trimming:
+				 showTrimmingArea();
+				 break;
+			 }
+		 }
 	private: System::Void timerPreviewUpdate_Tick(System::Object^  sender, System::EventArgs^  e)
 		 {
 			 static int frame;
@@ -750,7 +807,7 @@ namespace SignatureNameEditor {
 					L"Save images before closing?", 
 					MessageBoxButtons::YesNoCancel)) {
 			 case System::Windows::Forms::DialogResult::Yes: 
-				 showSaveDialog();
+				 showSaveDialog();//TODO: Check failure
 				 Close();
 				 break;
 			 case System::Windows::Forms::DialogResult::No:
@@ -763,5 +820,5 @@ namespace SignatureNameEditor {
 				 break;
 			 }
 		 }
-	 };
+	};
 }

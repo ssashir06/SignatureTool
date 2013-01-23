@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}</ProjectGuid>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <RootNamespace>SignatureNameEditor</RootNamespace>
   </PropertyGroup>
@@ -22,12 +22,14 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CLRSupport>Pure</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CLRSupport>Pure</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -55,7 +57,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_nonfree242d.lib;opencv_core242d.lib;opencv_features2d242d.lib;opencv_highgui242d.lib;opencv_imgproc242d.lib;opencv_flann242d.lib;opencv_objdetect242d.lib;opencv_calib3d242d.lib;$(OutDir)LibCameraScanner.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_nonfree243d.lib;opencv_core243d.lib;opencv_features2d243d.lib;opencv_highgui243d.lib;opencv_imgproc243d.lib;opencv_flann243d.lib;opencv_objdetect243d.lib;opencv_calib3d243d.lib;$(OutDir)LibCameraScanner.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>main</EntryPointSymbol>
     </Link>
@@ -69,7 +71,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_nonfree242.lib;opencv_core242.lib;opencv_features2d242.lib;opencv_highgui242.lib;opencv_imgproc242.lib;opencv_flann242.lib;opencv_objdetect242.lib;opencv_calib3d242.lib;$(OutDir)LibCameraScanner.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_nonfree243.lib;opencv_core243.lib;opencv_features2d243.lib;opencv_highgui243.lib;opencv_imgproc243.lib;opencv_flann243.lib;opencv_objdetect243.lib;opencv_calib3d243.lib;$(OutDir)LibCameraScanner.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>main</EntryPointSymbol>
     </Link>

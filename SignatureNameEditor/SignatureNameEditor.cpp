@@ -1,7 +1,6 @@
 // SignatureNameEditor.cpp : メイン プロジェクト ファイルです。
 
 #include "stdafx.h"
-//#include "SignPreview.h"
 #include "Scan.h"
 
 using namespace SignatureNameEditor;
@@ -14,7 +13,6 @@ int main(array<System::String ^> ^args)
 	Application::SetCompatibleTextRenderingDefault(false); 
 
 	// メイン ウィンドウを作成して、実行します
-	//Application::Run(gcnew SignPreview());
 	Application::Run(gcnew Scan());
 	return 0;
 }

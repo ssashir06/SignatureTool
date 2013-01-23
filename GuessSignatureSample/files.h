@@ -60,7 +60,6 @@ static const std::string file_info[][3] = {
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0054.jpg", "ニイシ", "山田"},
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0055.jpg", "グルン", "山田"},
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0056.jpg", "グルン", "山田"},
-	{"Documents\\Visual Studio 2010\\Projects\\SignatureTool\\ImageSignatureTest\\scan_camera_test.jpg", "コイデ", "み"},//TEST
 };
 #if 0
 static const cv::Rect trim_area_train[] = {

@@ -19,11 +19,6 @@ namespace SignatureNameEditor {
 		this->used = used;
 	}
 
-	Rect::operator cv::Rect()
-	{
-		return cv::Rect(x, y, width, height);
-	}
-
 	String^ Rect::ToString()
 	{
 		return String::Format(L"({0},{1}) Size({2},{3})", x, y, width, height);
