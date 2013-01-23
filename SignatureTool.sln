@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GuessSignatureSample", "GuessSignatureSample\GuessSignatureSample.vcxproj", "{B79AFDB0-8F1B-418A-91C1-677ABFB12EBE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {9E183EDA-6208-4434-A7B3-94BF05B0E09A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CameraScannerSample", "CameraScannerSample\CameraScannerSample.vcxproj", "{56AC7786-502E-4780-A369-DAD24053E9F4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6} = {B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scanner", "Scanner", "{96902D98-5D2D-42D3-817D-AA1402E71294}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibCameraScanner", "LibCameraScanner\LibCameraScanner.vcxproj", "{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GuessSignature", "GuessSignature", "{5E290395-C7A4-467C-BA34-E17713539364}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibGuessSignature", "LibGuessSignature\LibGuessSignature.vcxproj", "{9E183EDA-6208-4434-A7B3-94BF05B0E09A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{FC631DD2-1146-498F-A92D-AA45DE96BE99}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SignatureNameEditor", "SignatureNameEditor\SignatureNameEditor.vcxproj", "{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6} = {B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {9E183EDA-6208-4434-A7B3-94BF05B0E09A}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B79AFDB0-8F1B-418A-91C1-677ABFB12EBE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B79AFDB0-8F1B-418A-91C1-677ABFB12EBE}.Debug|Win32.Build.0 = Debug|Win32
+		{B79AFDB0-8F1B-418A-91C1-677ABFB12EBE}.Release|Win32.ActiveCfg = Release|Win32
+		{B79AFDB0-8F1B-418A-91C1-677ABFB12EBE}.Release|Win32.Build.0 = Release|Win32
+		{56AC7786-502E-4780-A369-DAD24053E9F4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{56AC7786-502E-4780-A369-DAD24053E9F4}.Debug|Win32.Build.0 = Debug|Win32
+		{56AC7786-502E-4780-A369-DAD24053E9F4}.Release|Win32.ActiveCfg = Release|Win32
+		{56AC7786-502E-4780-A369-DAD24053E9F4}.Release|Win32.Build.0 = Release|Win32
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}.Debug|Win32.Build.0 = Debug|Win32
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}.Release|Win32.ActiveCfg = Release|Win32
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}.Release|Win32.Build.0 = Release|Win32
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A}.Debug|Win32.Build.0 = Debug|Win32
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A}.Release|Win32.ActiveCfg = Release|Win32
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A}.Release|Win32.Build.0 = Release|Win32
+		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Debug|Win32.Build.0 = Debug|Win32
+		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Release|Win32.ActiveCfg = Release|Win32
+		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{96902D98-5D2D-42D3-817D-AA1402E71294} = {FC631DD2-1146-498F-A92D-AA45DE96BE99}
+		{5E290395-C7A4-467C-BA34-E17713539364} = {FC631DD2-1146-498F-A92D-AA45DE96BE99}
+		{56AC7786-502E-4780-A369-DAD24053E9F4} = {96902D98-5D2D-42D3-817D-AA1402E71294}
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6} = {96902D98-5D2D-42D3-817D-AA1402E71294}
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {5E290395-C7A4-467C-BA34-E17713539364}
+		{B79AFDB0-8F1B-418A-91C1-677ABFB12EBE} = {5E290395-C7A4-467C-BA34-E17713539364}
+	EndGlobalSection
+EndGlobal

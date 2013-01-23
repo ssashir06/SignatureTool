@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="GuessSignature">
+      <UniqueIdentifier>{161b12be-7a6d-4cb9-8e79-420110109521}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StdAfx">
+      <UniqueIdentifier>{944d8bf0-43ba-45d7-a270-42a856ce5991}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GuessSignature\File">
+      <UniqueIdentifier>{fcda9d94-4805-43bd-a349-00e8378a40be}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="EvalEasy.cpp">
+      <Filter>GuessSignature</Filter>
+    </ClCompile>
+    <ClCompile Include="GuessSignature.cpp">
+      <Filter>GuessSignature</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StdAfx\StdAfx.cpp">
+      <Filter>StdAfx</Filter>
+    </ClCompile>
+    <ClCompile Include="FileInfo.cpp">
+      <Filter>GuessSignature\File</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EvalEasy.h">
+      <Filter>GuessSignature</Filter>
+    </ClInclude>
+    <ClInclude Include="GuessSignature.h">
+      <Filter>GuessSignature</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StdAfx\StdAfx.h">
+      <Filter>StdAfx</Filter>
+    </ClInclude>
+    <ClInclude Include="FileInfo.h">
+      <Filter>GuessSignature\File</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
