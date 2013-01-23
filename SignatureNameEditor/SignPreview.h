@@ -40,26 +40,12 @@ namespace SignatureNameEditor {
 	protected: 
 
 
-
-
-
-
-
-
 	private: System::Windows::Forms::MenuStrip^  menuStrip1;
 	private: System::Windows::Forms::ToolStripMenuItem^  fileToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  exitToolStripMenuItem;
-
-
-
-
-
-
-
 	private: System::Windows::Forms::GroupBox^  groupBox3;
 	private: System::Windows::Forms::GroupBox^  groupBox1;
 	private: System::Windows::Forms::CheckBox^  checkBoxSampling;
-
 	private: System::Windows::Forms::GroupBox^  groupBox2;
 	private: System::Windows::Forms::TextBox^  textBoxNewName;
 	private: System::Windows::Forms::ListBox^  listManual;
@@ -71,14 +57,9 @@ namespace SignatureNameEditor {
 	private: System::Windows::Forms::ToolStripMenuItem^  samplesToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  loadSamplesStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  saveSamplesToolStripMenuItem;
-
-
 	private: System::Windows::Forms::ToolStripMenuItem^  imagesToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  scanImagesToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  loadImagesToolStripMenuItem;
-
-
-
 
 
 
@@ -104,6 +85,10 @@ namespace SignatureNameEditor {
 			this->exitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->samplesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->loadSamplesStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->saveSamplesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->imagesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->scanImagesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->loadImagesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->groupBox3 = (gcnew System::Windows::Forms::GroupBox());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
 			this->checkBoxIgnore = (gcnew System::Windows::Forms::CheckBox());
@@ -115,10 +100,6 @@ namespace SignatureNameEditor {
 			this->pictureBoxPreview = (gcnew System::Windows::Forms::PictureBox());
 			this->groupBox4 = (gcnew System::Windows::Forms::GroupBox());
 			this->listSignature = (gcnew System::Windows::Forms::ListBox());
-			this->saveSamplesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->imagesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->scanImagesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->loadImagesToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->menuStrip1->SuspendLayout();
 			this->groupBox3->SuspendLayout();
 			this->groupBox1->SuspendLayout();
@@ -133,7 +114,8 @@ namespace SignatureNameEditor {
 				this->samplesToolStripMenuItem, this->imagesToolStripMenuItem});
 			this->menuStrip1->Location = System::Drawing::Point(0, 0);
 			this->menuStrip1->Name = L"menuStrip1";
-			this->menuStrip1->Size = System::Drawing::Size(836, 26);
+			this->menuStrip1->Padding = System::Windows::Forms::Padding(7, 2, 0, 2);
+			this->menuStrip1->Size = System::Drawing::Size(975, 26);
 			this->menuStrip1->TabIndex = 6;
 			this->menuStrip1->Text = L"menuStrip1";
 			// 
@@ -147,7 +129,7 @@ namespace SignatureNameEditor {
 			// exitToolStripMenuItem
 			// 
 			this->exitToolStripMenuItem->Name = L"exitToolStripMenuItem";
-			this->exitToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->exitToolStripMenuItem->Size = System::Drawing::Size(98, 22);
 			this->exitToolStripMenuItem->Text = L"Exit";
 			// 
 			// samplesToolStripMenuItem
@@ -161,120 +143,13 @@ namespace SignatureNameEditor {
 			// loadSamplesStripMenuItem
 			// 
 			this->loadSamplesStripMenuItem->Name = L"loadSamplesStripMenuItem";
-			this->loadSamplesStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->loadSamplesStripMenuItem->Size = System::Drawing::Size(105, 22);
 			this->loadSamplesStripMenuItem->Text = L"Load";
-			// 
-			// groupBox3
-			// 
-			this->groupBox3->Controls->Add(this->groupBox1);
-			this->groupBox3->Controls->Add(this->pictureBoxPreview);
-			this->groupBox3->Location = System::Drawing::Point(268, 38);
-			this->groupBox3->Name = L"groupBox3";
-			this->groupBox3->Size = System::Drawing::Size(556, 449);
-			this->groupBox3->TabIndex = 7;
-			this->groupBox3->TabStop = false;
-			// 
-			// groupBox1
-			// 
-			this->groupBox1->Controls->Add(this->checkBoxIgnore);
-			this->groupBox1->Controls->Add(this->checkBoxSampling);
-			this->groupBox1->Controls->Add(this->groupBox2);
-			this->groupBox1->Controls->Add(this->listManual);
-			this->groupBox1->Controls->Add(this->listAutomatic);
-			this->groupBox1->Location = System::Drawing::Point(6, 229);
-			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Size = System::Drawing::Size(544, 216);
-			this->groupBox1->TabIndex = 7;
-			this->groupBox1->TabStop = false;
-			this->groupBox1->Text = L"Signature name";
-			// 
-			// checkBoxIgnore
-			// 
-			this->checkBoxIgnore->AutoSize = true;
-			this->checkBoxIgnore->Location = System::Drawing::Point(326, 94);
-			this->checkBoxIgnore->Name = L"checkBoxIgnore";
-			this->checkBoxIgnore->Size = System::Drawing::Size(55, 16);
-			this->checkBoxIgnore->TabIndex = 6;
-			this->checkBoxIgnore->Text = L"ignore";
-			this->checkBoxIgnore->UseVisualStyleBackColor = true;
-			// 
-			// checkBoxSampling
-			// 
-			this->checkBoxSampling->AutoSize = true;
-			this->checkBoxSampling->Location = System::Drawing::Point(326, 72);
-			this->checkBoxSampling->Name = L"checkBoxSampling";
-			this->checkBoxSampling->Size = System::Drawing::Size(136, 16);
-			this->checkBoxSampling->TabIndex = 5;
-			this->checkBoxSampling->Text = L"add to sample images";
-			this->checkBoxSampling->UseVisualStyleBackColor = true;
-			// 
-			// groupBox2
-			// 
-			this->groupBox2->Controls->Add(this->textBoxNewName);
-			this->groupBox2->Location = System::Drawing::Point(326, 18);
-			this->groupBox2->Name = L"groupBox2";
-			this->groupBox2->Size = System::Drawing::Size(212, 48);
-			this->groupBox2->TabIndex = 4;
-			this->groupBox2->TabStop = false;
-			this->groupBox2->Text = L"add new name";
-			// 
-			// textBoxNewName
-			// 
-			this->textBoxNewName->Location = System::Drawing::Point(6, 18);
-			this->textBoxNewName->Name = L"textBoxNewName";
-			this->textBoxNewName->Size = System::Drawing::Size(200, 19);
-			this->textBoxNewName->TabIndex = 0;
-			// 
-			// listManual
-			// 
-			this->listManual->FormattingEnabled = true;
-			this->listManual->ItemHeight = 12;
-			this->listManual->Location = System::Drawing::Point(166, 18);
-			this->listManual->Name = L"listManual";
-			this->listManual->Size = System::Drawing::Size(154, 184);
-			this->listManual->TabIndex = 3;
-			// 
-			// listAutomatic
-			// 
-			this->listAutomatic->FormattingEnabled = true;
-			this->listAutomatic->ItemHeight = 12;
-			this->listAutomatic->Location = System::Drawing::Point(6, 18);
-			this->listAutomatic->Name = L"listAutomatic";
-			this->listAutomatic->Size = System::Drawing::Size(154, 184);
-			this->listAutomatic->TabIndex = 2;
-			// 
-			// pictureBoxPreview
-			// 
-			this->pictureBoxPreview->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			this->pictureBoxPreview->Location = System::Drawing::Point(6, 18);
-			this->pictureBoxPreview->Name = L"pictureBoxPreview";
-			this->pictureBoxPreview->Size = System::Drawing::Size(544, 205);
-			this->pictureBoxPreview->TabIndex = 6;
-			this->pictureBoxPreview->TabStop = false;
-			// 
-			// groupBox4
-			// 
-			this->groupBox4->Controls->Add(this->listSignature);
-			this->groupBox4->Location = System::Drawing::Point(12, 38);
-			this->groupBox4->Name = L"groupBox4";
-			this->groupBox4->Size = System::Drawing::Size(250, 449);
-			this->groupBox4->TabIndex = 8;
-			this->groupBox4->TabStop = false;
-			this->groupBox4->Text = L"Signatures";
-			// 
-			// listSignature
-			// 
-			this->listSignature->FormattingEnabled = true;
-			this->listSignature->ItemHeight = 12;
-			this->listSignature->Location = System::Drawing::Point(6, 18);
-			this->listSignature->Name = L"listSignature";
-			this->listSignature->Size = System::Drawing::Size(238, 412);
-			this->listSignature->TabIndex = 0;
 			// 
 			// saveSamplesToolStripMenuItem
 			// 
 			this->saveSamplesToolStripMenuItem->Name = L"saveSamplesToolStripMenuItem";
-			this->saveSamplesToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->saveSamplesToolStripMenuItem->Size = System::Drawing::Size(105, 22);
 			this->saveSamplesToolStripMenuItem->Text = L"Save";
 			// 
 			// imagesToolStripMenuItem
@@ -288,24 +163,149 @@ namespace SignatureNameEditor {
 			// scanImagesToolStripMenuItem
 			// 
 			this->scanImagesToolStripMenuItem->Name = L"scanImagesToolStripMenuItem";
-			this->scanImagesToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->scanImagesToolStripMenuItem->Size = System::Drawing::Size(104, 22);
 			this->scanImagesToolStripMenuItem->Text = L"Scan";
 			// 
 			// loadImagesToolStripMenuItem
 			// 
 			this->loadImagesToolStripMenuItem->Name = L"loadImagesToolStripMenuItem";
-			this->loadImagesToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->loadImagesToolStripMenuItem->Size = System::Drawing::Size(104, 22);
 			this->loadImagesToolStripMenuItem->Text = L"Load";
+			// 
+			// groupBox3
+			// 
+			this->groupBox3->Controls->Add(this->groupBox1);
+			this->groupBox3->Controls->Add(this->pictureBoxPreview);
+			this->groupBox3->Location = System::Drawing::Point(313, 48);
+			this->groupBox3->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox3->Name = L"groupBox3";
+			this->groupBox3->Padding = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox3->Size = System::Drawing::Size(649, 561);
+			this->groupBox3->TabIndex = 7;
+			this->groupBox3->TabStop = false;
+			// 
+			// groupBox1
+			// 
+			this->groupBox1->Controls->Add(this->checkBoxIgnore);
+			this->groupBox1->Controls->Add(this->checkBoxSampling);
+			this->groupBox1->Controls->Add(this->groupBox2);
+			this->groupBox1->Controls->Add(this->listManual);
+			this->groupBox1->Controls->Add(this->listAutomatic);
+			this->groupBox1->Location = System::Drawing::Point(7, 286);
+			this->groupBox1->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox1->Name = L"groupBox1";
+			this->groupBox1->Padding = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox1->Size = System::Drawing::Size(635, 270);
+			this->groupBox1->TabIndex = 7;
+			this->groupBox1->TabStop = false;
+			this->groupBox1->Text = L"Signature name";
+			// 
+			// checkBoxIgnore
+			// 
+			this->checkBoxIgnore->AutoSize = true;
+			this->checkBoxIgnore->Location = System::Drawing::Point(380, 118);
+			this->checkBoxIgnore->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->checkBoxIgnore->Name = L"checkBoxIgnore";
+			this->checkBoxIgnore->Size = System::Drawing::Size(60, 19);
+			this->checkBoxIgnore->TabIndex = 6;
+			this->checkBoxIgnore->Text = L"ignore";
+			this->checkBoxIgnore->UseVisualStyleBackColor = true;
+			// 
+			// checkBoxSampling
+			// 
+			this->checkBoxSampling->AutoSize = true;
+			this->checkBoxSampling->Location = System::Drawing::Point(380, 90);
+			this->checkBoxSampling->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->checkBoxSampling->Name = L"checkBoxSampling";
+			this->checkBoxSampling->Size = System::Drawing::Size(142, 19);
+			this->checkBoxSampling->TabIndex = 5;
+			this->checkBoxSampling->Text = L"add to sample images";
+			this->checkBoxSampling->UseVisualStyleBackColor = true;
+			// 
+			// groupBox2
+			// 
+			this->groupBox2->Controls->Add(this->textBoxNewName);
+			this->groupBox2->Location = System::Drawing::Point(380, 22);
+			this->groupBox2->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox2->Name = L"groupBox2";
+			this->groupBox2->Padding = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox2->Size = System::Drawing::Size(247, 60);
+			this->groupBox2->TabIndex = 4;
+			this->groupBox2->TabStop = false;
+			this->groupBox2->Text = L"add new name";
+			// 
+			// textBoxNewName
+			// 
+			this->textBoxNewName->Location = System::Drawing::Point(7, 22);
+			this->textBoxNewName->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->textBoxNewName->Name = L"textBoxNewName";
+			this->textBoxNewName->Size = System::Drawing::Size(233, 23);
+			this->textBoxNewName->TabIndex = 0;
+			// 
+			// listManual
+			// 
+			this->listManual->FormattingEnabled = true;
+			this->listManual->ItemHeight = 15;
+			this->listManual->Location = System::Drawing::Point(194, 22);
+			this->listManual->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->listManual->Name = L"listManual";
+			this->listManual->Size = System::Drawing::Size(179, 229);
+			this->listManual->TabIndex = 3;
+			// 
+			// listAutomatic
+			// 
+			this->listAutomatic->FormattingEnabled = true;
+			this->listAutomatic->ItemHeight = 15;
+			this->listAutomatic->Location = System::Drawing::Point(7, 22);
+			this->listAutomatic->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->listAutomatic->Name = L"listAutomatic";
+			this->listAutomatic->Size = System::Drawing::Size(179, 229);
+			this->listAutomatic->TabIndex = 2;
+			// 
+			// pictureBoxPreview
+			// 
+			this->pictureBoxPreview->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->pictureBoxPreview->Location = System::Drawing::Point(7, 22);
+			this->pictureBoxPreview->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->pictureBoxPreview->Name = L"pictureBoxPreview";
+			this->pictureBoxPreview->Size = System::Drawing::Size(634, 256);
+			this->pictureBoxPreview->TabIndex = 6;
+			this->pictureBoxPreview->TabStop = false;
+			// 
+			// groupBox4
+			// 
+			this->groupBox4->Controls->Add(this->listSignature);
+			this->groupBox4->Location = System::Drawing::Point(14, 48);
+			this->groupBox4->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox4->Name = L"groupBox4";
+			this->groupBox4->Padding = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->groupBox4->Size = System::Drawing::Size(292, 561);
+			this->groupBox4->TabIndex = 8;
+			this->groupBox4->TabStop = false;
+			this->groupBox4->Text = L"Signatures";
+			// 
+			// listSignature
+			// 
+			this->listSignature->FormattingEnabled = true;
+			this->listSignature->ItemHeight = 15;
+			this->listSignature->Location = System::Drawing::Point(7, 22);
+			this->listSignature->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
+			this->listSignature->Name = L"listSignature";
+			this->listSignature->Size = System::Drawing::Size(277, 514);
+			this->listSignature->TabIndex = 0;
 			// 
 			// SignPreview
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
+			this->AutoScaleDimensions = System::Drawing::SizeF(7, 15);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(836, 499);
+			this->ClientSize = System::Drawing::Size(975, 624);
 			this->Controls->Add(this->groupBox4);
 			this->Controls->Add(this->groupBox3);
 			this->Controls->Add(this->menuStrip1);
+			this->Font = (gcnew System::Drawing::Font(L"Segoe UI", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+				static_cast<System::Byte>(0)));
 			this->MainMenuStrip = this->menuStrip1;
+			this->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->Name = L"SignPreview";
 			this->Text = L"SignPreview";
 			this->menuStrip1->ResumeLayout(false);

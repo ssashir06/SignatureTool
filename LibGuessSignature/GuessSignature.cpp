@@ -1,3 +1,4 @@
+#include <memory>
 #include "GuessSignature.h"
 using namespace std;
 using namespace cv;
@@ -314,7 +315,7 @@ namespace Signature
 			return info;
 		}
 
-		void Base::setMatchingMachine(Ptr<FeatureDetector>& detector, Ptr<DescriptorExtractor>& extractor)
+		void Base::setMatchingMachine(shared_ptr<FeatureDetector>& detector, shared_ptr<DescriptorExtractor>& extractor)
 		{
 			this->detector = detector;
 			this->extractor = extractor;

@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+#include <list>
 #include "GuessSignature.h"
 
 namespace Signature
@@ -8,7 +10,7 @@ namespace Signature
 		class EvalEasy : public Base
 		{
 		protected:
-			cv::Ptr<cv::DescriptorMatcher> matcher;
+			std::shared_ptr<cv::DescriptorMatcher> matcher;
 			static const int matching_count_weight_default = 100;
 		public:
 			double matching_count_weight;

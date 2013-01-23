@@ -45,10 +45,6 @@ namespace SignatureNameEditor {
 	private: System::Windows::Forms::PictureBox^  pictureBoxPreview;
 	private: System::Windows::Forms::PictureBox^  pictureBoxTrimming;
 	private: System::Windows::Forms::Button^  buttonScan;
-
-
-
-
 	private: System::ComponentModel::IContainer^  components;
 	private: System::Windows::Forms::StatusStrip^  statusStrip1;
 	private: System::Windows::Forms::ToolStripStatusLabel^  toolStripStatus;

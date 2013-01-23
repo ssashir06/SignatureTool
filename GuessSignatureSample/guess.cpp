@@ -1,3 +1,4 @@
+#include <memory>
 #include <list>
 #include <string>
 #include <map>
@@ -43,13 +44,15 @@ void loadImages()
 	}
 }
 
-template<class Evaluator>
-void eval()
+void eval(Guess::Base& eval_train, Guess::Base& eval_query)
 {
-	Ptr<FeatureDetector> detector = new SiftFeatureDetector();
-	Ptr<DescriptorExtractor> extractor = new SiftDescriptorExtractor();
-
-	Evaluator eval_train, eval_query;
+#if 0
+	shared_ptr<FeatureDetector> detector(new SiftFeatureDetector());
+	shared_ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor());
+#else
+	shared_ptr<FeatureDetector> detector(new SurfFeatureDetector());
+	shared_ptr<DescriptorExtractor> extractor(new SurfDescriptorExtractor());
+#endif
 
 	eval_train.setMatchingMachine(detector, extractor);
 	eval_train.buildInfo(train);
@@ -79,6 +82,7 @@ void eval()
 int main()
 {
 	loadImages();
-	eval<Guess::EvalEasy>();
+	Guess::EvalEasy eval_train, eval_query;
+	eval(eval_train, eval_query);
 	return 0;
 }

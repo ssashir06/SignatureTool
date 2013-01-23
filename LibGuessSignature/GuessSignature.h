@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <vector>
 #include <list>
@@ -102,7 +103,6 @@ namespace Signature
 			void addSignature(const Candidate& signature, int idx);//FIXME
 		};
 	}
-
 	namespace Guess
 	{
 		typedef std::list<Image::Candidate::Assessment> Result;
@@ -110,8 +110,8 @@ namespace Signature
 		{
 		protected:
 			Image::Info info;
-			cv::Ptr<cv::FeatureDetector> detector;
-			cv::Ptr<cv::DescriptorExtractor> extractor;
+			std::shared_ptr<cv::FeatureDetector> detector;
+			std::shared_ptr<cv::DescriptorExtractor> extractor;
 		public:
 			Base();
 			Base(const Base& src);
@@ -119,7 +119,7 @@ namespace Signature
 			virtual ~Base();
 
 			const Image::Info& getInfo() const;
-			void setMatchingMachine(cv::Ptr<cv::FeatureDetector>& detector, cv::Ptr<cv::DescriptorExtractor>& extractor);
+			void setMatchingMachine(std::shared_ptr<cv::FeatureDetector>& detector, std::shared_ptr<cv::DescriptorExtractor>& extractor);
 			virtual void buildInfo(const std::list<Image::Conclusive>& images);
 			virtual void buildInfo(const std::list<Image::Candidate>& images);
 			virtual Result match(const Image::Info& query, int idx) = 0;
