@@ -12,8 +12,7 @@ using namespace std;
 using namespace cv;
 using namespace Signature;
 
-list<Image::Conclusive> train;
-list<Image::Candidate> query;
+list<shared_ptr<Image::Base> > train, query;
 
 void loadImages()
 {
@@ -35,10 +34,10 @@ void loadImages()
 		for (list<pair<int, Mat> >::const_iterator it_img=it->second.begin(); it_img!=it->second.end(); it_img++, i++) {
 			if (i < count / 2) {
 				Mat img_trim = Mat(it_img->second, trim_area_train[it_img->first]);
-				train.push_back(Image::Conclusive(train.size(), img_trim.clone(), name));
+				train.push_back(shared_ptr<Image::Base>(new Image::Conclusive(train.size(), img_trim.clone(), name)));
 			} else {
 				Mat img_trim = Mat(it_img->second, trim_area_query[it_img->first]);
-				query.push_back(Image::Candidate(query.size(), img_trim.clone()));
+				query.push_back(shared_ptr<Image::Base>(new Image::Candidate(query.size(), img_trim.clone())));
 			}
 		}
 	}
@@ -46,20 +45,6 @@ void loadImages()
 
 void eval(Guess::Base& eval_train, Guess::Base& eval_query)
 {
-#if 0
-	shared_ptr<FeatureDetector> detector(new SiftFeatureDetector());
-	shared_ptr<DescriptorExtractor> extractor(new SiftDescriptorExtractor());
-#else
-	shared_ptr<FeatureDetector> detector(new SurfFeatureDetector());
-	shared_ptr<DescriptorExtractor> extractor(new SurfDescriptorExtractor());
-#endif
-
-	eval_train.setMatchingMachine(detector, extractor);
-	eval_train.buildInfo(train);
-
-	eval_query.setMatchingMachine(detector, extractor);
-	eval_query.buildInfo(query);
-
 	namedWindow("match");
 	Mat img;
 	const Image::Info& info_query = eval_query.getInfo();
@@ -82,7 +67,15 @@ void eval(Guess::Base& eval_train, Guess::Base& eval_query)
 int main()
 {
 	loadImages();
+
 	Guess::EvalEasy eval_train, eval_query;
+
+	eval_train.setMatchingMachine(Signature::Image::MatchingMachines(Ptr<FeatureDetector>(new SurfFeatureDetector()), Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()), "SURF"));
+	eval_train.buildInfo(train);
+
+	eval_query.setMatchingMachine(Signature::Image::MatchingMachines(Ptr<FeatureDetector>(new SurfFeatureDetector()), Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()), "SURF"));
+	eval_query.buildInfo(query);
+
 	eval(eval_train, eval_query);
 	return 0;
 }

@@ -20,8 +20,7 @@ namespace Signature
 			EvalEasy(const EvalEasy& src);
 			EvalEasy& operator=(const EvalEasy& src);
 			virtual ~EvalEasy();
-			virtual void buildInfo(const std::list<Image::Conclusive>& images);
-			virtual void buildInfo(const std::list<Image::Candidate>& images);
+			virtual void buildInfo(const std::list<std::shared_ptr<Image::Base> >& images);
 			virtual Result match(const Image::Info& query, int idx);
 		};
 	}

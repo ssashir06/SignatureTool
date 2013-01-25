@@ -30,14 +30,7 @@ namespace Signature
 		{
 		}
 
-		void EvalEasy::buildInfo(const std::list<Image::Conclusive>& images)
-		{
-			Base::buildInfo(images);
-			matcher = shared_ptr<cv::DescriptorMatcher>(new FlannBasedMatcher());
-			matcher->add(info.getDescriptors());
-		}
-
-		void EvalEasy::buildInfo(const std::list<Image::Candidate>& images)
+		void EvalEasy::buildInfo(const list<shared_ptr<Image::Base> >& images)
 		{
 			Base::buildInfo(images);
 			matcher = shared_ptr<cv::DescriptorMatcher>(new FlannBasedMatcher());

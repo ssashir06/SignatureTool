@@ -72,17 +72,10 @@ namespace Signature
 		{
 		}
 
-		void FileInfo::addSignature(const Conclusive& signature, const FileDetails& file, const cv::FeatureDetector& detector, const cv::DescriptorExtractor& extractor)//FIXME
+		void FileInfo::addSignature(const Base& signature, const FileDetails& file, const MatchingMachines& machines)
 		{
 			Idx idx = size();
-			Info::addSignature(signature, detector, extractor);
-			setFileDetails(idx, file);
-		}
-
-		void FileInfo::addSignature(const Candidate& signature, const FileDetails& file, const cv::FeatureDetector& detector, const cv::DescriptorExtractor& extractor)//FIXME
-		{
-			Idx idx = size();
-			Info::addSignature(signature, detector, extractor);
+			Info::addSignature(signature, machines);
 			setFileDetails(idx, file);
 		}
 

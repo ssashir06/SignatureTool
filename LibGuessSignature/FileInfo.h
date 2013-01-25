@@ -30,8 +30,7 @@ namespace Signature
 			FileInfo& operator=(const FileInfo& src);
 			virtual ~FileInfo(void);
 
-			virtual void addSignature(const Conclusive& signature, const FileDetails& file, const cv::FeatureDetector& detector, const cv::DescriptorExtractor& extractor);//FIXME
-			virtual void addSignature(const Candidate& signature, const FileDetails& file, const cv::FeatureDetector& detector, const cv::DescriptorExtractor& extractor);//FIXME
+			virtual void addSignature(const Base& signature, const FileDetails& file, const MatchingMachines& machines);
 
 			FileDetails getFileDetails(Idx idx) const;
 			void setFileDetails(Idx idx, const FileDetails& file);

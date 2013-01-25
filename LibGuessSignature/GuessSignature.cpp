@@ -7,6 +7,7 @@ namespace Signature
 {
 	namespace Image
 	{
+#pragma region Base
 		Base::Base()
 		{
 			id = 0;
@@ -24,6 +25,12 @@ namespace Signature
 			signature = src.signature;
 		}
 
+		Base::Base(const Base* src)
+		{
+			id = src->id;
+			signature = src->signature;
+		}
+
 		Base& Base::operator=(const Base& src)
 		{
 			id = src.id;
@@ -34,7 +41,9 @@ namespace Signature
 		Base::~Base()
 		{
 		}
+#pragma endregion
 
+#pragma region Conclusive
 		Conclusive::Conclusive() : Base()
 		{
 		}
@@ -64,6 +73,13 @@ namespace Signature
 		{
 		}
 
+		string Conclusive::getName() const
+		{
+			return name;
+		}
+#pragma endregion
+
+#pragma region Candidate
 		Candidate::Assessment::Assessment()
 		{
 			score = 0;
@@ -102,8 +118,8 @@ namespace Signature
 		Candidate::operator Conclusive() const
 		{
 			list<Assessment> names_copy = names;
-			names_copy.sort();//FIXME
-			Conclusive conclusive((Base)*this);
+			names_copy.sort();
+			Conclusive conclusive(*this);
 			conclusive.name = names_copy.front().name;
 			return conclusive;
 		}
@@ -112,6 +128,74 @@ namespace Signature
 		{
 		}
 
+		string Candidate::getName() const
+		{
+			return "UNKNOWN";
+		}
+#pragma endregion
+
+#pragma region MatchingMachines
+		MatchingMachines::MatchingMachines()
+		{
+			type = default_type;
+			make();
+		}
+
+		MatchingMachines::MatchingMachines(const string& type)
+		{
+			this->type = type;
+			make();
+		}
+
+		MatchingMachines::MatchingMachines(const Ptr<FeatureDetector>& detector, const Ptr<DescriptorExtractor>& extractor, const std::string& type)
+		{
+			this->type = type;
+			this->detector = detector;
+			this->extractor = extractor;
+		}
+
+		MatchingMachines::MatchingMachines(const MatchingMachines& src)
+		{
+			type = src.type;
+			detector = src.detector;
+			extractor = src.extractor;
+		}
+
+		MatchingMachines& MatchingMachines::operator=(const MatchingMachines& src)
+		{
+			type = src.type;
+			detector = src.detector;
+			extractor = src.extractor;
+			return *this;
+		}
+
+		MatchingMachines::~MatchingMachines()
+		{
+		}
+
+		Ptr<cv::FeatureDetector> MatchingMachines::getDetector() const
+		{
+			return detector;
+		}
+
+		Ptr<cv::DescriptorExtractor> MatchingMachines::getExtractor() const
+		{
+			return extractor;
+		}
+
+		string MatchingMachines::getName() const
+		{
+			return type;
+		}
+
+		void MatchingMachines::make()
+		{
+			detector = FeatureDetector::create(type);
+			extractor = DescriptorExtractor::create(type);
+		}
+#pragma endregion
+
+#pragma region Info
 		Info::Info()
 		{
 		}
@@ -138,60 +222,32 @@ namespace Signature
 		}
 
 #pragma region Set signature(s)
-		void Info::prepare(const list<Conclusive>& signatures, const FeatureDetector& detector, const DescriptorExtractor& extractor)
+		void Info::prepare(const list<shared_ptr<Base> >& signatures, const MatchingMachines& machines)
 		{
 			resize(signatures.size());
 			int i = 0;
-			for (list<Conclusive>::const_iterator it=signatures.begin(); it!=signatures.end(); it++, i++) {
-				addSignature(*it, i);
+			for (list<shared_ptr<Base> >::const_iterator it=signatures.begin(); it!=signatures.end(); it++, i++) {
+				addSignature(**it, i);
 			}
-			detector.detect(images, keypoints);
-			extractor.compute(images, keypoints, descriptors);
+			machines.getDetector()->detect(images, keypoints);
+			machines.getExtractor()->compute(images, keypoints, descriptors);
 		}
 
-		void Info::prepare(const list<Candidate>& signatures, const FeatureDetector& detector, const DescriptorExtractor& extractor)
-		{
-			resize(signatures.size());
-			int i = 0;
-			for (list<Candidate>::const_iterator it=signatures.begin(); it!=signatures.end(); it++, i++) {
-				addSignature(*it, i);
-			}
-			detector.detect(images, keypoints);
-			extractor.compute(images, keypoints, descriptors);
-		}
-
-		void Info::addSignature(const Conclusive& signature, int idx)
+		void Info::addSignature(const Base& signature, int idx)
 		{
 			if (size() <= idx) throw "bad idx";
 			setID(idx, signature.id);
 			setImage(idx, signature.signature);
-			setName(idx, signature.name);
+			setName(idx, signature.getName());
 		}
 
-		void Info::addSignature(const Candidate& signature, int idx)
-		{
-			if (size() <= idx) throw "bad idx";
-			setID(idx, signature.id);
-			setImage(idx, signature.signature);
-			setName(idx, "Unknown");
-		}
-
-		void Info::addSignature(const Conclusive& signature, const FeatureDetector& detector, const DescriptorExtractor& extractor)
+		void Info::addSignature(const Base& signature, const MatchingMachines& machines)
 		{
 			Idx idx = size();
 			resize(idx);
 			addSignature(signature, size());
-			detector.detect(getImage(idx), getKeyPoints(idx));
-			extractor.compute(getImage(idx), getKeyPoints(idx), getDescriptor(idx));
-		}
-
-		void Info::addSignature(const Candidate& signature, const FeatureDetector& detector, const DescriptorExtractor& extractor)
-		{
-			Idx idx = size();
-			resize(idx);
-			addSignature(signature, size());
-			detector.detect(getImage(idx), getKeyPoints(idx));
-			extractor.compute(getImage(idx), getKeyPoints(idx), getDescriptor(idx));
+			machines.getDetector()->detect(getImage(idx), getKeyPoints(idx));
+			machines.getExtractor()->compute(getImage(idx), getKeyPoints(idx), getDescriptor(idx));
 		}
 #pragma endregion
 
@@ -284,9 +340,11 @@ namespace Signature
 			descriptors.resize(size);
 			names.resize(size);
 		}
+#pragma endregion
 	}
 	namespace Guess
 	{
+#pragma region Base
 		Base::Base()
 		{
 		}
@@ -294,15 +352,13 @@ namespace Signature
 		Base::Base(const Base& src)
 		{
 			info = src.info;
-			detector = src.detector;
-			extractor = src.extractor;
+			machines = src.machines;
 		}
 
 		Base& Base::operator=(const Base& src)
 		{
 			info = src.info;
-			detector = src.detector;
-			extractor = src.extractor;
+			machines = src.machines;
 			return *this;
 		}
 
@@ -314,21 +370,21 @@ namespace Signature
 		{
 			return info;
 		}
-
-		void Base::setMatchingMachine(shared_ptr<FeatureDetector>& detector, shared_ptr<DescriptorExtractor>& extractor)
+		
+		void Base::setMatchingMachine(const std::string& type)
 		{
-			this->detector = detector;
-			this->extractor = extractor;
+			machines = Image::MatchingMachines(type);
 		}
 
-		void Base::buildInfo(const list<Image::Conclusive>& images)
+		void Base::setMatchingMachine(const Image::MatchingMachines& machines)
 		{
-			info.prepare(images, *detector, *extractor);
+			this->machines = machines;
 		}
 
-		void Base::buildInfo(const list<Image::Candidate>& images)
+		void Base::buildInfo(const list<shared_ptr<Image::Base> >& images)
 		{
-			info.prepare(images, *detector, *extractor);
+			info.prepare(images, machines);
 		}
+#pragma endregion
 	}
 }
