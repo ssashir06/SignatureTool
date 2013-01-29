@@ -7,12 +7,14 @@
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 #include "../LibGuessSignature/EvalEasy.h"
+#include "../LibGuessSignature/GuessSvmOneVsAll.h"
 #include "files.h"
 using namespace std;
 using namespace cv;
 using namespace Signature;
 
-list<shared_ptr<Image::Base> > train, query;
+list<shared_ptr<Image::Base> > train_images;
+list<pair<string, Mat> > query_images;
 
 void loadImages()
 {
@@ -32,50 +34,49 @@ void loadImages()
 		int count = it->second.size(), i = 0;
 		if (count < 3) continue;
 		for (list<pair<int, Mat> >::const_iterator it_img=it->second.begin(); it_img!=it->second.end(); it_img++, i++) {
-			if (i < count / 2) {
+			if (i < count - 1) {
 				Mat img_trim = Mat(it_img->second, trim_area_train[it_img->first]);
-				train.push_back(shared_ptr<Image::Base>(new Image::Conclusive(train.size(), img_trim.clone(), name)));
+				train_images.push_back(shared_ptr<Image::Base>(new Image::Conclusive(train_images.size(), img_trim.clone(), name)));
 			} else {
 				Mat img_trim = Mat(it_img->second, trim_area_query[it_img->first]);
-				query.push_back(shared_ptr<Image::Base>(new Image::Candidate(query.size(), img_trim.clone())));
+				query_images.push_back(pair<string, Mat>(name, img_trim.clone()));
 			}
 		}
 	}
 }
 
-void eval(Guess::Base& eval_train, Guess::Base& eval_query)
+void guess(const Guess::Base& trainer)
 {
-	namedWindow("match");
-	Mat img;
-	const Image::Info& info_query = eval_query.getInfo();
-	for (int i=0; i<info_query.size(); i++) {
-		drawKeypoints(info_query.getImage(i), info_query.getKeyPoints(i), img);
-		imshow("match", img);
-
-		Guess::Result result = eval_train.match(info_query, i);
-
-		if (result.empty()) continue;
+	const string window_name = "query_name";
+	namedWindow(window_name);
+	for (const auto& query : query_images)
+	{
+		Guess::Result result = trainer.match(query.second);
 		result.sort();
-		for (Guess::Result::const_iterator it = result.begin(); it!=result.end(); it++) {
-			cout << "Name: " << it->name << " (" << it->score << ")" << endl;
+		cout << "------------------" << endl;
+		cout << "Query name: " << query.first << endl;
+		for (const auto& assesment : result)
+		{
+			cout << assesment.name << "\t" << assesment.score << endl;
 		}
-		cout << "------------" << endl;
+		imshow(window_name, query.second);
 		waitKey();
 	}
+	destroyWindow(window_name);
 }
 
 int main()
 {
+	//Guess::Base trainer;
+	Guess::SvmOneVsAll trainer;
+
 	loadImages();
+	trainer.setMatchingMachines(Image::MatchingMachines(
+		Ptr<FeatureDetector>(new SurfFeatureDetector()),
+		Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()),
+		Ptr<DescriptorMatcher>(new FlannBasedMatcher())));
+	trainer.setImages(train_images);
+	guess(trainer);
 
-	Guess::EvalEasy eval_train, eval_query;
-
-	eval_train.setMatchingMachine(Signature::Image::MatchingMachines(Ptr<FeatureDetector>(new SurfFeatureDetector()), Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()), "SURF"));
-	eval_train.buildInfo(train);
-
-	eval_query.setMatchingMachine(Signature::Image::MatchingMachines(Ptr<FeatureDetector>(new SurfFeatureDetector()), Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()), "SURF"));
-	eval_query.buildInfo(query);
-
-	eval(eval_train, eval_query);
 	return 0;
 }

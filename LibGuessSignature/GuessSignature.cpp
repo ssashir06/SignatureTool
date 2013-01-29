@@ -1,4 +1,5 @@
 #include <memory>
+#include <opencv2/nonfree/features2d.hpp>
 #include "GuessSignature.h"
 using namespace std;
 using namespace cv;
@@ -25,12 +26,6 @@ namespace Signature
 			signature = src.signature;
 		}
 
-		Base::Base(const Base* src)
-		{
-			id = src->id;
-			signature = src->signature;
-		}
-
 		Base& Base::operator=(const Base& src)
 		{
 			id = src.id;
@@ -48,18 +43,19 @@ namespace Signature
 		{
 		}
 
-		Conclusive::Conclusive(ID id, const Mat& signature, const string& name) : Base(id, signature)
-		{
-			this->name = name;
-		}
-
-		Conclusive::Conclusive(const Base& src) : Base(src)
+		Conclusive::Conclusive(ID id, const Mat& signature, const string& name)
+			: Base(id, signature), name(name)
 		{
 		}
 
-		Conclusive::Conclusive(const Conclusive& src) : Base(src)
+		Conclusive::Conclusive(const Base& src)
+			: Base(src)
 		{
-			name = src.name;
+		}
+
+		Conclusive::Conclusive(const Conclusive& src)
+			: Base(src), name(src.name)
+		{
 		}
 
 		Conclusive& Conclusive::operator=(const Conclusive& src)
@@ -94,18 +90,19 @@ namespace Signature
 		{
 		}
 
-		Candidate::Candidate(ID id, const Mat& signature) : Base(id, signature)
+		Candidate::Candidate(ID id, const Mat& signature)
+			: Base(id, signature)
 		{
 		}
 
-		Candidate::Candidate(ID id, const Mat& signature, list<Assessment> names) : Base(id, signature)
+		Candidate::Candidate(ID id, const Mat& signature, list<Assessment> names)
+			: Base(id, signature), names(names)
 		{
-			this->names = names;
 		}
 
-		Candidate::Candidate(const Candidate& src) : Base(src)
+		Candidate::Candidate(const Candidate& src)
+			: Base(src), names(src.names)
 		{
-			names = src.names;
 		}
 
 		Candidate& Candidate::operator=(const Candidate& src)
@@ -136,36 +133,27 @@ namespace Signature
 
 #pragma region MatchingMachines
 		MatchingMachines::MatchingMachines()
+			: detector(new SurfFeatureDetector()), extractor(new SurfDescriptorExtractor()), matcher(new FlannBasedMatcher())
 		{
-			type = default_type;
-			make();
 		}
 
-		MatchingMachines::MatchingMachines(const string& type)
+		MatchingMachines::MatchingMachines(const Ptr<FeatureDetector>& detector, const Ptr<DescriptorExtractor>& extractor, const Ptr<DescriptorMatcher>& matcher)
+			: detector(detector), extractor(extractor), matcher(matcher)
 		{
-			this->type = type;
-			make();
-		}
-
-		MatchingMachines::MatchingMachines(const Ptr<FeatureDetector>& detector, const Ptr<DescriptorExtractor>& extractor, const std::string& type)
-		{
-			this->type = type;
-			this->detector = detector;
-			this->extractor = extractor;
 		}
 
 		MatchingMachines::MatchingMachines(const MatchingMachines& src)
 		{
-			type = src.type;
 			detector = src.detector;
 			extractor = src.extractor;
+			matcher = src.matcher;
 		}
 
 		MatchingMachines& MatchingMachines::operator=(const MatchingMachines& src)
 		{
-			type = src.type;
 			detector = src.detector;
 			extractor = src.extractor;
+			matcher = src.matcher;
 			return *this;
 		}
 
@@ -173,25 +161,19 @@ namespace Signature
 		{
 		}
 
-		Ptr<cv::FeatureDetector> MatchingMachines::getDetector() const
+		Ptr<FeatureDetector> MatchingMachines::getDetector() const
 		{
 			return detector;
 		}
 
-		Ptr<cv::DescriptorExtractor> MatchingMachines::getExtractor() const
+		Ptr<DescriptorExtractor> MatchingMachines::getExtractor() const
 		{
 			return extractor;
 		}
 
-		string MatchingMachines::getName() const
+		Ptr<DescriptorMatcher> MatchingMachines::getMatcher() const
 		{
-			return type;
-		}
-
-		void MatchingMachines::make()
-		{
-			detector = FeatureDetector::create(type);
-			extractor = DescriptorExtractor::create(type);
+			return matcher;
 		}
 #pragma endregion
 
@@ -235,7 +217,7 @@ namespace Signature
 
 		void Info::addSignature(const Base& signature, int idx)
 		{
-			if (size() <= idx) throw "bad idx";
+			if (count() <= idx) throw "bad idx";
 			setID(idx, signature.id);
 			setImage(idx, signature.signature);
 			setName(idx, signature.getName());
@@ -243,30 +225,37 @@ namespace Signature
 
 		void Info::addSignature(const Base& signature, const MatchingMachines& machines)
 		{
-			Idx idx = size();
+			Idx idx = count();
 			resize(idx);
-			addSignature(signature, size());
-			machines.getDetector()->detect(getImage(idx), getKeyPoints(idx));
-			machines.getExtractor()->compute(getImage(idx), getKeyPoints(idx), getDescriptor(idx));
+			addSignature(signature, count());
+
+			KeyPoints keypoints;
+			Descriptor descriptor;
+
+			machines.getDetector()->detect(getImage(idx), keypoints);
+			machines.getExtractor()->compute(getImage(idx), keypoints, descriptor);
+
+			setKeyPoints(idx, keypoints);
+			setDescriptor(idx, descriptor);
 		}
 #pragma endregion
 
 #pragma region Get/Set
 		ID Info::getID(int idx) const
 		{
-			if (idx < 0 || size() <= idx) throw "Invalid idx";
+			if (idx < 0 || count() <= idx) throw "Invalid idx";
 			return ids[idx];
 		}
 
 		Mat Info::getImage(int idx) const
 		{
-			if (idx < 0 || size() <= idx) throw "Invalid idx";
+			if (idx < 0 || count() <= idx) throw "Invalid idx";
 			return images[idx];
 		}
 
 		Info::KeyPoints Info::getKeyPoints(int idx) const
 		{
-			if (idx < 0 || size() <= idx) throw "Invalid idx";
+			if (idx < 0 || count() <= idx) throw "Invalid idx";
 			return keypoints[idx];
 		}
 
@@ -293,7 +282,7 @@ namespace Signature
 			ids[idx] = id;
 		}
 
-		void Info::setImage(Idx idx, const cv::Mat& image, bool make_clone)
+		void Info::setImage(Idx idx, const Mat& image, bool make_clone)
 		{
 			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
 			images[idx] = make_clone ? image.clone() : image;
@@ -311,14 +300,14 @@ namespace Signature
 			descriptors[idx] = descriptor;
 		}
 
-		void Info::setName(Idx idx, const std::string& name)
+		void Info::setName(Idx idx, const string& name)
 		{
 			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
 			names[idx] = name;
 		}
 #pragma endregion
 
-		size_t Info::size() const
+		size_t Info::count() const
 		{
 			return ids.size();
 		}
@@ -351,13 +340,11 @@ namespace Signature
 
 		Base::Base(const Base& src)
 		{
-			info = src.info;
 			machines = src.machines;
 		}
 
 		Base& Base::operator=(const Base& src)
 		{
-			info = src.info;
 			machines = src.machines;
 			return *this;
 		}
@@ -366,24 +353,9 @@ namespace Signature
 		{
 		}
 
-		const Image::Info& Base::getInfo() const
-		{
-			return info;
-		}
-		
-		void Base::setMatchingMachine(const std::string& type)
-		{
-			machines = Image::MatchingMachines(type);
-		}
-
-		void Base::setMatchingMachine(const Image::MatchingMachines& machines)
+		void Base::setMatchingMachines(const Image::MatchingMachines& machines)
 		{
 			this->machines = machines;
-		}
-
-		void Base::buildInfo(const list<shared_ptr<Image::Base> >& images)
-		{
-			info.prepare(images, machines);
 		}
 #pragma endregion
 	}

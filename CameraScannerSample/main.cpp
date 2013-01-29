@@ -18,7 +18,7 @@ Mat takePicture(const ScanSpec& spec, Reshape& scanner, int width, int height)
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, width);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, height);
 
-	const char const *window = "Capturing";
+	const char* const window = "Capturing";
 	namedWindow(window);
 	Mat img_tmp, img_cap, img_preview;
 	int frame = 0;

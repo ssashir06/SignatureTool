@@ -20,7 +20,6 @@ namespace Signature
 
 	namespace Image
 	{
-		static const std::string default_type = "SURF";
 		typedef int ID;
 		struct Base
 		{
@@ -29,7 +28,6 @@ namespace Signature
 			Base();
 			Base(ID id, const cv::Mat& signature);
 			Base(const Base& src);
-			Base(const Base* src);
 			Base& operator=(const Base& src);
 			virtual ~Base();
 			virtual std::string getName() const = 0;
@@ -67,14 +65,13 @@ namespace Signature
 		class MatchingMachines
 		{
 		protected:
-			std::string type;
 			cv::Ptr<cv::FeatureDetector> detector;
 			cv::Ptr<cv::DescriptorExtractor> extractor;
+			cv::Ptr<cv::DescriptorMatcher> matcher;
 
 		public:
 			MatchingMachines();
-			MatchingMachines(const std::string& type);
-			MatchingMachines(const cv::Ptr<cv::FeatureDetector>& detector, const cv::Ptr<cv::DescriptorExtractor>& extractor, const std::string& type);
+			MatchingMachines(const cv::Ptr<cv::FeatureDetector>& detector, const cv::Ptr<cv::DescriptorExtractor>& extractor, const cv::Ptr<cv::DescriptorMatcher>& matcher);
 			MatchingMachines(const MatchingMachines& src);
 			MatchingMachines& operator=(const MatchingMachines& src);
 			virtual ~MatchingMachines();
@@ -82,17 +79,15 @@ namespace Signature
 		public:
 			cv::Ptr<cv::FeatureDetector> getDetector() const;
 			cv::Ptr<cv::DescriptorExtractor> getExtractor() const;
-			std::string getName() const;
-
-		protected:
-			void make();
+			cv::Ptr<cv::DescriptorMatcher> getMatcher() const;
 		};
 		class Info
 		{
-		protected:
+		public:
 			typedef std::vector<cv::KeyPoint> KeyPoints;
 			typedef cv::Mat Descriptor;
 			typedef int Idx;
+		protected:
 			std::vector<ID> ids;
 			std::vector<cv::Mat> images;
 			std::vector<KeyPoints> keypoints;
@@ -114,7 +109,7 @@ namespace Signature
 			std::vector<Descriptor> getDescriptors() const;
 			std::string getName(Idx idx) const;
 
-			size_t size() const;
+			size_t count() const;
 			virtual void clear();
 			virtual void resize(size_t size);
 		protected:
@@ -133,7 +128,6 @@ namespace Signature
 		class Base
 		{
 		protected:
-			Image::Info info;
 			Image::MatchingMachines machines;
 		public:
 			Base();
@@ -141,11 +135,10 @@ namespace Signature
 			Base& operator=(const Base& src);
 			virtual ~Base();
 
-			const Image::Info& getInfo() const;
-			void setMatchingMachine(const std::string& type);
-			void setMatchingMachine(const Image::MatchingMachines& machines);
-			virtual void buildInfo(const std::list<std::shared_ptr<Image::Base> >& images);
-			virtual Result match(const Image::Info& query, int idx) = 0;
+			void setMatchingMachines(const Image::MatchingMachines& machines);
+
+			virtual void setImages(const std::list<std::shared_ptr<Image::Base> >& trains) = 0;
+			virtual Result match(const cv::Mat& query) const = 0;
 		};
 	}
 }

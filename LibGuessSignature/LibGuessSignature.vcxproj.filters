@@ -22,11 +22,14 @@
     <Filter Include="GuessSignature\File">
       <UniqueIdentifier>{fcda9d94-4805-43bd-a349-00e8378a40be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GuessSignature\Guess">
+      <UniqueIdentifier>{d90a81cb-5f12-4f1a-ac20-908f3944d745}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GuessSignature\LIBSVMWrapper">
+      <UniqueIdentifier>{69ca0902-08f4-43ce-839b-66ba61badef9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EvalEasy.cpp">
-      <Filter>GuessSignature</Filter>
-    </ClCompile>
     <ClCompile Include="GuessSignature.cpp">
       <Filter>GuessSignature</Filter>
     </ClCompile>
@@ -36,11 +39,17 @@
     <ClCompile Include="FileInfo.cpp">
       <Filter>GuessSignature\File</Filter>
     </ClCompile>
+    <ClCompile Include="EvalEasy.cpp">
+      <Filter>GuessSignature\Guess</Filter>
+    </ClCompile>
+    <ClCompile Include="GuessKMeans.cpp">
+      <Filter>GuessSignature\Guess</Filter>
+    </ClCompile>
+    <ClCompile Include="GuessSvmOneVsAll.cpp">
+      <Filter>GuessSignature\Guess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EvalEasy.h">
-      <Filter>GuessSignature</Filter>
-    </ClInclude>
     <ClInclude Include="GuessSignature.h">
       <Filter>GuessSignature</Filter>
     </ClInclude>
@@ -49,6 +58,15 @@
     </ClInclude>
     <ClInclude Include="FileInfo.h">
       <Filter>GuessSignature\File</Filter>
+    </ClInclude>
+    <ClInclude Include="EvalEasy.h">
+      <Filter>GuessSignature\Guess</Filter>
+    </ClInclude>
+    <ClInclude Include="GuessKMeans.h">
+      <Filter>GuessSignature\Guess</Filter>
+    </ClInclude>
+    <ClInclude Include="GuessSvmOneVsAll.h">
+      <Filter>GuessSignature\Guess</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

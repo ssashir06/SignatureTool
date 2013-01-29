@@ -56,9 +56,8 @@ namespace Signature
 		}
 
 		FileInfo::FileInfo(const FileInfo& src)
-			: Info(src)
+			: Info(src), infomations(src.infomations)
 		{
-			infomations = src.infomations;
 		}
 
 		FileInfo& FileInfo::operator=(const FileInfo& src)
@@ -74,27 +73,27 @@ namespace Signature
 
 		void FileInfo::addSignature(const Base& signature, const FileDetails& file, const MatchingMachines& machines)
 		{
-			Idx idx = size();
+			Idx idx = count();
 			Info::addSignature(signature, machines);
 			setFileDetails(idx, file);
 		}
 
 		FileInfo::FileDetails FileInfo::getFileDetails(Idx idx) const
 		{
-			if (idx < 0 || size() <= idx) throw "Invalid idx";
+			if (idx < 0 || count() <= idx) throw "Invalid idx";
 			return infomations[idx];
 		}
 
 		void FileInfo::setFileDetails(Idx idx, const FileDetails& file)
 		{
-			if (idx < 0 || size() <= idx) throw "Invalid idx";
+			if (idx < 0 || count() <= idx) throw "Invalid idx";
 			infomations[idx] = file;
 		}
 
 		void FileInfo::write(FileStorage& fs) const
 		{
 			fs << "ImageInfo" << "{";
-			for (int i=0; i<size(); i++) {
+			for (int i=0; i<count(); i++) {
 				fs << "Id" << getID(i);
 				fs << "Descriptor" << getDescriptor(i);
 				fs << "Name" << getName(i);

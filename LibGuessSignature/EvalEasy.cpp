@@ -9,20 +9,21 @@ namespace Signature
 {
 	namespace Guess
 	{
-		EvalEasy::EvalEasy() : Base()
+		EvalEasy::EvalEasy()
+			: Base(), matching_count_weight(matching_count_weight_default)
 		{
-			matching_count_weight = matching_count_weight_default;
 		}
 
-		EvalEasy::EvalEasy(const EvalEasy& src) : Base(src)
+		EvalEasy::EvalEasy(const EvalEasy& src)
+			: Base(src), matching_count_weight(src.matching_count_weight), info(src.info)
 		{
-			matching_count_weight = src.matching_count_weight;
 		}
 
 		EvalEasy& EvalEasy::operator=(const EvalEasy& src)
 		{
 			Base::operator=(src);
 			matching_count_weight = src.matching_count_weight;
+			info = src.info;
 			return *this;
 		}
 
@@ -30,19 +31,27 @@ namespace Signature
 		{
 		}
 
-		void EvalEasy::buildInfo(const list<shared_ptr<Image::Base> >& images)
+		const Image::Info& EvalEasy::getInfo() const
 		{
-			Base::buildInfo(images);
-			matcher = shared_ptr<cv::DescriptorMatcher>(new FlannBasedMatcher());
-			matcher->add(info.getDescriptors());
+			return info;
 		}
 
-		Result EvalEasy::match(const Image::Info& query, int idx)
+		void EvalEasy::setImages(const list<shared_ptr<Image::Base> >& trains)
+		{
+			info.prepare(trains, machines);
+			machines.getMatcher()->add(info.getDescriptors());
+		}
+
+		Result EvalEasy::match(const Mat& query) const
 		{
 			const bool show_matching_image = false;
-			Mat img;
 			vector<DMatch> matches;
-			matcher->match(query.getDescriptor(idx), matches);
+			Image::Info::KeyPoints keypoints;
+			Image::Info::Descriptor descriptor;
+
+			machines.getDetector()->detect(query, keypoints);
+			machines.getExtractor()->compute(query, keypoints, descriptor);
+			machines.getMatcher()->match(descriptor, matches);
 
 			map<int, list<DMatch> > matches_grouped;
 			for (vector<DMatch>::const_iterator it = matches.begin(); it!=matches.end(); it++) {
@@ -66,7 +75,7 @@ namespace Signature
 					distance_sum += it_dmatch->distance;
 				}
 				score += distance_sum / match_count;
-				score += matching_count_weight * (double)(max(info.getKeyPoints(train_idx).size(), query.getKeyPoints(idx).size()) - match_count)
+				score += matching_count_weight * (double)(max(info.getKeyPoints(train_idx).size(), keypoints.size()) - match_count)
 					/ it->second.size();
 				scores[name] += score;
 				count_by_group[name]++;
@@ -77,11 +86,13 @@ namespace Signature
 					"\ttrain name: " << name << 
 					endl;
 				if (show_matching_image) {
+					cv::Mat image_out;
 					drawMatches(
-						query.getImage(idx), query.getKeyPoints(idx),
+						query, keypoints,
 						info.getImage(train_idx), info.getKeyPoints(train_idx),
-						convertArray<list<DMatch>, vector<DMatch> >(it->second), img);
-					imshow("matching", img);
+						convertArray<list<DMatch>, vector<DMatch> >(it->second),
+						image_out);
+					imshow("matching", image_out);
 					waitKey();
 				}
 			}

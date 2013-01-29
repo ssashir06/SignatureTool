@@ -29,6 +29,8 @@ static const std::string file_info[][3] = {
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0023.jpg", "山崎", "小平"},
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0024.jpg", "甲田", "山田"},
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0025.jpg", "マリ", "山田"},
+//#ifndef _DEBUG
+#if 1
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0026.jpg", "ニイシ", "山田"},
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0027.jpg", "ディネス", "山田"},
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0028.jpg", "白井", "山田"},
@@ -60,6 +62,7 @@ static const std::string file_info[][3] = {
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0054.jpg", "ニイシ", "山田"},
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0055.jpg", "グルン", "山田"},
 	{"pictures\\mp navigator ex\\2012_11_13\\IMG_0056.jpg", "グルン", "山田"},
+#endif
 };
 #if 0
 static const cv::Rect trim_area_train[] = {

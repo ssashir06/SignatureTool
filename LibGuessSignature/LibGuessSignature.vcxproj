@@ -18,12 +18,16 @@
     <ClCompile Include="EvalEasy.cpp" />
     <ClCompile Include="FileInfo.cpp" />
     <ClCompile Include="GuessSignature.cpp" />
+    <ClCompile Include="GuessKMeans.cpp" />
+    <ClCompile Include="GuessSvmOneVsAll.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\StdAfx\StdAfx.h" />
     <ClInclude Include="EvalEasy.h" />
     <ClInclude Include="FileInfo.h" />
     <ClInclude Include="GuessSignature.h" />
+    <ClInclude Include="GuessKMeans.h" />
+    <ClInclude Include="GuessSvmOneVsAll.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9E183EDA-6208-4434-A7B3-94BF05B0E09A}</ProjectGuid>
@@ -71,6 +75,9 @@
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
+    <Lib>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

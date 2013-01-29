@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 #include <list>
 #include "GuessSignature.h"
 
@@ -10,7 +9,7 @@ namespace Signature
 		class EvalEasy : public Base
 		{
 		protected:
-			std::shared_ptr<cv::DescriptorMatcher> matcher;
+			Image::Info info;
 			static const int matching_count_weight_default = 100;
 		public:
 			double matching_count_weight;
@@ -20,8 +19,10 @@ namespace Signature
 			EvalEasy(const EvalEasy& src);
 			EvalEasy& operator=(const EvalEasy& src);
 			virtual ~EvalEasy();
-			virtual void buildInfo(const std::list<std::shared_ptr<Image::Base> >& images);
-			virtual Result match(const Image::Info& query, int idx);
+
+			const Image::Info& getInfo() const;
+			virtual void setImages(const std::list<std::shared_ptr<Image::Base> >& trains);
+			virtual Result match(const cv::Mat& query) const;
 		};
 	}
 }
