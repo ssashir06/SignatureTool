@@ -21,7 +21,7 @@ namespace Signature
 			virtual ~EvalEasy();
 
 			const Image::Info& getInfo() const;
-			virtual void setImages(const std::list<std::shared_ptr<Image::Base> >& trains);
+			virtual void train(const std::list<std::shared_ptr<Image::Base> >& trains);
 			virtual Result match(const cv::Mat& query) const;
 		};
 	}

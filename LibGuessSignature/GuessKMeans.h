@@ -1,6 +1,4 @@
 #pragma once
-#include <vector>
-#include <list>
 #include <string>
 #include <map>
 #include <opencv2/opencv.hpp>
@@ -22,8 +20,12 @@ namespace Signature{
 			KMeansBase& operator=(const KMeansBase& src);
 			virtual ~KMeansBase(void);
 
-			virtual void setImages(const std::list<std::shared_ptr<Image::Base> >& trains);
+			virtual void train(const std::list<std::shared_ptr<Image::Base> >& trains);
+			virtual void train(const std::string& file_name);
+			void save(const std::string& file_name) const;
+			void load(const std::string& file_name);
 		protected:
+			void makeVocaabularies(const std::list<std::shared_ptr<Image::Base> >& trains);
 			virtual cv::BOWImgDescriptorExtractor makeBOWImageDescriptorExtractor() const;
 		};
 	}

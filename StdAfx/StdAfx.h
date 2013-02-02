@@ -1,9 +1,13 @@
 #pragma once
-#include <memory>
 #include <list>
-#include <string>
-#include <map>
+#include <tuple>
 #include <iostream>
+#include <sstream>
+#include <cfloat>
+#include <cmath>
+#include <ctime>
+#include <algorithm>
+#include <map>
 #include <opencv2/opencv.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/nonfree/features2d.hpp>

@@ -5,7 +5,7 @@ using namespace std;
 namespace LibSVM
 {
 #pragma region Node
-	Node EndOfNode()
+	Node endOfNode()
 	{
 		Node n;
 		n.index = -1;
@@ -13,30 +13,104 @@ namespace LibSVM
 	}
 #pragma endregion
 
+#pragma region NodeArray
+	NodeArray::NodeArray()
+		: nodes(nullptr)
+	{
+		setupTail();
+	}
+
+	NodeArray::NodeArray(const vector<Node>& nodes)
+		: nodes(make_shared<vector<Node> >(nodes))
+	{
+		setupTail();
+	}
+
+	NodeArray::NodeArray(const shared_ptr<vector<Node> >& nodes)
+		: nodes(nodes)
+	{
+		setupTail();
+	}
+
+	NodeArray::NodeArray(const NodeArray& src)
+		: nodes(src.nodes)
+	{
+	}
+
+	NodeArray& NodeArray::operator=(const NodeArray& src)
+	{
+		nodes = shared_ptr<vector<Node> >(src.nodes);
+		return *this;
+	}
+
+	NodeArray::~NodeArray()
+	{
+	}
+
+	shared_ptr<NodeArray> NodeArray::clone() const
+	{
+		auto c = make_shared<NodeArray>();
+		c->nodes = make_shared<vector<Node> >(nodes->begin(), nodes->end());
+		return c;
+	}
+
+	Node* NodeArray::getPtr() const
+	{
+		if (!nodes) return nullptr;
+		else return nodes->data();
+	}
+
+	const vector<Node>& NodeArray::getArray() const
+	{
+		return *nodes;
+	}
+
+	vector<Node>& NodeArray::getArray()
+	{
+		return *nodes;
+	}
+
+	void NodeArray::setupTail()
+	{
+		if (!nodes) nodes = shared_ptr<vector<Node> >(new vector<Node>());
+		if (nodes->empty() || nodes->back().index != -1) nodes->push_back(endOfNode());
+	}
+#pragma endregion
+
 #pragma region Problem
 	Problem::Problem()
 		: svm_problem(), delete_function(NULL)
 	{
-		update();
+		setNodes(vector<NodeArray::Classified>());
 	}
 
-	Problem::Problem(const vector<double>& y, const vector<vector<Node> >& x)
-		: svm_problem(), class_numbers(y), nodes(x), delete_function(NULL)
+	Problem::Problem(const vector<NodeArray::Classified>& data)
+		: svm_problem(), delete_function(NULL)
 	{
-		update();
+		setNodes(data);
 	}
 
 	Problem::Problem(const Problem& src)
-		: svm_problem(), class_numbers(src.class_numbers), nodes(src.nodes), delete_function(src.delete_function)
+		: svm_problem(), class_numbers(src.class_numbers), node_lists(src.node_lists), delete_function(src.delete_function)
 	{
-		l = src.l;
-		y = src.y;
-		x = src.x;
-		update();
+		if (list_of_nodes && class_numbers) {
+			l = list_of_nodes->size();
+			x = list_of_nodes->data();
+			y = class_numbers->data();
+		} else {
+			l = 0;
+			x = nullptr;
+			y = nullptr;
+		}
 	}
 
 	Problem& Problem::operator=(const Problem& src)
 	{
+		delete_function = src.delete_function;
+		l = src.l;
+		list_of_nodes = src.list_of_nodes;
+		class_numbers = src.class_numbers;
+		return *this;
 	}
 
 	Problem::~Problem()
@@ -44,123 +118,146 @@ namespace LibSVM
 		if (delete_function) (*delete_function)(this);
 	}
 
-	void Problem::setNodes(const vector<double>& y, const vector<vector<Node> >& x)
+	void Problem::setNodes(const vector<NodeArray::Classified>& data)
 	{
-		class_numbers = y;
-		nodes = x;
-		update();
+		class_numbers = make_shared<vector<double> >();
+		node_lists = make_shared<vector<NodeArray> >();
+		list_of_nodes = make_shared<vector<Node* > >();
+		for (const auto& d : data)
+		{
+			class_numbers->push_back(d.first);
+			node_lists->push_back(d.second);
+			list_of_nodes->push_back(node_lists->back().getPtr());
+		}
+
+		l = data.size();
+		x = list_of_nodes->data();
+		y = class_numbers->data();
 	}
 
 	const vector<double>& Problem::getY() const
 	{
-		return class_numbers;
+		return *class_numbers;
 	}
 
-	const vector<vector<Node> >& Problem::getX() const
+	const vector<NodeArray>& Problem::getX() const
 	{
-		return nodes;
+		return *node_lists;
 	}
 
 	void Problem::setDeleteFunction(void (*f)(const Problem* target))
 	{
 		delete_function = f;
 	}
-
-	void Problem::update()
-	{
-		if (class_numbers.size() != nodes.size()) throw "size of arrays is wrong.";
-		if (class_numbers.size() == 0) return;
-
-		l = class_numbers.size();
-		list_of_nodes.clear();
-		for (auto it=nodes.begin(); it!=nodes.end(); it++)
-		{
-			if (it->empty()) continue;
-			if (it->back().index != -1) it->push_back(EndOfNode());
-			list_of_nodes.push_back(it->data());
-		}
-		x = list_of_nodes.data();
-		y = class_numbers.data();
-	}
-#pragma endregion
-
-#pragma region Parameter
-	Parameter::Parameter()
-		: svm_parameter(), will_destroy(true)
-	{
-		weight = NULL, weight_label = NULL;
-	}
-
-	Parameter::Parameter(const Parameter& src)
-		: svm_parameter(src), will_destroy(false)
-	{
-		CopyArray(weight, src.weight);
-		CopyArray(weight_label, src.weight_label);
-	}
-
-	Parameter& Parameter::operator=(const Parameter& src)
-	{
-	}
-
-	Parameter::Parameter(const svm_parameter& param)
-		: svm_parameter(param), will_destroy(false)
-	{
-	}
-
-	Parameter::~Parameter()
-	{
-		svm_destroy_param(this);
-	}
 #pragma endregion
 
 #pragma region Model
 	Model::Model()
-		: svm_model(), will_destroy(true)
+		: Wrapper()
 	{
-		SV = NULL;
-		sv_coef = NULL;
-		rho = NULL;
-		probA = NULL;
-		probB = NULL;
-		sv_indices = NULL;
-		label = NULL;
-		nSV = NULL;
+	}
+
+	Model::Model(svm_model* ptr)
+		: Wrapper(ptr)
+	{
 	}
 
 	Model::Model(const Model& src)
-		: svm_model(src), will_destroy(true)
+		: Wrapper(src)
 	{
-		// see svm_free_model_content
-
-		CopyArray(SV, src.SV);
-		CopyArray(sv_coef, src.sv_coef);
-
-		if (src.free_sv && src.l>0 && src.SV!=NULL)
-			CopyArray(SV[0], src.SV[1]);
-		if (src.sv_coef)
-			for (int i=0; i<src.nr_class-1; i++)
-				CopyArray(sv_coef[i], src.sv_coef[i]);
-		CopyArray(rho, src.rho);
-		CopyArray(probA, src.probA);
-		CopyArray(probB, src.probB);
-		CopyArray(sv_indices, src.sv_indices);
-		CopyArray(label, src.label);
-		CopyArray(nSV, src.nSV);
 	}
 
 	Model& Model::operator=(const Model& src)
 	{
-	}
-
-	Model::Model(const svm_model& model)
-		: svm_model(model), will_destroy(false)
-	{
+		Wrapper::operator=(src);
+		return *this;
 	}
 
 	Model::~Model()
 	{
-		if (will_destroy)
-			svm_free_model_content(this);
+		if (ptr && ptr.unique()) {
+			svm_model* ptr_raw = ptr.get();
+			svm_free_and_destroy_model(&ptr_raw);
+		}
+	}
+#pragma endregion
+
+#pragma region static functions
+	vector<NodeArray::Classified> mergeClassified(const list<vector<NodeArray::Classified> >& data)
+	{
+		auto data_merged = list<NodeArray::Classified>();
+		for (const auto& d1 : data)
+			for (const auto& d2 : d1)
+				data_merged.push_back(d2);
+		return vector<NodeArray::Classified>(data_merged.begin(), data_merged.end());
+	}
+
+	ScalingSetting buildSettingOfScaling(const vector<NodeArray::Classified>& data, const v_range& x_range_new, const v_range& y_range_new, bool scale_y)
+	{
+		// search max and min
+		map<index, v_range> x_range;
+		v_range y_range(DBL_MAX, DBL_MIN);
+		for (const auto& d : data)
+		{
+			y_range.first = std::max(y_range.first, d.first);
+			y_range.second = std::min(y_range.second, d.first);
+
+			for (const auto& d2 : d.second.getArray())
+			{
+				if (x_range.find(d2.index) == x_range.end()) {
+					x_range[d2.index].first = d2.value, x_range[d2.index].second = d2.value;
+				} else {
+					x_range[d2.index].first = std::max(x_range[d2.index].first, d2.value);
+					x_range[d2.index].second = std::min(x_range[d2.index].second, d2.value);
+				}
+			}
+		}
+
+		const v_scale scale_defualt = make_tuple(0.0, 0.0, 1.0);
+		ScalingSetting setting = make_tuple(false, scale_defualt, map<index, v_scale>());
+		if (scale_y)
+			get<1>(setting) = make_tuple(
+			y_range.second,
+			y_range_new.second,
+			(y_range_new.first - y_range_new.second) / (double)(y_range.first - y_range.second));
+		for (const auto& xr : x_range)
+		{
+			auto& map = get<2>(setting);
+			if (xr.second.first == xr.second.second)
+				map[xr.first] = scale_defualt;
+			else
+				map[xr.first] = make_tuple(
+				xr.second.second,
+				x_range_new.second,
+				(x_range_new.first - x_range_new.second) / (double)(xr.second.first - xr.second.second));
+		}
+
+		return setting;
+	}
+
+	void scale(const ScalingSetting& setting, NodeArray& node_array)
+	{
+		for (auto& d : node_array.getArray())
+		{
+			// x
+			const v_scale& s = get<2>(setting).at(d.index);
+			//const v_scale& s = get<2>(setting)[d.index];// it doesn't work
+			d.value = (d.value - get<0>(s)) * get<2>(s) + get<1>(s);
+		}
+	}
+
+	void scale(const ScalingSetting& setting, std::vector<NodeArray::Classified>& classified_data)
+	{
+		// apply range
+		for (auto& d : classified_data)
+		{
+			// y
+			if (get<0>(setting)) {
+				const v_scale& s = get<1>(setting);
+				d.first = (d.first - get<0>(s)) * get<2>(s) + get<1>(s);
+			}
+			scale(setting, d.second);
+		}
 	}
 #pragma endregion
 }

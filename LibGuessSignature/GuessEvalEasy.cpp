@@ -1,7 +1,7 @@
 #include <iostream>
 #include <map>
 #include <opencv2/opencv.hpp>
-#include "EvalEasy.h"
+#include "GuessEvalEasy.h"
 using namespace std;
 using namespace cv;
 
@@ -36,7 +36,7 @@ namespace Signature
 			return info;
 		}
 
-		void EvalEasy::setImages(const list<shared_ptr<Image::Base> >& trains)
+		void EvalEasy::train(const list<shared_ptr<Image::Base> >& trains)
 		{
 			info.prepare(trains, machines);
 			machines.getMatcher()->add(info.getDescriptors());

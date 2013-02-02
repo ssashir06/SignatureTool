@@ -137,7 +137,7 @@ namespace Signature
 
 			void setMatchingMachines(const Image::MatchingMachines& machines);
 
-			virtual void setImages(const std::list<std::shared_ptr<Image::Base> >& trains) = 0;
+			virtual void train(const std::list<std::shared_ptr<Image::Base> >& trains) = 0;
 			virtual Result match(const cv::Mat& query) const = 0;
 		};
 	}

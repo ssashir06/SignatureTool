@@ -61,9 +61,6 @@
     <ClInclude Include="..\LibGuessSignature\GuessSignature.h">
       <Filter>Image\GuessSignature</Filter>
     </ClInclude>
-    <ClInclude Include="..\LibGuessSignature\EvalEasy.h">
-      <Filter>Image\GuessSignature</Filter>
-    </ClInclude>
     <ClInclude Include="Scan.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -78,6 +75,9 @@
     </ClInclude>
     <ClInclude Include="cv_utils_cli.h">
       <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LibGuessSignature\GuessEvalEasy.h">
+      <Filter>Image\GuessSignature</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

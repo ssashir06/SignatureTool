@@ -15,19 +15,26 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="EvalEasy.cpp" />
+    <ClCompile Include="GuessEvalEasy.cpp" />
     <ClCompile Include="FileInfo.cpp" />
     <ClCompile Include="GuessSignature.cpp" />
     <ClCompile Include="GuessKMeans.cpp" />
+    <ClCompile Include="GuessSvm.cpp" />
     <ClCompile Include="GuessSvmOneVsAll.cpp" />
+    <ClCompile Include="LibSVM.cpp" />
+    <ClCompile Include="GuessSvmOneVsOne.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\StdAfx\StdAfx.h" />
-    <ClInclude Include="EvalEasy.h" />
+    <ClInclude Include="GuessEvalEasy.h" />
     <ClInclude Include="FileInfo.h" />
     <ClInclude Include="GuessSignature.h" />
     <ClInclude Include="GuessKMeans.h" />
+    <ClInclude Include="GuessSvm.h" />
     <ClInclude Include="GuessSvmOneVsAll.h" />
+    <ClInclude Include="SaveLoadCV.h" />
+    <ClInclude Include="LibSVM.h" />
+    <ClInclude Include="GuessSvmOneVsOne.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9E183EDA-6208-4434-A7B3-94BF05B0E09A}</ProjectGuid>

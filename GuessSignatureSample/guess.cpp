@@ -6,8 +6,9 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/nonfree/features2d.hpp>
-#include "../LibGuessSignature/EvalEasy.h"
+#include "../LibGuessSignature/GuessEvalEasy.h"
 #include "../LibGuessSignature/GuessSvmOneVsAll.h"
+#include "../LibGuessSignature/GuessSvmOneVsOne.h"
 #include "files.h"
 using namespace std;
 using namespace cv;
@@ -26,6 +27,7 @@ void loadImages()
 		threshold(img_loaded, img_loaded, 190, 255, THRESH_BINARY);//“ñ’l‰»
 		for (int j=0; j<2; j++) {
 			string name = file_info[i][j+1];
+			if (name == ".") continue;
 			all_images[name].push_back(pair<int, Mat>(j, img_loaded));
 		}
 	}
@@ -45,12 +47,33 @@ void loadImages()
 	}
 }
 
-void guess(const Guess::Base& trainer)
+int main()
 {
+	unsigned int k = 10;
+#if 0
+	Guess::EvalEasy trainer;
+#elif 0
+	Guess::SvmOneVsAll trainer(k);
+#elif 1
+	Guess::SvmOneVsOne trainer(k);
+#endif
+
+	loadImages();
+	if (true) {
+		trainer.setMatchingMachines(Image::MatchingMachines(
+			Ptr<FeatureDetector>(new SurfFeatureDetector()),
+			Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()),
+			Ptr<DescriptorMatcher>(new FlannBasedMatcher())));
+		trainer.train(train_images);
+	} else {
+		trainer.train("kmeans.xml");
+	}
+
 	const string window_name = "query_name";
 	namedWindow(window_name);
 	for (const auto& query : query_images)
 	{
+		//trainer.log_output << "Query: " << query.first << endl;
 		Guess::Result result = trainer.match(query.second);
 		result.sort();
 		cout << "------------------" << endl;
@@ -63,20 +86,6 @@ void guess(const Guess::Base& trainer)
 		waitKey();
 	}
 	destroyWindow(window_name);
-}
-
-int main()
-{
-	//Guess::Base trainer;
-	Guess::SvmOneVsAll trainer;
-
-	loadImages();
-	trainer.setMatchingMachines(Image::MatchingMachines(
-		Ptr<FeatureDetector>(new SurfFeatureDetector()),
-		Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()),
-		Ptr<DescriptorMatcher>(new FlannBasedMatcher())));
-	trainer.setImages(train_images);
-	guess(trainer);
 
 	return 0;
 }

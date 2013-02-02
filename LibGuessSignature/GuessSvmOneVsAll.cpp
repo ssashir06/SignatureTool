@@ -1,7 +1,12 @@
 #include <list>
 #include <tuple>
 #include <iostream>
+#include <sstream>
 #include <cfloat>
+#include <cmath>
+#include <ctime>
+#include <algorithm>
+#include <svm.h>
 #include "GuessSvmOneVsAll.h"
 using namespace std;
 using namespace cv;
@@ -10,23 +15,25 @@ namespace Signature{
 	namespace Guess {
 #pragma region SvmOneVsAll
 		SvmOneVsAll::SvmOneVsAll(void)
-			: KMeansBase()
+			: SvmBase()
 		{
 		}
 
-		SvmOneVsAll::SvmOneVsAll(unsigned int k, const CvSVMParams& svm_params)
-			: KMeansBase(k), params(svm_params)
+		SvmOneVsAll::SvmOneVsAll(unsigned int k, const LibSVM::Parameter& param)
+			: SvmBase(k, param)
 		{
 		}
 
 		SvmOneVsAll::SvmOneVsAll(const SvmOneVsAll& src)
-			: KMeansBase(src)
+			: SvmBase(src), scaling(src.scaling), model_filename_by_name(src.model_filename_by_name)
 		{
 		}
 
 		SvmOneVsAll& SvmOneVsAll::operator=(const SvmOneVsAll& src)
 		{
 			KMeansBase::operator=(src);
+			scaling = src.scaling;
+			model_filename_by_name = src.model_filename_by_name;
 			return *this;
 		}
 
@@ -34,40 +41,58 @@ namespace Signature{
 		{
 		}
 
-		void SvmOneVsAll::setImages(const list<shared_ptr<Image::Base> >& images)
+		void SvmOneVsAll::train(const list<shared_ptr<Image::Base> >& images)
 		{
-			KMeansBase::setImages(images);
-			int label_type = CV_32FC1;//CV_32SC1 (only in the classification problem) or CV_32FC1 format
+			setBestParam(images, 2);
+			KMeansBase::train(images);
+			train();
+		}
 
-			svm_models_by_name.clear();
-			for (const auto& hist_positive : histgrams_by_name)
+		void SvmOneVsAll::train(const string& file_name)
+		{
+			load(file_name);
+			train();
+		}
+
+		void SvmOneVsAll::train()
+		{
+			scaling = buildScalingSetting(histgrams_by_name);
+
+			model_filename_by_name.clear();
+			for (const auto& hist_positive: histgrams_by_name)
 			{
-				Mat histgrams(0, hist_positive.second.cols, hist_positive.second.type());
-				Mat labels = Mat::ones(hist_positive.second.rows, 1, label_type);
-				histgrams.push_back(hist_positive.second);
-
-				int rest_count = 0;
-				for (const auto& hist_rest : histgrams_by_name)
+				list<vector<LibSVM::NodeArray::Classified> > data_set, data_set_positive, data_set_rest;
+				for (const auto& hist : histgrams_by_name)
 				{
-					if (hist_positive.first == hist_rest.first) continue;
-					histgrams.push_back(hist_rest.second);
-					Mat z = Mat::zeros(hist_rest.second.rows, 1, label_type);
-					labels.push_back(z);
-					rest_count++;
+					if (hist_positive.first == hist.first) {
+						auto d = buildClassfiedData(hist.second, 1);
+						data_set.push_back(d);
+						data_set_positive.push_back(d);
+					}
+					else {
+						auto d = buildClassfiedData(hist.second, 0);
+						data_set.push_back(d);
+						data_set_rest.push_back(d);
+					}
 				}
 
-				if (rest_count == 0) continue;
+				auto data_set_merged = LibSVM::mergeClassified(data_set);
+				LibSVM::scale(scaling, data_set_merged);
 
-				Mat histgrams_for_svm;
-				if (histgrams.type() != CV_32FC1)
-					histgrams.convertTo(histgrams_for_svm, CV_32FC1);//Only CV_32FC1 is accepted by CvSVM
-				else
-					histgrams_for_svm = histgrams;
+				LibSVM::Problem prob(data_set_merged);
 
-				shared_ptr<CvSVM> svm_model(new CvSVM());
-				cv::Mat var_idx, sample_idx;
-				svm_model->train(histgrams_for_svm, labels, var_idx, sample_idx, params);
-				svm_models_by_name[hist_positive.first] = make_tuple(svm_model, histgrams_for_svm, labels, var_idx, sample_idx);
+				const char* param_error_message = svm_check_parameter(&prob, param);
+				if (param_error_message) {
+					cerr << "Parameter is wrong: " << param_error_message << endl;
+					continue;
+				}
+
+				LibSVM::Model model(svm_train(&prob, param));
+
+				stringstream file_name;
+				file_name << "svm_model_" << hist_positive.first << ".dat";
+				svm_save_model(file_name.str().c_str(), model);
+				model_filename_by_name[hist_positive.first] = file_name.str();
 			}
 		}
 
@@ -78,20 +103,26 @@ namespace Signature{
 			Image::Info::Descriptor descriptor;
 			machines.getDetector()->detect(query, keypoints);
 			bowde.compute(query, keypoints, descriptor);
+			LibSVM::NodeArray node_list = buildNodeArray(descriptor);
+			LibSVM::scale(scaling, node_list);
 
 			cout << "matching query of image" << endl;
+			
 			Result assessments;
-			for (const auto& svm_model_group : svm_models_by_name)
+			for (const auto& model_file_group : model_filename_by_name)
 			{
-				const auto& svm_model = get<0>(svm_model_group.second);
-				float score_f = svm_model->predict(descriptor);
+				LibSVM::Model model(svm_load_model(model_file_group.second.c_str()));
+				double svm_out = svm_predict(model, node_list.getPtr());
+
 				Image::Candidate::Assessment assessment;
-				assessment.name = svm_model_group.first;
-				assessment.score = score_f;
+				assessment.name = model_file_group.first;
+				assessment.score = svm_out;
 				assessments.push_back(assessment);
 			}
 			return assessments;
 		}
+
+		//TODO: write load() and save() (overwriting)
 #pragma endregion
 	}
 }

@@ -108,7 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\LibCameraScanner\CameraScanner.h" />
-    <ClInclude Include="..\LibGuessSignature\EvalEasy.h" />
+    <ClInclude Include="..\LibGuessSignature\GuessEvalEasy.h" />
     <ClInclude Include="..\LibGuessSignature\GuessSignature.h" />
     <ClInclude Include="cv_utils_cli.h" />
     <ClInclude Include="Scan.h">

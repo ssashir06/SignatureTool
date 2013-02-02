@@ -4,25 +4,30 @@
 #include <list>
 #include <string>
 #include <map>
-#include <opencv2/ml/ml.hpp>
-#include "GuessKMeans.h"
+#include <fstream>
+#include "LibSVM.h"
+#include "GuessSvm.h"
 
 namespace Signature{
 	namespace Guess {
-		class SvmOneVsAll : public KMeansBase
+		class SvmOneVsAll : public SvmBase
 		{
 		protected:
-			std::map<std::string, std::tuple<std::shared_ptr<CvSVM>, cv::Mat, cv::Mat, cv::Mat, cv::Mat> > svm_models_by_name;
-			CvSVMParams params;
+			std::map<std::string, std::string> model_filename_by_name;
+			LibSVM::ScalingSetting scaling;
 		public:
 			SvmOneVsAll(void);
-			SvmOneVsAll(unsigned int k, const CvSVMParams& svm_params = CvSVMParams());
+			SvmOneVsAll(unsigned int k, const LibSVM::Parameter& param = buildDefaultParam());
 			SvmOneVsAll(const SvmOneVsAll& src);
 			SvmOneVsAll& operator=(const SvmOneVsAll& src);
 			virtual ~SvmOneVsAll(void);
 
-			virtual void setImages(const std::list<std::shared_ptr<Image::Base> >& images);
+			virtual void train(const std::list<std::shared_ptr<Image::Base> >& images);
+			virtual void train(const std::string& file_name);
 			virtual Result match(const cv::Mat& query) const;
+
+		protected:
+			virtual void train();
 		};
 	}
 }

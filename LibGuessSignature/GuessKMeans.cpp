@@ -1,16 +1,18 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include <string>
 #include <algorithm>
 #include <iostream>
-#include <fstream>
 #include <cstdlib>
 #include <ctime>
 #include <opencv2/opencv.hpp>
 #include "GuessKMeans.h"
+#include "SaveLoadCV.h"
 
 using namespace std;
 using namespace cv;
+using namespace CVUtil::SaveLoadCV;
 
 namespace Signature{
 	namespace Guess {
@@ -42,10 +44,8 @@ namespace Signature{
 		{
 		}
 
-		void KMeansBase::setImages(const list<shared_ptr<Image::Base> >& trains)
+		void KMeansBase::train(const list<shared_ptr<Image::Base> >& trains)
 		{
-			ofstream ofs_log("log_kmeans.txt");
-
 			cout << "make vocabulary" << endl;
 			BOWKMeansTrainer trainer(k);
 			map<string, list<pair<Mat, Image::Info::KeyPoints> > > trains_by_name;
@@ -57,15 +57,9 @@ namespace Signature{
 				Image::Info::Descriptor descriptor;
 				machines.getExtractor()->compute(train->signature, keypoints, descriptor);
 				trainer.add(descriptor);
-
-				ofs_log << "descriptor added of " << train->getName() << endl;
-				ofs_log << descriptor << endl;
 			}
 			vocabularies = trainer.cluster();
 			BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
-
-			ofs_log << "vocabularies" << endl;
-			ofs_log << vocabularies << endl;
 
 			cout << "make histgrams" << endl;
 			histgrams_by_name.clear();
@@ -88,12 +82,30 @@ namespace Signature{
 				{
 					histgrams_by_name[name].push_back(histgram);
 				}
-
-				ofs_log << "histgrams of " << name << endl;
-				ofs_log << histgrams_by_name[name] << endl;
 			}
+		}
 
-			ofs_log.close();
+		void KMeansBase::train(const string& file_name)
+		{
+			load(file_name);
+		}
+
+		void KMeansBase::save(const string& file_name) const
+		{
+			FileStorage fs(file_name, FileStorage::WRITE);
+			fs << "histgrams" << histgrams_by_name;
+			fs << "vocabularies" << vocabularies;
+			fs << "k" << (const int)k;
+			fs.release();
+		}
+
+		void KMeansBase::load(const string& file_name)
+		{
+			FileStorage fs(file_name, FileStorage::READ);
+			fs["histgrams"] >> histgrams_by_name;
+			fs["vocabularies"] >> vocabularies;
+			fs["k"] >> (int&)k;
+			fs.release();
 		}
 
 		BOWImgDescriptorExtractor KMeansBase::makeBOWImageDescriptorExtractor() const

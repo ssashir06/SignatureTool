@@ -1,0 +1,133 @@
+#include <list>
+#include <vector>
+#include <string>
+#include <opencv2/opencv.hpp>
+#include "GuessSvmOneVsOne.h"
+#include "SaveLoadCV.h"
+
+using namespace cv;
+using namespace std;
+using namespace CVUtil::SaveLoadCV;
+
+namespace Signature
+{
+	namespace Guess
+	{
+		SvmOneVsOne::SvmOneVsOne(void)
+			: SvmBase()
+		{
+		}
+
+		SvmOneVsOne::SvmOneVsOne(unsigned int k)
+			: SvmBase(k)
+		{
+		}
+
+		SvmOneVsOne::SvmOneVsOne(const SvmOneVsOne& src)
+			: SvmBase(src), scaling(src.scaling), models_by_name(src.models_by_name)
+		{
+		}
+
+		SvmOneVsOne& SvmOneVsOne::operator=(const SvmOneVsOne& src)
+		{
+			SvmBase::operator=(src);
+			scaling = src.scaling;
+			models_by_name = src.models_by_name;
+			return *this;
+		}
+
+		SvmOneVsOne::~SvmOneVsOne(void)
+		{
+		}
+
+		void SvmOneVsOne::train(const list<shared_ptr<Image::Base> >& trains)
+		{
+			//setBestParam(trains);
+			param = buildDefaultParam();
+			param->C = pow(2,10), param->gamma = pow(2, 2);
+
+			KMeansBase::train(trains);
+			train();
+		}
+
+		void SvmOneVsOne::train(const string& file_name)
+		{
+			load(file_name);
+			train();
+		}
+
+		void SvmOneVsOne::train()
+		{
+			scaling = buildScalingSetting(histgrams_by_name);
+
+			models_by_name.clear();
+			for (const auto& hist_positive : histgrams_by_name)
+			{
+				vector<LibSVM::NodeArray::Classified> positive_classified_data = buildClassfiedData(hist_positive.second, 1);
+				for (const auto& hist_rest : histgrams_by_name)
+				{
+					if (hist_positive.first == hist_rest.first) continue;
+
+					list<vector<LibSVM::NodeArray::Classified> > data_set;
+					data_set.push_back(positive_classified_data);
+					data_set.push_back(buildClassfiedData(hist_rest.second, 0));
+
+					auto data_set_merged = LibSVM::mergeClassified(data_set);
+					LibSVM::scale(scaling, data_set_merged);
+
+					LibSVM::Problem prob(data_set_merged);
+
+					const char* param_error_message = svm_check_parameter(&prob, param);
+					if (param_error_message) {
+						cerr << "Parameter is wrong: " << param_error_message << endl;
+						continue;
+					}
+
+					LibSVM::Model model(svm_train(&prob, param));
+
+					stringstream file_name;
+					file_name << "svm_model_1vs1_" << hist_positive.first << "_" << hist_rest.first << ".dat";
+					svm_save_model(file_name.str().c_str(), model);
+
+					models_by_name[hist_positive.first].push_back(make_tuple(hist_rest.first, model, prob));
+				}
+			}
+		}
+
+		Result SvmOneVsOne::match(const Mat& query) const
+		{
+			BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
+			Image::Info::KeyPoints keypoints;
+			Image::Info::Descriptor descriptor;
+			machines.getDetector()->detect(query, keypoints);
+			bowde.compute(query, keypoints, descriptor);
+			LibSVM::NodeArray node_list = buildNodeArray(descriptor);
+			LibSVM::scale(scaling, node_list);
+
+			cout << "matching query of image" << endl;
+			
+			Result assessments;
+			for (const auto& model_group : models_by_name)
+			{
+				if (model_group.second.empty()) continue;
+
+				double score_sum = 0;
+				unsigned int try_count = 0;
+				for (const auto& rest_group : model_group.second)
+				{
+					const auto& model = get<1>(rest_group);
+					double svm_out = svm_predict(model, node_list.getPtr());
+
+					try_count++;
+					score_sum += svm_out > 0 ? 1 : 0;
+				}
+
+				Image::Candidate::Assessment assessment;
+				assessment.name = model_group.first;
+				assessment.score = score_sum / try_count;
+				assessments.push_back(assessment);
+			}
+			return assessments;
+		}
+	}
+}
