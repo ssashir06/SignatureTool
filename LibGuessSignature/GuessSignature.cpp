@@ -143,10 +143,8 @@ namespace Signature
 		}
 
 		MatchingMachines::MatchingMachines(const MatchingMachines& src)
+			: detector(src.detector), extractor(src.extractor), matcher(src.matcher)
 		{
-			detector = src.detector;
-			extractor = src.extractor;
-			matcher = src.matcher;
 		}
 
 		MatchingMachines& MatchingMachines::operator=(const MatchingMachines& src)
@@ -339,8 +337,8 @@ namespace Signature
 		}
 
 		Base::Base(const Base& src)
+			: machines(src.machines)
 		{
-			machines = src.machines;
 		}
 
 		Base& Base::operator=(const Base& src)

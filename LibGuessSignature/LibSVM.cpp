@@ -91,9 +91,9 @@ namespace LibSVM
 	}
 
 	Problem::Problem(const Problem& src)
-		: svm_problem(), class_numbers(src.class_numbers), node_lists(src.node_lists), delete_function(src.delete_function)
+		: svm_problem(), class_numbers(src.class_numbers), list_of_nodes(src.list_of_nodes), node_lists(src.node_lists), delete_function(src.delete_function)
 	{
-		if (list_of_nodes && class_numbers) {
+		if (node_lists && class_numbers) {
 			l = list_of_nodes->size();
 			x = list_of_nodes->data();
 			y = class_numbers->data();
@@ -110,6 +110,7 @@ namespace LibSVM
 		l = src.l;
 		list_of_nodes = src.list_of_nodes;
 		class_numbers = src.class_numbers;
+		node_lists = src.node_lists;
 		return *this;
 	}
 

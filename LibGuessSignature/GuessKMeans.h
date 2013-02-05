@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <map>
+#include <vector>
 #include <opencv2/opencv.hpp>
 #include "GuessSignature.h"
 
@@ -9,7 +9,7 @@ namespace Signature{
 		class KMeansBase : public Base
 		{
 		protected:
-			std::map<std::string, cv::Mat> histgrams_by_name;
+			std::vector<std::pair<std::string, cv::Mat> > histgrams_by_name;
 			cv::Mat vocabularies;
 			unsigned int k;
 			static const unsigned int k_default = 1000;

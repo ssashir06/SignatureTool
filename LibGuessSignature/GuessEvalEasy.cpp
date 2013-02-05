@@ -108,6 +108,7 @@ namespace Signature
 				assessment.score = scores[name]/count_by_group[name];//Average
 				assessments.push_back(assessment);
 			}
+			assessments.sort();
 			return assessments;
 		}
 	}

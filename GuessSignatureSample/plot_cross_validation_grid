@@ -1,0 +1,5 @@
+#!/usr/bin/gnuplot -p
+set logscale xy
+set palette defined (-50 "red", -25 "green", 0 "blue")
+set zrange [] reverse
+splot 'cross_validation_grids.dat' using 3:4:1 palette z

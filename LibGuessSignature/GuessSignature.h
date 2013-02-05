@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <ostream>
 #include <map>
 #include <opencv2/opencv.hpp>
 
@@ -141,4 +142,21 @@ namespace Signature
 			virtual Result match(const cv::Mat& query) const = 0;
 		};
 	}
+	template<typename TS>
+	class OmpStreamWrapper
+	{
+		TS* stream;
+	public:
+		OmpStreamWrapper(TS& stream) : stream(&stream) {}
+		template<typename T> TS& operator<<(T& value)
+		{
+			TS* ret;
+#pragma omp critical
+			{
+				ret = &((*stream)<<value);
+			}
+			return *ret;
+		}
+	};
+	template<typename Ts1, typename Ts2> static OmpStreamWrapper<std::basic_ostream<Ts1, Ts2> > OmpStream(std::basic_ostream<Ts1, Ts2>& stream) { return OmpStreamWrapper<std::basic_ostream<Ts1, Ts2> >(stream); }
 }

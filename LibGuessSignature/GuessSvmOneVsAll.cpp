@@ -25,7 +25,7 @@ namespace Signature{
 		}
 
 		SvmOneVsAll::SvmOneVsAll(const SvmOneVsAll& src)
-			: SvmBase(src), scaling(src.scaling), model_filename_by_name(src.model_filename_by_name)
+			: SvmBase(src), scaling(src.scaling), models_by_name(src.models_by_name)
 		{
 		}
 
@@ -33,12 +33,17 @@ namespace Signature{
 		{
 			KMeansBase::operator=(src);
 			scaling = src.scaling;
-			model_filename_by_name = src.model_filename_by_name;
+			models_by_name = src.models_by_name;
 			return *this;
 		}
 
 		SvmOneVsAll::~SvmOneVsAll(void)
 		{
+		}
+
+		SvmBase* SvmOneVsAll::clone() const
+		{
+			return new SvmOneVsAll(*this);
 		}
 
 		void SvmOneVsAll::train(const list<shared_ptr<Image::Base> >& images)
@@ -58,7 +63,7 @@ namespace Signature{
 		{
 			scaling = buildScalingSetting(histgrams_by_name);
 
-			model_filename_by_name.clear();
+			models_by_name.clear();
 			for (const auto& hist_positive: histgrams_by_name)
 			{
 				list<vector<LibSVM::NodeArray::Classified> > data_set, data_set_positive, data_set_rest;
@@ -83,40 +88,39 @@ namespace Signature{
 
 				const char* param_error_message = svm_check_parameter(&prob, param);
 				if (param_error_message) {
-					cerr << "Parameter is wrong: " << param_error_message << endl;
+					OmpStream(cerr) << "Parameter is wrong: " << param_error_message << endl;
 					continue;
 				}
 
 				LibSVM::Model model(svm_train(&prob, param));
-
-				stringstream file_name;
-				file_name << "svm_model_" << hist_positive.first << ".dat";
-				svm_save_model(file_name.str().c_str(), model);
-				model_filename_by_name[hist_positive.first] = file_name.str();
+				models_by_name[hist_positive.first] = make_tuple(model, prob);
 			}
 		}
 
 		Result SvmOneVsAll::match(const Mat& query) const
 		{
-			BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
 			Image::Info::KeyPoints keypoints;
 			Image::Info::Descriptor descriptor;
-			machines.getDetector()->detect(query, keypoints);
-			bowde.compute(query, keypoints, descriptor);
+#pragma omp critical
+			{
+				BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
+				machines.getDetector()->detect(query, keypoints);
+				bowde.compute(query, keypoints, descriptor);
+			}
 			LibSVM::NodeArray node_list = buildNodeArray(descriptor);
 			LibSVM::scale(scaling, node_list);
 
-			cout << "matching query of image" << endl;
+			OmpStream(cout) << "matching query of image" << endl;
 			
 			Result assessments;
-			for (const auto& model_file_group : model_filename_by_name)
+			for (const auto& model_group : models_by_name)
 			{
-				LibSVM::Model model(svm_load_model(model_file_group.second.c_str()));
+				const auto& model = get<0>(model_group.second);
 				double svm_out = svm_predict(model, node_list.getPtr());
 
 				Image::Candidate::Assessment assessment;
-				assessment.name = model_file_group.first;
-				assessment.score = svm_out;
+				assessment.name = model_group.first;
+				assessment.score = - svm_out;
 				assessments.push_back(assessment);
 			}
 			return assessments;

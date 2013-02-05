@@ -28,7 +28,7 @@ namespace Signature{
 		}
 
 		KMeansBase::KMeansBase(const KMeansBase& src)
-			: Base(src), k(src.k), histgrams_by_name(src.histgrams_by_name.begin(), src.histgrams_by_name.end())
+			: Base(src), k(src.k), histgrams_by_name(src.histgrams_by_name.begin(), src.histgrams_by_name.end()), vocabularies(src.vocabularies)
 		{
 		}
 
@@ -36,7 +36,8 @@ namespace Signature{
 		{
 			Base::operator=(src);
 			k = src.k;
-			histgrams_by_name = map<string, Mat>(src.histgrams_by_name.begin(), src.histgrams_by_name.end());
+			histgrams_by_name = vector<pair<string, Mat> >(src.histgrams_by_name.begin(), src.histgrams_by_name.end());
+			vocabularies = src.vocabularies;
 			return *this;
 		}
 
@@ -77,11 +78,10 @@ namespace Signature{
 					histgrams.push_back(descriptor);
 				}
 				if (histgrams.empty()) continue;
-				histgrams_by_name[name] = Mat(0, histgrams.front().cols, histgrams.front().type());
+				Mat hist_mat = Mat(0, histgrams.front().cols, histgrams.front().type());
 				for (const auto& histgram : histgrams)
-				{
-					histgrams_by_name[name].push_back(histgram);
-				}
+					hist_mat.push_back(histgram);
+				histgrams_by_name.push_back(make_pair(name, hist_mat));
 			}
 		}
 
@@ -93,7 +93,7 @@ namespace Signature{
 		void KMeansBase::save(const string& file_name) const
 		{
 			FileStorage fs(file_name, FileStorage::WRITE);
-			fs << "histgrams" << histgrams_by_name;
+			//fs << "histgrams" << histgrams_by_name;
 			fs << "vocabularies" << vocabularies;
 			fs << "k" << (const int)k;
 			fs.release();
@@ -102,7 +102,7 @@ namespace Signature{
 		void KMeansBase::load(const string& file_name)
 		{
 			FileStorage fs(file_name, FileStorage::READ);
-			fs["histgrams"] >> histgrams_by_name;
+			//fs["histgrams"] >> histgrams_by_name;
 			fs["vocabularies"] >> vocabularies;
 			fs["k"] >> (int&)k;
 			fs.release();

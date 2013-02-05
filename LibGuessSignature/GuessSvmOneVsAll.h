@@ -13,7 +13,7 @@ namespace Signature{
 		class SvmOneVsAll : public SvmBase
 		{
 		protected:
-			std::map<std::string, std::string> model_filename_by_name;
+			std::map<std::string, std::tuple<LibSVM::Model, LibSVM::Problem> > models_by_name;
 			LibSVM::ScalingSetting scaling;
 		public:
 			SvmOneVsAll(void);
@@ -21,6 +21,7 @@ namespace Signature{
 			SvmOneVsAll(const SvmOneVsAll& src);
 			SvmOneVsAll& operator=(const SvmOneVsAll& src);
 			virtual ~SvmOneVsAll(void);
+			virtual SvmBase* clone() const;
 
 			virtual void train(const std::list<std::shared_ptr<Image::Base> >& images);
 			virtual void train(const std::string& file_name);

@@ -11,7 +11,7 @@ namespace CVUtil
 		template<typename Tk, typename Tv>
 		cv::FileStorage& operator<<(cv::FileStorage& fs, const std::map<Tk, Tv>& map)
 		{
-			if(!fs.isOpened()) return fs;
+			if (!fs.isOpened()) return fs;
 
 			fs << "[";
 			for (const auto& item : map)
@@ -46,7 +46,29 @@ namespace CVUtil
 		//TODO
 #pragma endregion
 #pragma region std::pair
-		//TODO
+		template<typename T1, typename T2>
+		cv::FileStorage& operator<<(cv::FileStorage& fs, const std::pair<T1, T2>& pair)
+		{
+			if (!fs.isOpened()) return fs;
+
+			fs << "[";
+			fs << "first" << pair.first;
+			fs << "second" << pair.second;
+			fs << "]";
+			return fs;
+		}
+		template<typename T1, typename T2>
+		cv::FileNodeIterator& operator>>(cv::FileNodeIterator& it, std::pair<T1, T2>& pair)
+		{
+			(*it)["first"] >> pair.first;
+			(*it)["second"] >> pair.second;
+			return it;
+		}
+		template<typename T1, typename T2>
+		void operator>>(const cv::FileNode& fn, std::pair<T1, T2>& pair)
+		{
+			fn.begin() >> pair;
+		}
 #pragma endregion
 	}
 }

@@ -49,10 +49,14 @@ void loadImages()
 
 int main()
 {
+#ifdef _DEBUG
 	unsigned int k = 10;
+#else
+	unsigned int k = 25;
+#endif
 #if 0
 	Guess::EvalEasy trainer;
-#elif 0
+#elif 1
 	Guess::SvmOneVsAll trainer(k);
 #elif 1
 	Guess::SvmOneVsOne trainer(k);

@@ -40,12 +40,14 @@ namespace Signature
 		{
 		}
 
+		SvmBase* SvmOneVsOne::clone() const
+		{
+			return new SvmOneVsOne(*this);
+		}
+
 		void SvmOneVsOne::train(const list<shared_ptr<Image::Base> >& trains)
 		{
-			//setBestParam(trains);
-			param = buildDefaultParam();
-			param->C = pow(2,10), param->gamma = pow(2, 2);
-
+			setBestParam(trains);
 			KMeansBase::train(trains);
 			train();
 		}
@@ -64,8 +66,11 @@ namespace Signature
 			for (const auto& hist_positive : histgrams_by_name)
 			{
 				vector<LibSVM::NodeArray::Classified> positive_classified_data = buildClassfiedData(hist_positive.second, 1);
-				for (const auto& hist_rest : histgrams_by_name)
+
+#pragma omp parallel for
+				for (int rest_i = 0; rest_i<(int)histgrams_by_name.size(); rest_i++)
 				{
+					const auto& hist_rest = histgrams_by_name[rest_i];
 					if (hist_positive.first == hist_rest.first) continue;
 
 					list<vector<LibSVM::NodeArray::Classified> > data_set;
@@ -84,23 +89,24 @@ namespace Signature
 					}
 
 					LibSVM::Model model(svm_train(&prob, param));
-
-					stringstream file_name;
-					file_name << "svm_model_1vs1_" << hist_positive.first << "_" << hist_rest.first << ".dat";
-					svm_save_model(file_name.str().c_str(), model);
-
-					models_by_name[hist_positive.first].push_back(make_tuple(hist_rest.first, model, prob));
+#pragma omp critical
+					{
+						models_by_name[hist_positive.first].push_back(make_tuple(hist_rest.first, model, prob));
+					}
 				}
 			}
 		}
 
 		Result SvmOneVsOne::match(const Mat& query) const
 		{
-			BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
 			Image::Info::KeyPoints keypoints;
 			Image::Info::Descriptor descriptor;
-			machines.getDetector()->detect(query, keypoints);
-			bowde.compute(query, keypoints, descriptor);
+#pragma omp critical
+			{
+				BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
+				machines.getDetector()->detect(query, keypoints);
+				bowde.compute(query, keypoints, descriptor);
+			}
 			LibSVM::NodeArray node_list = buildNodeArray(descriptor);
 			LibSVM::scale(scaling, node_list);
 
@@ -124,9 +130,10 @@ namespace Signature
 
 				Image::Candidate::Assessment assessment;
 				assessment.name = model_group.first;
-				assessment.score = score_sum / try_count;
+				assessment.score = - score_sum / try_count;
 				assessments.push_back(assessment);
 			}
+			assessments.sort();
 			return assessments;
 		}
 	}

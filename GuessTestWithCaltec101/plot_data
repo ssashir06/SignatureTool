@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+my ($preview) = @ARGV;
+
+my $fh;
+unless ($preview) {
+	open(GNUPLOT, "| `which gnuplot`") or die "$!";
+	$fh = *GNUPLOT;
+
+} else {
+	$fh = *STDOUT;
+}
+
+my @target = ();
+for (my $i=0; $i<12; $i++) { push(@target, 2**$i); }
+
+#########################################################################
+{
+	
+	print $fh <<_EOS_ unless $preview;
+set terminal canvas standalone mousing jsdir "js" size 800,400
+set output 'score_caltec_101.html'
+_EOS_
+	print $fh "plot ";
+	foreach my $k (16)
+	{
+		print $fh "\"<grep '^$k\t' experiment_data.dat\" using 4:xticlabels(2) with imp notitle";
+		print $fh ",";# unless ($k eq $target[$#target]);
+	}
+	foreach my $k (@target)
+	{
+		print $fh "\"<grep '^$k\t' experiment_data.dat\" using 3:xticlabels(2) with boxes title \"k=$k\"";
+		print $fh "," unless ($k eq $target[$#target]);
+	}
+	print $fh "\n";
+
+	print $fh "pause 1\n" if $preview;
+}
+#########################################################################
+{
+	print $fh <<_EOS_ unless $preview;
+set terminal canvas standalone mousing jsdir "js" size 800,400
+set output 'cross_validation_caltec_101.html'
+_EOS_
+
+	print $fh <<_EOS_;
+set title "Cross-validation score"
+
+set logscale xy 2
+set xtics auto
+set ytics auto
+set xrange [*:*]
+set yrange [*:*]
+
+set autoscale z
+set zrange [] reverse
+set palette defined (0 "red", 0.5 "green", 1 "blue")
+
+set xlabel "C"
+set ylabel "gamma"
+set zlabel "score"
+
+set view 0, 0
+_EOS_
+
+	print $fh "splot ";
+	foreach my $k (@target)
+	{
+		print $fh "\"< grep '^$k\t' 'cross_validation_grids.dat'\" using 4:5:2 palette z title \"k=$k\"";
+		print $fh "," unless ($k eq $target[$#target]);
+	}
+	print $fh "\n";
+
+	print $fh "pause 1\n" if $preview;
+}
+

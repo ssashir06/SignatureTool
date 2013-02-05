@@ -20,6 +20,7 @@ namespace Signature
 			SvmOneVsOne(const SvmOneVsOne& src);
 			SvmOneVsOne& operator=(const SvmOneVsOne& src);
 			virtual ~SvmOneVsOne(void);
+			virtual SvmBase* clone() const;
 
 			virtual void train(const std::list<std::shared_ptr<Image::Base> >& trains);
 			virtual void train(const std::string& file_name);
