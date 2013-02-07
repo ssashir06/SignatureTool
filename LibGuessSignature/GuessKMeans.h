@@ -9,24 +9,23 @@ namespace Signature{
 		class KMeansBase : public Base
 		{
 		protected:
+			Image::MatchingMachines machines;
 			std::vector<std::pair<std::string, cv::Mat> > histgrams_by_name;
-			cv::Mat vocabularies;
+			cv::BOWImgDescriptorExtractor bowde;
 			unsigned int k;
 			static const unsigned int k_default = 1000;
 		public:
 			KMeansBase(void);
-			KMeansBase(unsigned int k);
+			KMeansBase(unsigned int k, const Image::MatchingMachines& machines = Image::MatchingMachines());
 			KMeansBase(const KMeansBase& src);
 			KMeansBase& operator=(const KMeansBase& src);
 			virtual ~KMeansBase(void);
 
-			virtual void train(const std::list<std::shared_ptr<Image::Base> >& trains);
-			virtual void train(const std::string& file_name);
-			void save(const std::string& file_name) const;
-			void load(const std::string& file_name);
+			virtual void train(const std::list<Image::Conclusive >& trains);
 		protected:
-			void makeVocaabularies(const std::list<std::shared_ptr<Image::Base> >& trains);
-			virtual cv::BOWImgDescriptorExtractor makeBOWImageDescriptorExtractor() const;
+			void makeVocaabularies(const std::list<Image::Conclusive >& trains);
+			virtual Image::Descriptor getDescriptor(const Image::Base& image) const;
+			cv::BOWImgDescriptorExtractor copyBOWDescriptrExtractor() const;
 		};
 	}
 }

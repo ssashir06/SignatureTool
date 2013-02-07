@@ -1589,7 +1589,7 @@ static const std::string file_info[][2] = {
 	{"101_ObjectCategories\\binocular\\image_0031.jpg", "binocular"},
 	{"101_ObjectCategories\\binocular\\image_0032.jpg", "binocular"},
 	{"101_ObjectCategories\\binocular\\image_0033.jpg", "binocular"},
-#if 0
+#if 1
 	{"101_ObjectCategories\\bonsai\\image_0001.jpg", "bonsai"},
 	{"101_ObjectCategories\\bonsai\\image_0002.jpg", "bonsai"},
 	{"101_ObjectCategories\\bonsai\\image_0003.jpg", "bonsai"},

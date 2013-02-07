@@ -64,21 +64,24 @@ static const std::string file_info[][3] = {
 	{"2012_11_13\\IMG_0056.jpg", "グルン", "山田"},
 #endif
 };
+
 #if 0
-static const cv::Rect trim_area_train[] = {
-	cv::Rect(2000, 0, 475, 190),	//集荷者
-	cv::Rect(2000, 140, 475, 190),	//検品者
-};
-static const cv::Rect trim_area_query[] = {
+static const cv::Rect trim_area[] = {
 	cv::Rect(1800, 0, 675, 190),	//集荷者
 	cv::Rect(1800, 140, 675, 190),	//検品者
 };
-#else
-static const cv::Rect trim_area_train[] = {
-	cv::Rect(2000, 30, 475, 160),	//集荷者
-	cv::Rect(2000, 170, 475, 160),	//検品者
+#elif 1
+static const cv::Rect trim_area[] = {
+	cv::Rect(1800, 30, 675, 160),	//集荷者
+	cv::Rect(1800, 170, 675, 160),	//検品者
 };
-static const cv::Rect trim_area_query[] = {
+#elif 1
+static const cv::Rect trim_area[] = {
+	cv::Rect(2000, 0, 475, 190),	//集荷者
+	cv::Rect(2000, 140, 475, 190),	//検品者
+};
+#else
+static const cv::Rect trim_area[] = {
 	cv::Rect(2000, 30, 475, 160),	//集荷者
 	cv::Rect(2000, 170, 475, 160),	//検品者
 };

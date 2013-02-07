@@ -41,7 +41,7 @@ namespace Signature{
 		{
 		}
 
-		void SvmBase::setBestParam(const list<shared_ptr<Image::Base> >& images, unsigned int grid)
+		void SvmBase::setBestParam(const list<Image::Conclusive>& images, unsigned int grid)
 		{
 			auto param_scores = crossValidation(images, grid);
 			param_scores.sort([](const SvmBase::ParamScore& v1, const SvmBase::ParamScore& v2){ return get<0>(v1) < get<0>(v2); });
@@ -53,43 +53,33 @@ namespace Signature{
 			return param;
 		}
 
-		list<SvmBase::ParamScore> SvmBase::crossValidation(const list<shared_ptr<Image::Base> >& images, unsigned int grid)
+		list<SvmBase::ParamScore> SvmBase::crossValidation(const list<Image::Conclusive>& images, unsigned int grid)
 		{
-			map<string, list<shared_ptr<Image::Base> > > images_by_name;
-			vector<list<shared_ptr<Image::Base> > > parted_image_list(grid);
-			for (const auto& image : images) images_by_name[image->getName()].push_back(image);
-			for (const auto& image : images_by_name)
+			map<string, list<Image::Conclusive> > images_by_name;
+			vector<list<Image::Conclusive> > parted_image_list(grid);
+			for (const auto& image : images) images_by_name[image.name].push_back(image);
+			for (const auto& images : images_by_name)
 			{
-				unsigned int grid_local = std::min(grid, image.second.size());
-				unsigned int part_count = image.second.size() / grid_local;
-				unsigned int part_mod = image.second.size() % grid_local;
-
-				auto it = image.second.begin();
-				for (unsigned int i=0; i<grid_local; i++)
+				unsigned int i=0;
+				for (const auto& image : images.second)
 				{
-					for (unsigned int j=0; j<part_count; j++)
-						parted_image_list[i].push_back(*(it++));
-				}
-				for (unsigned int i=0; i<part_mod; i++)
-				{
-					parted_image_list[i].push_back(*(it++));
+					parted_image_list[i].push_back(image);
+					i = (i+1)%grid;
 				}
 			}
 
-			vector<pair<shared_ptr<SvmBase>,map<string, bool> > > svms(parted_image_list.size());
-			for (int i=0; i<parted_image_list.size(); i++)
+			vector<pair<shared_ptr<SvmBase>, map<string, list<Image::Candidate> > > > svms(parted_image_list.size());
+			for (unsigned int i=0; i<parted_image_list.size(); i++)
 			{
-				const list<shared_ptr<Image::Base> >& test_data = parted_image_list[i];
-				auto& names_on_train_data = svms[i].second;
-				list<shared_ptr<Image::Base> > train_data;
-				for (unsigned int j=0; j<grid; j++)
-				{
-					if (i==j) continue;
-					train_data.insert(train_data.end(), parted_image_list[j].begin(), parted_image_list[j].end());
+				auto& test_data = svms[i].second;
+				for (const auto& image : parted_image_list[i])
+					test_data[image.name].push_back(image);
 
-					for (const auto& image : parted_image_list[j])
-						names_on_train_data[image->getName()] = true;
-				}
+				list<Image::Conclusive> train_data;
+				for (unsigned int j=0; j<parted_image_list.size(); j++)
+					if (i!=j)
+						train_data.insert(train_data.end(), parted_image_list[j].begin(), parted_image_list[j].end());
+
 				if (test_data.empty() || train_data.empty()) continue;
 				svms[i].first = shared_ptr<SvmBase>(clone());
 				svms[i].first->KMeansBase::train(train_data);
@@ -100,7 +90,7 @@ namespace Signature{
 			LibSVM::v_range r_c(15, -4), r_gamma(gamma_center + 1, gamma_center - 1);
 			double step_c = 3, step_gamma = 1;
 #else
-			LibSVM::v_range r_c(20, -4), r_gamma(gamma_center + 1, gamma_center - 1);
+			LibSVM::v_range r_c(20, -4), r_gamma(gamma_center + 2, gamma_center - 2);
 			double step_c = 1, step_gamma = 0.5;
 #endif
 			typedef pair<double, double> TargetKey;
@@ -122,15 +112,16 @@ namespace Signature{
 					params_array.push_back(make_pair(target, param));
 				}
 
-				for (unsigned int i=0; i<parted_image_list.size(); i++)
+				for (unsigned int i=0; i<svms.size(); i++)
 				{
-					const list<shared_ptr<Image::Base> >& test_data = parted_image_list[i];
-					auto& names_on_train_data = svms[i].second;
 #pragma omp parallel for
 					for (int j = 0; j<(int)params_array.size(); j++)
 					{
 						const auto& param_key = params_array[j].first;
 						shared_ptr<SvmBase> svm;
+
+						OmpStream(cout) << "testing pram: (" << param_key.first << ", " << param_key.second << ")" << endl;
+
 #pragma omp critical
 						{
 							svm = shared_ptr<SvmBase>(svms[i].first->clone());
@@ -138,17 +129,18 @@ namespace Signature{
 						}
 						svm->train();
 
-						OmpStream(cout) << "testing pram: (" << param_key.first << ", " << param_key.second << ")" << endl;
-						for (const auto& data : test_data)
+						for (const auto& data_group : svms[i].second)
 						{
-							if (names_on_train_data.find(data->getName()) == names_on_train_data.end()) continue;
-
-							Result results = svm->match(data->signature);
 							double score = 0;
-							for (const auto& r : results)
-								score += (r.name == data->getName()) ? r.score : r.score * -0.8;
+							for (const auto& candidate : data_group.second)
+							{
+								Image::Candidate::Assessments results = svm->match(candidate);
+								for (const auto& r : results)
+									score += (r.name == data_group.first) ? r.score : r.score * -0.8; //TODO
+							}
+							score /= data_group.second.size();
 
-							OmpStream(cout) << data->getName() << "\tscore: " << score << endl;
+							OmpStream(cout) << data_group.first << "\tscore: " << score << endl;
 
 #pragma omp critical
 							{
@@ -213,7 +205,8 @@ namespace Signature{
 
 			return try_log_avg;
 		}
-
+#pragma endregion
+#pragma region Handle LibSVM
 		LibSVM::Parameter SvmBase::buildDefaultParam()
 		{
 			LibSVM::Parameter param;
@@ -234,9 +227,8 @@ namespace Signature{
 			param->weight = NULL;
 			return param;
 		}
-#pragma endregion
-#pragma region Handle cv::Mat
-		vector<LibSVM::NodeArray::Classified> buildClassfiedData(const Mat& histgram, double label)
+	
+		vector<LibSVM::NodeArray::Classified> buildClassfiedData(const Image::Descriptor& histgram, double label)
 		{
 			auto data = vector<LibSVM::NodeArray::Classified>(histgram.rows);
 
@@ -248,7 +240,7 @@ namespace Signature{
 			return data;
 		}
 
-		LibSVM::NodeArray buildNodeArray(const Mat& descriptor)
+		LibSVM::NodeArray buildNodeArray(const Image::Descriptor& descriptor)
 		{
 			if (descriptor.rows != 1) throw;
 			auto nodes = make_shared<vector<LibSVM::Node> >(descriptor.cols);
@@ -272,7 +264,7 @@ namespace Signature{
 			return LibSVM::NodeArray(nodes);
 		}
 
-		LibSVM::ScalingSetting buildScalingSetting(const vector<pair<string, Mat> >& histgrams_by_name)
+		LibSVM::ScalingSetting buildScalingSetting(const vector<pair<string, Image::Descriptor> >& histgrams_by_name)
 		{
 			LibSVM::ScalingSetting scaling;
 			for (const auto& hist_positive: histgrams_by_name)

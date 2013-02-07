@@ -45,16 +45,10 @@ namespace Signature
 			return new SvmOneVsOne(*this);
 		}
 
-		void SvmOneVsOne::train(const list<shared_ptr<Image::Base> >& trains)
+		void SvmOneVsOne::train(const list<Image::Conclusive >& trains)
 		{
 			setBestParam(trains);
 			KMeansBase::train(trains);
-			train();
-		}
-
-		void SvmOneVsOne::train(const string& file_name)
-		{
-			load(file_name);
 			train();
 		}
 
@@ -97,22 +91,14 @@ namespace Signature
 			}
 		}
 
-		Result SvmOneVsOne::match(const Mat& query) const
+		Image::Candidate::Assessments SvmOneVsOne::match(const Image::Candidate& query) const
 		{
-			Image::Info::KeyPoints keypoints;
-			Image::Info::Descriptor descriptor;
-#pragma omp critical
-			{
-				BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
-				machines.getDetector()->detect(query, keypoints);
-				bowde.compute(query, keypoints, descriptor);
-			}
-			LibSVM::NodeArray node_list = buildNodeArray(descriptor);
+			LibSVM::NodeArray node_list = buildNodeArray(getDescriptor(query));
 			LibSVM::scale(scaling, node_list);
 
 			cout << "matching query of image" << endl;
 			
-			Result assessments;
+			Image::Candidate::Assessments assessments;
 			for (const auto& model_group : models_by_name)
 			{
 				if (model_group.second.empty()) continue;

@@ -79,13 +79,13 @@ namespace LibSVM
 
 #pragma region Problem
 	Problem::Problem()
-		: svm_problem(), delete_function(NULL)
+		: svm_problem(), delete_function(nullptr)
 	{
 		setNodes(vector<NodeArray::Classified>());
 	}
 
 	Problem::Problem(const vector<NodeArray::Classified>& data)
-		: svm_problem(), delete_function(NULL)
+		: svm_problem(), delete_function(nullptr)
 	{
 		setNodes(data);
 	}

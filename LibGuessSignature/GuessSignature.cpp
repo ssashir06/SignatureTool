@@ -11,30 +11,98 @@ namespace Signature
 #pragma region Base
 		Base::Base()
 		{
-			id = 0;
 		}
 
-		Base::Base(ID id, const Mat& signature)
+		Base::Base(const string& file_name)
+			: file_name(file_name)
 		{
-			this->id = id;
-			this->signature = signature;
+		}
+
+		Base::Base(const Mat& signature, const string& file_name)
+			: signature(signature), file_name(file_name)
+		{
 		}
 
 		Base::Base(const Base& src)
+			: signature(src.signature), file_name(src.file_name), descriptor(src.descriptor), keypoints(keypoints)
 		{
-			id = src.id;
-			signature = src.signature;
 		}
 
 		Base& Base::operator=(const Base& src)
 		{
-			id = src.id;
 			signature = src.signature;
+			file_name = src.file_name;
+			descriptor = src.descriptor;
+			keypoints = src.keypoints;
 			return *this;
 		}
 
 		Base::~Base()
 		{
+		}
+
+		Descriptor Base::getDescriptor()
+		{
+			if (!descriptor.empty()) return descriptor;
+
+			machines.getExtractor()->compute(getImage(), getKeyPoints(), descriptor);
+			return descriptor;
+		}
+
+		Descriptor Base::getDescriptor() const
+		{
+			if (!descriptor.empty()) return descriptor;
+
+			Descriptor descriptor;
+			machines.getExtractor()->compute(getImage(), getKeyPoints(), descriptor);
+			return descriptor;
+		}
+
+		KeyPoints Base::getKeyPoints()
+		{
+			if (!keypoints.empty()) return keypoints;
+
+			machines.getDetector()->detect(getImage(), keypoints);
+			return keypoints;
+		}
+
+		KeyPoints Base::getKeyPoints() const
+		{
+			if (!keypoints.empty()) return keypoints;
+
+			KeyPoints keypoints;
+			machines.getDetector()->detect(getImage(), keypoints);
+			return keypoints;
+		}
+
+		Mat Base::getImage()
+		{
+			if (!signature.empty()) return signature;
+
+			if (file_name.empty()) throw "unable to open image, file name is empty";
+			Mat img = imread(file_name);
+			if (img.empty()) throw "failed to open image";
+			return signature = img;
+		}
+
+		Mat Base::getImage() const
+		{
+			if (!signature.empty()) return signature;
+
+			if (file_name.empty()) throw "unable to open image, file name is empty";
+			Mat img = imread(file_name);
+			if (img.empty()) throw "failed to open image";
+			return img;
+		}
+
+		void Base::makeSmall()
+		{
+			if (file_name.size())
+			{
+				getKeyPoints();
+				getDescriptor();
+				signature = cv::Mat();
+			}
 		}
 #pragma endregion
 
@@ -43,8 +111,13 @@ namespace Signature
 		{
 		}
 
-		Conclusive::Conclusive(ID id, const Mat& signature, const string& name)
-			: Base(id, signature), name(name)
+		Conclusive::Conclusive(const string& name, const string& file_name)
+			: Base(file_name), name(name)
+		{
+		}
+
+		Conclusive::Conclusive(const Mat& signature, const string& name, const string& file_name)
+			: Base(signature, file_name), name(name)
 		{
 		}
 
@@ -68,11 +141,6 @@ namespace Signature
 		Conclusive::~Conclusive()
 		{
 		}
-
-		string Conclusive::getName() const
-		{
-			return name;
-		}
 #pragma endregion
 
 #pragma region Candidate
@@ -90,13 +158,23 @@ namespace Signature
 		{
 		}
 
-		Candidate::Candidate(ID id, const Mat& signature)
-			: Base(id, signature)
+		Candidate::Candidate(const string& file_name)
+			: Base(file_name)
 		{
 		}
 
-		Candidate::Candidate(ID id, const Mat& signature, list<Assessment> names)
-			: Base(id, signature), names(names)
+		Candidate::Candidate(const Mat& signature, const string& file_name)
+			: Base(signature, file_name)
+		{
+		}
+
+		Candidate::Candidate(list<Assessment> names, const string& file_name)
+			: Base(file_name), names(names)
+		{
+		}
+
+		Candidate::Candidate(const Mat& signature, list<Assessment> names, const string& file_name)
+			: Base(signature, file_name), names(names)
 		{
 		}
 
@@ -112,6 +190,17 @@ namespace Signature
 			return *this;
 		}
 
+		Candidate::Candidate(const Conclusive& src)
+			: Base(src)
+		{
+		}
+
+		Candidate& Candidate::operator=(const Conclusive& src)
+		{
+			Base::operator=(src);
+			return *this;
+		}
+
 		Candidate::operator Conclusive() const
 		{
 			list<Assessment> names_copy = names;
@@ -123,11 +212,6 @@ namespace Signature
 
 		Candidate::~Candidate()
 		{
-		}
-
-		string Candidate::getName() const
-		{
-			return "UNKNOWN";
 		}
 #pragma endregion
 
@@ -175,159 +259,6 @@ namespace Signature
 		}
 #pragma endregion
 
-#pragma region Info
-		Info::Info()
-		{
-		}
-
-		Info::Info(const Info& src)
-		{
-			ids = src.ids;
-			images = src.images;
-			keypoints = src.keypoints;
-			descriptors = src.descriptors;
-		}
-
-		Info& Info::operator=(const Info& src)
-		{
-			ids = src.ids;
-			images = src.images;
-			keypoints = src.keypoints;
-			descriptors = src.descriptors;
-			return *this;
-		}
-
-		Info::~Info()
-		{
-		}
-
-#pragma region Set signature(s)
-		void Info::prepare(const list<shared_ptr<Base> >& signatures, const MatchingMachines& machines)
-		{
-			resize(signatures.size());
-			int i = 0;
-			for (list<shared_ptr<Base> >::const_iterator it=signatures.begin(); it!=signatures.end(); it++, i++) {
-				addSignature(**it, i);
-			}
-			machines.getDetector()->detect(images, keypoints);
-			machines.getExtractor()->compute(images, keypoints, descriptors);
-		}
-
-		void Info::addSignature(const Base& signature, int idx)
-		{
-			if (count() <= idx) throw "bad idx";
-			setID(idx, signature.id);
-			setImage(idx, signature.signature);
-			setName(idx, signature.getName());
-		}
-
-		void Info::addSignature(const Base& signature, const MatchingMachines& machines)
-		{
-			Idx idx = count();
-			resize(idx);
-			addSignature(signature, count());
-
-			KeyPoints keypoints;
-			Descriptor descriptor;
-
-			machines.getDetector()->detect(getImage(idx), keypoints);
-			machines.getExtractor()->compute(getImage(idx), keypoints, descriptor);
-
-			setKeyPoints(idx, keypoints);
-			setDescriptor(idx, descriptor);
-		}
-#pragma endregion
-
-#pragma region Get/Set
-		ID Info::getID(int idx) const
-		{
-			if (idx < 0 || count() <= idx) throw "Invalid idx";
-			return ids[idx];
-		}
-
-		Mat Info::getImage(int idx) const
-		{
-			if (idx < 0 || count() <= idx) throw "Invalid idx";
-			return images[idx];
-		}
-
-		Info::KeyPoints Info::getKeyPoints(int idx) const
-		{
-			if (idx < 0 || count() <= idx) throw "Invalid idx";
-			return keypoints[idx];
-		}
-
-		Info::Descriptor Info::getDescriptor(int idx) const
-		{
-			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
-			return descriptors[idx];
-		}
-
-		vector<Info::Descriptor> Info::getDescriptors() const
-		{
-			return descriptors;
-		}
-
-		string Info::getName(int idx) const
-		{
-			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
-			return names[idx];
-		}
-
-		void Info::setID(Idx idx, ID id)
-		{
-			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
-			ids[idx] = id;
-		}
-
-		void Info::setImage(Idx idx, const Mat& image, bool make_clone)
-		{
-			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
-			images[idx] = make_clone ? image.clone() : image;
-		}
-
-		void Info::setKeyPoints(Idx idx, const KeyPoints& keypoints)
-		{
-			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
-			(this->keypoints)[idx] = keypoints;
-		}
-
-		void Info::setDescriptor(Idx idx, const Descriptor& descriptor)
-		{
-			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
-			descriptors[idx] = descriptor;
-		}
-
-		void Info::setName(Idx idx, const string& name)
-		{
-			if (idx < 0 || ids.size() <= idx) throw "Invalid idx";
-			names[idx] = name;
-		}
-#pragma endregion
-
-		size_t Info::count() const
-		{
-			return ids.size();
-		}
-
-		void Info::clear()
-		{
-			ids.clear();
-			images.clear();
-			keypoints.clear();
-			descriptors.clear();
-			names.clear();
-		}
-
-		void Info::resize(size_t size)
-		{
-			ids.resize(size);
-			images.resize(size);
-			keypoints.resize(size);
-			descriptors.resize(size);
-			names.resize(size);
-		}
-#pragma endregion
 	}
 	namespace Guess
 	{
@@ -337,23 +268,26 @@ namespace Signature
 		}
 
 		Base::Base(const Base& src)
-			: machines(src.machines)
 		{
 		}
 
 		Base& Base::operator=(const Base& src)
 		{
-			machines = src.machines;
 			return *this;
 		}
 
 		Base::~Base()
 		{
 		}
-
-		void Base::setMatchingMachines(const Image::MatchingMachines& machines)
+		
+		void Base::match(Image::Candidate& query) const
 		{
-			this->machines = machines;
+			query.names = match((const Image::Candidate)query);
+		}
+
+		Image::Descriptor Base::getDescriptor(const Image::Base& image) const
+		{
+			return image.getDescriptor();
 		}
 #pragma endregion
 	}

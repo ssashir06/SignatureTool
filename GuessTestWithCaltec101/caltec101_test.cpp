@@ -13,34 +13,36 @@ using namespace std;
 using namespace cv;
 using namespace Signature;
 
-list<shared_ptr<Image::Base> > train_images;
-list<pair<string, Mat> > query_images;
+list<Image::Conclusive > train_images;
+map<string, list<Image::Candidate> > query_image_by_name;
 
 void loadImages()
 {
-	map<string, list<pair<int, Mat> > > all_images;
+	map<string, list<string> > file_by_name;
 	int number_of_images = sizeof(file_info)/sizeof(*file_info);
 	for (int i=0; i<number_of_images; i++) {
-		string file_name = path + file_info[i][0];
-		Mat img_loaded;
-		if (false) {
-			img_loaded = imread(file_name, 0);//ƒ‚ƒmƒNƒ
-			threshold(img_loaded, img_loaded, 190, 255, THRESH_BINARY);//“ñ’l‰»
-		} else {
-			img_loaded = imread(file_name);
-		}
 		string name = file_info[i][1];
-		all_images[name].push_back(pair<int, Mat>(1, img_loaded));
+		string file_name = path + file_info[i][0];
+		file_by_name[name].push_back(file_name);
 	}
-	for (const auto& image_group : all_images) {
+	for (const auto& image_group : file_by_name) {
 		string name = image_group.first;
-		int count = image_group.second.size(), i = 0;
-		if (count < 5) continue;
-		for (const auto& image : image_group.second) {
-			if (i++ > count * 0.2) {
-				train_images.push_back(shared_ptr<Image::Base>(new Image::Conclusive(train_images.size(), image.second, name)));
+		if (image_group.second.size() < 5) continue;
+		unsigned int i=0;
+		for (const auto& file_name : image_group.second)
+		{
+			Mat img_loaded;
+			if (false) {
+				img_loaded = imread(file_name, 0);//ƒ‚ƒmƒNƒ
+				threshold(img_loaded, img_loaded, 190, 255, THRESH_BINARY);//“ñ’l‰»
 			} else {
-				query_images.push_back(pair<string, Mat>(name, image.second));
+				img_loaded = imread(file_name);
+			}
+
+			if (i++ > image_group.second.size() * 0.2) {
+				train_images.push_back(Image::Conclusive(img_loaded, name, file_name));
+			} else {
+				query_image_by_name[name].push_back(Image::Candidate(img_loaded, file_name));
 			}
 		}
 	}
@@ -53,37 +55,34 @@ int main()
 	ofstream ofs("experiment_data.dat", ios::out | ios::app);
 	if (!ofs.is_open()) exit(1);
 
-	for (unsigned int kb=4; kb<10; kb++)
+	for (unsigned int kb=4; kb<=12; kb+=2)
 	{
-		unsigned int k = pow(2, kb);
+		unsigned int k = (unsigned int)pow(2, kb);
 
 		cout << "K:" << k << endl;
 
 		Guess::SvmOneVsAll trainer(k);
 
-		trainer.setMatchingMachines(Image::MatchingMachines(
-			Ptr<FeatureDetector>(new SurfFeatureDetector()),
-			Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()),
-			Ptr<DescriptorMatcher>(new FlannBasedMatcher())));
 		trainer.train(train_images);
 
-		map<string, pair<unsigned int, unsigned int> > match_scores;
-		for (const auto& query : query_images)
+		for (const auto& query_group : query_image_by_name)
 		{
-			Guess::Result result = trainer.match(query.second);
-			result.sort();
+			unsigned int match_count = 0, try_count = 0;
+			string name = query_group.first;
 
-			auto& match_score = match_scores[query.first];
-			if (result.front().name == query.first) match_score.first++;
-			match_score.second++;
-		}
+			for (const auto& query : query_group.second)
+			{
+				Image::Candidate::Assessments result = trainer.match(query);
+				result.sort();
 
-		for (const auto& match_score : match_scores)
-		{
+				if (result.front().name == name) match_count++;
+				try_count++;
+			}
+
 			ofs <<
 				k << "\t" <<
-				match_score.first << "\t" <<
-				match_score.second.first << "\t" <<match_score.second.second << endl;
+				name << "\t" <<
+				match_count << "\t" << try_count << endl;
 		}
 	}
 

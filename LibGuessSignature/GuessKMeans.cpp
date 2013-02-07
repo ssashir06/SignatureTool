@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <opencv2/opencv.hpp>
+#include <opencv2/nonfree/features2d.hpp>
 #include "GuessKMeans.h"
 #include "SaveLoadCV.h"
 
@@ -18,17 +19,17 @@ namespace Signature{
 	namespace Guess {
 #pragma region KMeansBase abstract class
 		KMeansBase::KMeansBase(void)
-			: Base(), k(k_default)
+			: Base(), k(k_default), machines(), bowde(machines.getExtractor(), machines.getMatcher())
 		{
 		}
 
-		KMeansBase::KMeansBase(unsigned int k)
-			: Base(), k(k)
+		KMeansBase::KMeansBase(unsigned int k, const Image::MatchingMachines& machines)
+			: Base(), k(k), machines(machines), bowde(machines.getExtractor(), machines.getMatcher())
 		{
 		}
 
 		KMeansBase::KMeansBase(const KMeansBase& src)
-			: Base(src), k(src.k), histgrams_by_name(src.histgrams_by_name.begin(), src.histgrams_by_name.end()), vocabularies(src.vocabularies)
+			: Base(src), k(src.k), histgrams_by_name(src.histgrams_by_name.begin(), src.histgrams_by_name.end()), bowde(src.copyBOWDescriptrExtractor()), machines(src.machines)
 		{
 		}
 
@@ -37,7 +38,7 @@ namespace Signature{
 			Base::operator=(src);
 			k = src.k;
 			histgrams_by_name = vector<pair<string, Mat> >(src.histgrams_by_name.begin(), src.histgrams_by_name.end());
-			vocabularies = src.vocabularies;
+			bowde = src.copyBOWDescriptrExtractor();
 			return *this;
 		}
 
@@ -45,22 +46,17 @@ namespace Signature{
 		{
 		}
 
-		void KMeansBase::train(const list<shared_ptr<Image::Base> >& trains)
+		void KMeansBase::train(const list<Image::Conclusive >& trains)
 		{
 			cout << "make vocabulary" << endl;
 			BOWKMeansTrainer trainer(k);
-			map<string, list<pair<Mat, Image::Info::KeyPoints> > > trains_by_name;
+			map<string, list<Image::Conclusive > > trains_by_name;
 			for (const auto& train : trains) {
-				Image::Info::KeyPoints keypoints;
-				machines.getDetector()->detect(train->signature, keypoints);
-				trains_by_name[train->getName()].push_back(pair<Mat, Image::Info::KeyPoints>(train->signature, keypoints));
-
-				Image::Info::Descriptor descriptor;
-				machines.getExtractor()->compute(train->signature, keypoints, descriptor);
-				trainer.add(descriptor);
+				trains_by_name[train.name].push_back(train);
+				trainer.add(train.getDescriptor());
 			}
-			vocabularies = trainer.cluster();
-			BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
+			bowde = BOWImgDescriptorExtractor(machines.getExtractor(), machines.getMatcher());
+			bowde.setVocabulary(trainer.cluster());
 
 			cout << "make histgrams" << endl;
 			histgrams_by_name.clear();
@@ -68,51 +64,35 @@ namespace Signature{
 			{
 				const auto& name = trains_group.first;
 				cout << "histgram of " << name << endl;
-				list<Image::Info::Descriptor> histgrams;
+				list<Image::Descriptor> histgrams;
 				for (const auto& train : trains_group.second)
 				{
-					Image::Info::KeyPoints keypoints = train.second;
-					Image::Info::Descriptor descriptor;
-					bowde.compute(train.first, keypoints, descriptor);
-
-					histgrams.push_back(descriptor);
+					histgrams.push_back(getDescriptor(train));
 				}
 				if (histgrams.empty()) continue;
-				Mat hist_mat = Mat(0, histgrams.front().cols, histgrams.front().type());
+				Image::Descriptor hist_mat = Mat(0, histgrams.front().cols, histgrams.front().type());
 				for (const auto& histgram : histgrams)
 					hist_mat.push_back(histgram);
 				histgrams_by_name.push_back(make_pair(name, hist_mat));
 			}
 		}
 
-		void KMeansBase::train(const string& file_name)
+		Image::Descriptor KMeansBase::getDescriptor(const Image::Base& image) const
 		{
-			load(file_name);
+			Image::Descriptor descriptor;
+			auto bowde_copy = copyBOWDescriptrExtractor();
+			bowde_copy.compute(image.getImage(), image.getKeyPoints(), descriptor);
+			return descriptor;
 		}
 
-		void KMeansBase::save(const string& file_name) const
+		BOWImgDescriptorExtractor KMeansBase::copyBOWDescriptrExtractor() const
 		{
-			FileStorage fs(file_name, FileStorage::WRITE);
-			//fs << "histgrams" << histgrams_by_name;
-			fs << "vocabularies" << vocabularies;
-			fs << "k" << (const int)k;
-			fs.release();
-		}
-
-		void KMeansBase::load(const string& file_name)
-		{
-			FileStorage fs(file_name, FileStorage::READ);
-			//fs["histgrams"] >> histgrams_by_name;
-			fs["vocabularies"] >> vocabularies;
-			fs["k"] >> (int&)k;
-			fs.release();
-		}
-
-		BOWImgDescriptorExtractor KMeansBase::makeBOWImageDescriptorExtractor() const
-		{
-			BOWImgDescriptorExtractor bowde(machines.getExtractor(), machines.getMatcher());
-			bowde.setVocabulary(vocabularies);
-			return bowde;
+			//FIXME: thread unsafe
+			//auto bow_copy = BOWImgDescriptorExtractor(machines.getExtractor(), machines.getMatcher());
+			auto bow_copy = BOWImgDescriptorExtractor(new SurfDescriptorExtractor(), new FlannBasedMatcher());//ok
+			Image::Descriptor descriptor = bowde.getVocabulary();
+			if (!descriptor.empty()) bow_copy.setVocabulary(descriptor);
+			return bow_copy;
 		}
 #pragma endregion
 	}

@@ -31,9 +31,6 @@
     <ClCompile Include="..\StdAfx\StdAfx.cpp">
       <Filter>StdAfx</Filter>
     </ClCompile>
-    <ClCompile Include="FileInfo.cpp">
-      <Filter>GuessSignature\File</Filter>
-    </ClCompile>
     <ClCompile Include="GuessKMeans.cpp">
       <Filter>GuessSignature\Guess</Filter>
     </ClCompile>
@@ -49,9 +46,6 @@
     <ClCompile Include="GuessSvmOneVsOne.cpp">
       <Filter>GuessSignature\Guess</Filter>
     </ClCompile>
-    <ClCompile Include="GuessEvalEasy.cpp">
-      <Filter>GuessSignature\Guess</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GuessSignature.h">
@@ -59,9 +53,6 @@
     </ClInclude>
     <ClInclude Include="..\StdAfx\StdAfx.h">
       <Filter>StdAfx</Filter>
-    </ClInclude>
-    <ClInclude Include="FileInfo.h">
-      <Filter>GuessSignature\File</Filter>
     </ClInclude>
     <ClInclude Include="GuessKMeans.h">
       <Filter>GuessSignature\Guess</Filter>
@@ -79,9 +70,6 @@
       <Filter>GuessSignature\Guess</Filter>
     </ClInclude>
     <ClInclude Include="GuessSvmOneVsOne.h">
-      <Filter>GuessSignature\Guess</Filter>
-    </ClInclude>
-    <ClInclude Include="GuessEvalEasy.h">
       <Filter>GuessSignature\Guess</Filter>
     </ClInclude>
   </ItemGroup>

@@ -46,16 +46,10 @@ namespace Signature{
 			return new SvmOneVsAll(*this);
 		}
 
-		void SvmOneVsAll::train(const list<shared_ptr<Image::Base> >& images)
+		void SvmOneVsAll::train(const list<Image::Conclusive >& images)
 		{
 			setBestParam(images, 2);
 			KMeansBase::train(images);
-			train();
-		}
-
-		void SvmOneVsAll::train(const string& file_name)
-		{
-			load(file_name);
 			train();
 		}
 
@@ -97,22 +91,14 @@ namespace Signature{
 			}
 		}
 
-		Result SvmOneVsAll::match(const Mat& query) const
+		Image::Candidate::Assessments SvmOneVsAll::match(const Image::Candidate& query) const
 		{
-			Image::Info::KeyPoints keypoints;
-			Image::Info::Descriptor descriptor;
-#pragma omp critical
-			{
-				BOWImgDescriptorExtractor bowde = makeBOWImageDescriptorExtractor();
-				machines.getDetector()->detect(query, keypoints);
-				bowde.compute(query, keypoints, descriptor);
-			}
-			LibSVM::NodeArray node_list = buildNodeArray(descriptor);
+			LibSVM::NodeArray node_list = buildNodeArray(getDescriptor(query));
 			LibSVM::scale(scaling, node_list);
 
 			OmpStream(cout) << "matching query of image" << endl;
 			
-			Result assessments;
+			Image::Candidate::Assessments assessments;
 			for (const auto& model_group : models_by_name)
 			{
 				const auto& model = get<0>(model_group.second);

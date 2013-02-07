@@ -21,48 +21,9 @@ namespace Signature
 
 	namespace Image
 	{
-		typedef int ID;
-		struct Base
-		{
-			ID id;
-			cv::Mat signature;
-			Base();
-			Base(ID id, const cv::Mat& signature);
-			Base(const Base& src);
-			Base& operator=(const Base& src);
-			virtual ~Base();
-			virtual std::string getName() const = 0;
-		};
-		struct Conclusive : public Base
-		{
-			std::string name;
-			Conclusive();
-			Conclusive(ID id, const cv::Mat& signature, const std::string& name);
-			Conclusive(const Base& src);
-			Conclusive(const Conclusive& src);
-			Conclusive& operator=(const Conclusive& src);
-			virtual ~Conclusive();
-			virtual std::string getName() const;
-		};
-		struct Candidate : public Base
-		{
-			struct Assessment
-			{
-				std::string name;
-				double score;
-				Assessment();
-				bool operator<(const Assessment& val) const;
-			};
-			std::list<Assessment> names;
-			Candidate();
-			Candidate(ID id, const cv::Mat& signature);
-			Candidate(ID id, const cv::Mat& signature, std::list<Assessment> names);
-			Candidate(const Candidate& src);
-			Candidate& operator=(const Candidate& src);
-			operator Conclusive() const;
-			virtual ~Candidate();
-			virtual std::string getName() const;
-		};
+		typedef std::vector<cv::KeyPoint> KeyPoints;
+		typedef cv::Mat Descriptor;
+
 		class MatchingMachines
 		{
 		protected:
@@ -71,77 +32,100 @@ namespace Signature
 			cv::Ptr<cv::DescriptorMatcher> matcher;
 
 		public:
-			MatchingMachines();
+			MatchingMachines();// default is SURF.
 			MatchingMachines(const cv::Ptr<cv::FeatureDetector>& detector, const cv::Ptr<cv::DescriptorExtractor>& extractor, const cv::Ptr<cv::DescriptorMatcher>& matcher);
 			MatchingMachines(const MatchingMachines& src);
 			MatchingMachines& operator=(const MatchingMachines& src);
 			virtual ~MatchingMachines();
+
+			Descriptor calcurateDescriptor(const cv::Mat& image) const;
 
 		public:
 			cv::Ptr<cv::FeatureDetector> getDetector() const;
 			cv::Ptr<cv::DescriptorExtractor> getExtractor() const;
 			cv::Ptr<cv::DescriptorMatcher> getMatcher() const;
 		};
-		class Info
+		class Base
+		{
+		protected:
+			KeyPoints keypoints;
+			Descriptor descriptor;
+			MatchingMachines machines;
+			std::string file_name;
+			cv::Mat signature;
+		public:
+			Base();
+			Base(const std::string& file_name);
+			Base(const cv::Mat& signature, const std::string& file_name = std::string());
+			Base(const Base& src);
+			Base& operator=(const Base& src);
+			virtual ~Base();
+
+			Descriptor getDescriptor();
+			Descriptor getDescriptor() const;
+			KeyPoints getKeyPoints();
+			KeyPoints getKeyPoints() const;
+			virtual cv::Mat getImage();
+			virtual cv::Mat getImage() const;
+
+			void makeSmall();
+		};
+		class Conclusive : public Base
 		{
 		public:
-			typedef std::vector<cv::KeyPoint> KeyPoints;
-			typedef cv::Mat Descriptor;
-			typedef int Idx;
-		protected:
-			std::vector<ID> ids;
-			std::vector<cv::Mat> images;
-			std::vector<KeyPoints> keypoints;
-			std::vector<Descriptor> descriptors;
-			std::vector<std::string> names;
+			std::string name;
+			Conclusive();
+			Conclusive(const std::string& name, const std::string& file_name);
+			Conclusive(const cv::Mat& signature, const std::string& name, const std::string& file_name = std::string());
+			Conclusive(const Base& src);
+			Conclusive(const Conclusive& src);
+			Conclusive& operator=(const Conclusive& src);
+			virtual ~Conclusive();
+		};
+		class Candidate : public Base
+		{
 		public:
-			Info();
-			Info(const Info& src);
-			Info& operator=(const Info& src);
-			virtual ~Info();
-
-			void prepare(const std::list<std::shared_ptr<Base> >& signatures, const MatchingMachines& machines);
-			virtual void addSignature(const Base& signature, const MatchingMachines& machines);
-
-			ID getID(Idx idx) const;
-			cv::Mat getImage(Idx idx) const;
-			KeyPoints getKeyPoints(Idx idx) const;
-			Descriptor getDescriptor(Idx idx) const;
-			std::vector<Descriptor> getDescriptors() const;
-			std::string getName(Idx idx) const;
-
-			size_t count() const;
-			virtual void clear();
-			virtual void resize(size_t size);
-		protected:
-			void setID(Idx idx, ID id);
-			void setImage(Idx idx, const cv::Mat& image, bool make_clone = false);
-			void setKeyPoints(Idx idx, const KeyPoints& keypoints);
-			void setDescriptor(Idx idx, const Descriptor& descriptor);
-			void setName(Idx idx, const std::string& name);
-
-			void addSignature(const Base& signature, int idx);
+			struct Assessment
+			{
+				std::string name;
+				double score;
+				Assessment();
+				bool operator<(const Assessment& val) const;
+			};
+			typedef std::list<Assessment> Assessments;
+			Assessments names;
+			Candidate();
+			Candidate(const std::string& file_name);
+			Candidate(const cv::Mat& signature, const std::string& file_name = std::string());
+			Candidate(std::list<Assessment> names, const std::string& file_name);
+			Candidate(const cv::Mat& signature, std::list<Assessment> names, const std::string& file_name = std::string());
+			Candidate(const Candidate& src);
+			Candidate& operator=(const Candidate& src);
+			Candidate(const Conclusive& src);
+			Candidate& operator=(const Conclusive& src);
+			operator Conclusive() const;
+			virtual ~Candidate();
 		};
 	}
 	namespace Guess
 	{
-		typedef std::list<Image::Candidate::Assessment> Result;
 		class Base
 		{
-		protected:
-			Image::MatchingMachines machines;
 		public:
 			Base();
 			Base(const Base& src);
 			Base& operator=(const Base& src);
 			virtual ~Base();
 
-			void setMatchingMachines(const Image::MatchingMachines& machines);
-
-			virtual void train(const std::list<std::shared_ptr<Image::Base> >& trains) = 0;
-			virtual Result match(const cv::Mat& query) const = 0;
+			virtual void train(const std::list<Image::Conclusive >& trains) = 0;
+			virtual Image::Candidate::Assessments match(const Image::Candidate& query) const = 0;
+			virtual void match(Image::Candidate& query) const;
+		protected:
+			virtual Image::Descriptor getDescriptor(const Image::Base& image) const;
 		};
 	}
+
+	//TODO: move
 	template<typename TS>
 	class OmpStreamWrapper
 	{

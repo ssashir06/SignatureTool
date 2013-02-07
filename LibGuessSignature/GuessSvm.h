@@ -20,20 +20,20 @@ namespace Signature{
 			virtual ~SvmBase(void);
 			virtual SvmBase* clone() const = 0;
 
-			void setBestParam(const std::list<std::shared_ptr<Image::Base> >& images, unsigned int grid = 3);
+			void setBestParam(const std::list<Image::Conclusive >& images, unsigned int grid = 3);
 			LibSVM::Parameter getParam() const;
-			std::list<ParamScore> crossValidation(const std::list<std::shared_ptr<Image::Base> >& images, unsigned int grid);
+			std::list<ParamScore> crossValidation(const std::list<Image::Conclusive >& images, unsigned int grid);
 
-			virtual void train(const std::list<std::shared_ptr<Image::Base> >& images) = 0;
+			virtual void train(const std::list<Image::Conclusive >& images) = 0;
 		protected:
 			virtual void train() = 0;
 			static LibSVM::Parameter buildDefaultParam();
 		};
 
 #pragma region cv
-		std::vector<LibSVM::NodeArray::Classified> buildClassfiedData(const cv::Mat& histgram, double label);
-		LibSVM::NodeArray buildNodeArray(const cv::Mat& descriptor);
-		LibSVM::ScalingSetting buildScalingSetting(const std::vector<std::pair<std::string, cv::Mat> >& histgrams_by_name);
+		std::vector<LibSVM::NodeArray::Classified> buildClassfiedData(const Image::Descriptor& histgram, double label);
+		LibSVM::NodeArray buildNodeArray(const Image::Descriptor& descriptor);
+		LibSVM::ScalingSetting buildScalingSetting(const std::vector<std::pair<std::string, Image::Descriptor> >& histgrams_by_name);
 #pragma endregion
 	}
 }

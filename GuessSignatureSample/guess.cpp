@@ -14,34 +14,56 @@ using namespace std;
 using namespace cv;
 using namespace Signature;
 
-list<shared_ptr<Image::Base> > train_images;
-list<pair<string, Mat> > query_images;
+list<Image::Conclusive > train_images;
+map<string, list<Image::Candidate> > query_image_by_name;
 
 void loadImages()
 {
-	map<string, list<pair<int, Mat> > > all_images;
+	map<string, list<pair<int, string> > > file_by_name;
 	int number_of_images = sizeof(file_info)/sizeof(*file_info);
 	for (int i=0; i<number_of_images; i++) {
 		string file_name = path + file_info[i][0];
-		Mat img_loaded = imread(file_name, 0);//ƒ‚ƒmƒNƒ
-		threshold(img_loaded, img_loaded, 190, 255, THRESH_BINARY);//“ñ’l‰»
-		for (int j=0; j<2; j++) {
+		for (int j=0; j<2; j++)
+		{
 			string name = file_info[i][j+1];
-			if (name == ".") continue;
-			all_images[name].push_back(pair<int, Mat>(j, img_loaded));
+			file_by_name[name].push_back(make_pair(j, file_name));
 		}
 	}
-	for (map<string, list<pair<int, Mat> > >::const_iterator it=all_images.begin(); it!=all_images.end(); it++) {
-		string name = it->first;
-		int count = it->second.size(), i = 0;
-		if (count < 3) continue;
-		for (list<pair<int, Mat> >::const_iterator it_img=it->second.begin(); it_img!=it->second.end(); it_img++, i++) {
-			if (i < count - 1) {
-				Mat img_trim = Mat(it_img->second, trim_area_train[it_img->first]);
-				train_images.push_back(shared_ptr<Image::Base>(new Image::Conclusive(train_images.size(), img_trim.clone(), name)));
+
+	pair<string, Mat> last_loaded;
+	for (const auto& image_group : file_by_name) {
+		string name = image_group.first;
+		unsigned int i=0;
+
+		if (image_group.second.size() < 3) continue;
+		if (name == ".") continue;
+
+		for (const auto& file_name_group : image_group.second)
+		{
+			const auto type = file_name_group.first;
+			const auto file_name = file_name_group.second;
+
+			Mat img_loaded;
+			if (last_loaded.first != file_name)
+			{
+				if (true)
+				{
+					img_loaded = imread(file_name, 0);//ƒ‚ƒmƒNƒ
+					//threshold(img_loaded, img_loaded, 190, 255, THRESH_BINARY);//“ñ’l‰»
+				} else {
+					img_loaded = imread(file_name);
+				}
+
+				last_loaded = make_pair(file_name, img_loaded);
 			} else {
-				Mat img_trim = Mat(it_img->second, trim_area_query[it_img->first]);
-				query_images.push_back(pair<string, Mat>(name, img_trim.clone()));
+				img_loaded = last_loaded.second;
+			}
+
+			Mat img_trim = Mat(img_loaded, trim_area[type]).clone();
+			if (i++ != 0) {
+				train_images.push_back(Image::Conclusive(img_trim, name, file_name));
+			} else {
+				query_image_by_name[name].push_back(Image::Candidate(img_trim, file_name));
 			}
 		}
 	}
@@ -52,7 +74,7 @@ int main()
 #ifdef _DEBUG
 	unsigned int k = 10;
 #else
-	unsigned int k = 25;
+	unsigned int k = 100;
 #endif
 #if 0
 	Guess::EvalEasy trainer;
@@ -63,31 +85,26 @@ int main()
 #endif
 
 	loadImages();
-	if (true) {
-		trainer.setMatchingMachines(Image::MatchingMachines(
-			Ptr<FeatureDetector>(new SurfFeatureDetector()),
-			Ptr<DescriptorExtractor>(new SurfDescriptorExtractor()),
-			Ptr<DescriptorMatcher>(new FlannBasedMatcher())));
-		trainer.train(train_images);
-	} else {
-		trainer.train("kmeans.xml");
-	}
+	trainer.train(train_images);
 
 	const string window_name = "query_name";
 	namedWindow(window_name);
-	for (const auto& query : query_images)
+	for (const auto& query_group : query_image_by_name)
 	{
-		//trainer.log_output << "Query: " << query.first << endl;
-		Guess::Result result = trainer.match(query.second);
-		result.sort();
-		cout << "------------------" << endl;
-		cout << "Query name: " << query.first << endl;
-		for (const auto& assesment : result)
+		string name = query_group.first;
+		for (const auto& query : query_group.second)
 		{
-			cout << assesment.name << "\t" << assesment.score << endl;
+			Image::Candidate::Assessments result = trainer.match(query);
+			result.sort();
+			cout << "------------------" << endl;
+			cout << "Query name: " << name << endl;
+			for (const auto& assesment : result)
+			{
+				cout << assesment.name << "\t" << assesment.score << endl;
+			}
+			imshow(window_name, query.getImage());
+			waitKey();
 		}
-		imshow(window_name, query.second);
-		waitKey();
 	}
 	destroyWindow(window_name);
 

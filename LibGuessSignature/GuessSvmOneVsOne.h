@@ -22,9 +22,8 @@ namespace Signature
 			virtual ~SvmOneVsOne(void);
 			virtual SvmBase* clone() const;
 
-			virtual void train(const std::list<std::shared_ptr<Image::Base> >& trains);
-			virtual void train(const std::string& file_name);
-			virtual Result match(const cv::Mat& query) const;
+			virtual void train(const std::list<Image::Conclusive >& trains);
+			virtual Image::Candidate::Assessments match(const Image::Candidate& query) const;
 
 		protected:
 			virtual void train();
