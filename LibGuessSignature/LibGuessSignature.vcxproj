@@ -25,6 +25,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="GuessEvalEasy.cpp" />
     <ClCompile Include="GuessSignature.cpp" />
     <ClCompile Include="GuessKMeans.cpp" />
     <ClCompile Include="GuessSvm.cpp" />
@@ -34,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\StdAfx\StdAfx.h" />
+    <ClInclude Include="GuessEvalEasy.h" />
     <ClInclude Include="GuessSignature.h" />
     <ClInclude Include="GuessKMeans.h" />
     <ClInclude Include="GuessSvm.h" />

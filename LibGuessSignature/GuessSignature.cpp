@@ -10,21 +10,22 @@ namespace Signature
 	{
 #pragma region Base
 		Base::Base()
+			: keypoints(nullptr)
 		{
 		}
 
 		Base::Base(const string& file_name)
-			: file_name(file_name)
+			: file_name(file_name), keypoints(nullptr)
 		{
 		}
 
 		Base::Base(const Mat& signature, const string& file_name)
-			: signature(signature), file_name(file_name)
+			: signature(signature), file_name(file_name), keypoints(nullptr)
 		{
 		}
 
 		Base::Base(const Base& src)
-			: signature(src.signature), file_name(src.file_name), descriptor(src.descriptor), keypoints(keypoints)
+			: signature(src.signature), file_name(src.file_name), descriptor(src.descriptor), keypoints(src.keypoints)
 		{
 		}
 
@@ -45,7 +46,7 @@ namespace Signature
 		{
 			if (!descriptor.empty()) return descriptor;
 
-			machines.getExtractor()->compute(getImage(), getKeyPoints(), descriptor);
+			machines.getExtractor()->compute(getImage(), *getKeyPoints(), descriptor);
 			return descriptor;
 		}
 
@@ -54,24 +55,25 @@ namespace Signature
 			if (!descriptor.empty()) return descriptor;
 
 			Descriptor descriptor;
-			machines.getExtractor()->compute(getImage(), getKeyPoints(), descriptor);
+			machines.getExtractor()->compute(getImage(), *getKeyPoints(), descriptor);
 			return descriptor;
 		}
 
-		KeyPoints Base::getKeyPoints()
+		shared_ptr<KeyPoints> Base::getKeyPoints()
 		{
-			if (!keypoints.empty()) return keypoints;
+			if (keypoints != nullptr && !keypoints->empty()) return keypoints;
 
-			machines.getDetector()->detect(getImage(), keypoints);
+			keypoints = shared_ptr<KeyPoints>(new KeyPoints());
+			machines.getDetector()->detect(getImage(), *keypoints);
 			return keypoints;
 		}
 
-		KeyPoints Base::getKeyPoints() const
+		shared_ptr<KeyPoints> Base::getKeyPoints() const
 		{
-			if (!keypoints.empty()) return keypoints;
+			if (keypoints != nullptr && !keypoints->empty()) return keypoints;
 
-			KeyPoints keypoints;
-			machines.getDetector()->detect(getImage(), keypoints);
+			shared_ptr<KeyPoints> keypoints = shared_ptr<KeyPoints>(new KeyPoints());
+			machines.getDetector()->detect(getImage(), *keypoints);
 			return keypoints;
 		}
 

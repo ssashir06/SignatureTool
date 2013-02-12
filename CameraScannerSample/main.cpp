@@ -3,7 +3,6 @@
 #include <string>
 #include <list>
 #include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include "../LibCameraScanner/CameraScanner.h"
 
 using namespace std;
@@ -22,7 +21,6 @@ Mat takePicture(const ScanSpec& spec, Reshape& scanner, int width, int height)
 	namedWindow(window);
 	Mat img_tmp, img_cap, img_preview;
 	int frame = 0;
-	Edges edges;
 	do {
 		cap >> img_tmp;
 		img_cap = img_tmp.clone();
@@ -35,9 +33,9 @@ Mat takePicture(const ScanSpec& spec, Reshape& scanner, int width, int height)
 			} catch (...) {
 				// do nothing
 			}
-			img_preview = scanner.drawSideLines();
+			drawEdges(img_preview, scanner.getPaperEdges(), CV_RGB(255, 0, 0), CV_RGB(0, 255, 0));
+			img_preview = scanner.drawSideLines(true);
 		}
-		drawEdges(img_preview, edges, CV_RGB(255, 0, 0), CV_RGB(0, 255, 0));
 		imshow(window, img_preview);
 		frame = (frame + 1) % 10;
 	} while (waitKey(10) == -1);
@@ -59,7 +57,7 @@ int main()
 
 	scanner.prepare(img_src);
 	//Mat img_preview = img_src.clone();
-	//drawEdges(img_preview, edges, CV_RGB(255, 0, 0));
+	//drawEdges(img_preview, scanner.getPaperEdges(), CV_RGB(128, 0, 0), CV_RGB(0, 255, 0));
 	//showDebugImage(smallerImage(img_preview, 640, 480));
 
 	Mat a4_paper = scanner.scan();

@@ -5,7 +5,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
-#include <opencv2/nonfree/features2d.hpp>
 #include "../LibGuessSignature/GuessEvalEasy.h"
 #include "../LibGuessSignature/GuessSvmOneVsAll.h"
 #include "../LibGuessSignature/GuessSvmOneVsOne.h"
@@ -22,10 +21,10 @@ void loadImages()
 	map<string, list<pair<int, string> > > file_by_name;
 	int number_of_images = sizeof(file_info)/sizeof(*file_info);
 	for (int i=0; i<number_of_images; i++) {
-		string file_name = path + file_info[i][0];
+		string file_name = string(path) + string(file_info[i][0]);
 		for (int j=0; j<2; j++)
 		{
-			string name = file_info[i][j+1];
+			string name(file_info[i][j+1]);
 			file_by_name[name].push_back(make_pair(j, file_name));
 		}
 	}
@@ -49,7 +48,7 @@ void loadImages()
 				if (true)
 				{
 					img_loaded = imread(file_name, 0);//ƒ‚ƒmƒNƒ
-					//threshold(img_loaded, img_loaded, 190, 255, THRESH_BINARY);//“ñ’l‰»
+					threshold(img_loaded, img_loaded, 210, 255, THRESH_BINARY);//“ñ’l‰»
 				} else {
 					img_loaded = imread(file_name);
 				}
@@ -76,7 +75,7 @@ int main()
 #else
 	unsigned int k = 100;
 #endif
-#if 0
+#if 1
 	Guess::EvalEasy trainer;
 #elif 1
 	Guess::SvmOneVsAll trainer(k);

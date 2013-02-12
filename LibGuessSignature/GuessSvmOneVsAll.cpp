@@ -96,7 +96,7 @@ namespace Signature{
 			LibSVM::NodeArray node_list = buildNodeArray(getDescriptor(query));
 			LibSVM::scale(scaling, node_list);
 
-			OmpStream(cout) << "matching query of image" << endl;
+			OmpStream(cout) << "matching query" << endl;
 			
 			Image::Candidate::Assessments assessments;
 			for (const auto& model_group : models_by_name)
@@ -111,8 +111,6 @@ namespace Signature{
 			}
 			return assessments;
 		}
-
-		//TODO: write load() and save() (overwriting)
 #pragma endregion
 	}
 }

@@ -46,6 +46,9 @@
     <ClCompile Include="GuessSvmOneVsOne.cpp">
       <Filter>GuessSignature\Guess</Filter>
     </ClCompile>
+    <ClCompile Include="GuessEvalEasy.cpp">
+      <Filter>GuessSignature\Guess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GuessSignature.h">
@@ -70,6 +73,9 @@
       <Filter>GuessSignature\Guess</Filter>
     </ClInclude>
     <ClInclude Include="GuessSvmOneVsOne.h">
+      <Filter>GuessSignature\Guess</Filter>
+    </ClInclude>
+    <ClInclude Include="GuessEvalEasy.h">
       <Filter>GuessSignature\Guess</Filter>
     </ClInclude>
   </ItemGroup>

@@ -133,9 +133,10 @@ namespace CameraScanner
 		img_target = src.img_target;
 		img_bin = src.img_bin;
 		side_lines = src.side_lines;
+		side_lines_candidate = src.side_lines_candidate;
 		paper_center = src.paper_center;
 		edges = src.edges;
-		edges = src.edges_learge;
+		edges_learge = src.edges_learge;
 		small_size = src.small_size;
 		spec = src.spec;
 	}
@@ -146,9 +147,10 @@ namespace CameraScanner
 		img_target = src.img_target;
 		img_bin = src.img_bin;
 		side_lines = src.side_lines;
+		side_lines_candidate = src.side_lines_candidate;
 		paper_center = src.paper_center;
 		edges = src.edges;
-		edges = src.edges_learge;
+		edges_learge = src.edges_learge;
 		small_size = src.small_size;
 		spec = src.spec;
 		return *this;
@@ -165,7 +167,7 @@ namespace CameraScanner
 			setImageSource(image);
 			makeBinaryColor();
 			guessSideLines();
-			getPaperIntersectionEdges();
+			decideIntersectionEdges();
 		} catch (const char* const msg) {
 			stringstream ss_msg;
 			ss_msg << L"Preparing scan was failed: " << msg;
@@ -177,8 +179,6 @@ namespace CameraScanner
 	Mat Reshape::scan()
 	{
 		try {
-			edges_learge = edges;
-			resizeEdges(edges_learge, (double)img_src.rows / img_target.rows);
 			fitToPaperCorner();
 			return trimPaper();
 		} catch (const char* const msg) {
@@ -189,18 +189,36 @@ namespace CameraScanner
 		}
 	}
 
-	Mat Reshape::drawSideLines(Mat& img) const
+	Mat Reshape::drawSideLines(Mat& img, bool with_candidates) const
 	{
 		if (img.empty()) throw L"image is not set?";
+
+		if (with_candidates)
+			drawLines(img, convertLineArray(side_lines_candidate, img_src.rows * 3), CV_RGB(128, 128, 128), 1);
 
 		drawLines(img, convertLineArray(side_lines, img_src.rows * 3), CV_RGB(0, 0, 255), 1);
 		drawEdges(img, edges, CV_RGB(255, 0, 0), CV_RGB(0, 255, 0));
 		return img;
 	}
 
-	Mat Reshape::drawSideLines() const
+	Mat Reshape::drawSideLines(bool with_candidates) const
 	{
-		return drawSideLines(img_target.clone());
+		return drawSideLines(img_target.clone(), with_candidates);
+	}
+
+	Edges Reshape::getPaperEdges() const
+	{
+		return edges;
+	}
+
+	Edge Reshape::getPaperCenter() const
+	{
+		return paper_center;
+	}
+
+	ScanSpec Reshape::getScanSpec() const
+	{
+		return spec;
 	}
 
 	void Reshape::reset()
@@ -224,13 +242,22 @@ namespace CameraScanner
 
 	void Reshape::makeBinaryColor()
 	{
-		Mat work;
-		vector<Mat> hsv;
+		Mat median;
+		medianBlur(img_target, median, (int)(img_target.cols * 0.01717 * 1.5 / 2) * 2 + 1);
+		cvtColor(median, median, CV_BGR2HSV);
 
-		medianBlur(img_target, work, (int)(img_target.cols * 0.01717 * 1.5 / 2) * 2 + 1);
-		cvtColor(work, work, CV_BGR2HSV);
-		split(work, hsv);
-		Canny(hsv[2], img_bin, 10, 50);
+		Mat mask = Mat::zeros(median.rows + 2, median.cols + 2, CV_8UC1);
+		Scalar hsv_diff = CV_RGB(2, 20, 20);
+		floodFill(median, mask, Point(median.cols/2, median.rows/2), CV_RGB(0, 0, 0), nullptr, hsv_diff, hsv_diff, FLOODFILL_MASK_ONLY | 255<<8 | 4);
+		erode(mask, mask, Mat());
+
+		Mat masked;
+		vector<Mat> hsv;
+		split(median, hsv);
+
+		hsv[2].copyTo(masked, Mat(mask, Rect(1, 1, median.cols, median.rows)));
+
+		Canny(masked, img_bin, 10, 50);
 	}
 
 	void Reshape::guessSideLines()
@@ -260,12 +287,15 @@ namespace CameraScanner
 		if (hough_lines.size() < cluster_count) throw L"too a few side lines";
 
 		moveLines(hough_lines, paper_center);
+		side_lines_candidate.resize(hough_lines.size());
 		for (int i=0; i<hough_lines.size(); i++) {
 			if (hough_lines[i][0] < 0) {
 				hough_lines[i][0] *= -1;
 				hough_lines[i][1] += CV_PI;
 			}
+			side_lines_candidate[i] = Vec2f(hough_lines[i][0], hough_lines[i][1]);
 		}
+		moveLines(side_lines_candidate, -paper_center);
 
 		for (int i=0; i<hough_lines.size(); i++) {
 			lines_mat.at<float>(i, 0) = hough_lines[i][0];
@@ -285,7 +315,7 @@ namespace CameraScanner
 		moveLines(side_lines, -paper_center);
 	}
 
-	void Reshape::getPaperIntersectionEdges()
+	void Reshape::decideIntersectionEdges()
 	{
 		double length = max(img_target.cols, img_target.rows) * 2;
 		vector<pair<Line::P, Line::P> > lines_p_center = convertLineArray(side_lines, length);
@@ -308,6 +338,9 @@ namespace CameraScanner
 		for (list<pair<double, Edge> >::const_iterator it=edges_w_distance.begin(); it!=edges_w_distance.end() && edges.size() < 4; it++) {
 			edges.push_back(it->second);
 		}
+
+		edges_learge = edges;
+		resizeEdges(edges_learge, (double)img_src.rows / img_target.rows);
 	}
 
 	void Reshape::fitToPaperCorner()

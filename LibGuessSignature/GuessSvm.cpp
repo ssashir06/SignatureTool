@@ -58,13 +58,18 @@ namespace Signature{
 			map<string, list<Image::Conclusive> > images_by_name;
 			vector<list<Image::Conclusive> > parted_image_list(grid);
 			for (const auto& image : images) images_by_name[image.name].push_back(image);
-			for (const auto& images : images_by_name)
+			for (auto& images : images_by_name)
 			{
-				unsigned int i=0;
-				for (const auto& image : images.second)
+				list<pair<size_t, size_t> > image_sizes;
+				for (size_t i=0; i<parted_image_list.size(); i++) image_sizes.push_back(make_pair(i, parted_image_list[i].size()));
+				const auto& min_partation = min_element(image_sizes.begin(), image_sizes.end(),
+					[](const pair<size_t, size_t>& v1, const pair<size_t, size_t>& v2) { return v1.second < v2.second; });
+
+				unsigned int i = (min_partation == image_sizes.end()) ? 0 : min_partation->first;
+				for (auto& image : images.second)
 				{
-					parted_image_list[i].push_back(image);
-					i = (i+1)%grid;
+					image.getDescriptor();//update descriptor/keypoint
+					parted_image_list[(i++)%parted_image_list.size()].push_back(image);
 				}
 			}
 
@@ -109,6 +114,7 @@ namespace Signature{
 					auto param = buildDefaultParam();
 					param->C = std::pow(2, target.first);
 					param->gamma = std::pow(2, target.second);
+					param->cache_size = std::max((double)100, std::min((double)500, (double)5 * images.size()));
 					params_array.push_back(make_pair(target, param));
 				}
 

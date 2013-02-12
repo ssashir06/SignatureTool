@@ -21,8 +21,8 @@ void loadImages()
 	map<string, list<string> > file_by_name;
 	int number_of_images = sizeof(file_info)/sizeof(*file_info);
 	for (int i=0; i<number_of_images; i++) {
-		string name = file_info[i][1];
-		string file_name = path + file_info[i][0];
+		string name(file_info[i][1]);
+		string file_name = string(path) + string(file_info[i][0]);
 		file_by_name[name].push_back(file_name);
 	}
 	for (const auto& image_group : file_by_name) {
@@ -55,7 +55,7 @@ int main()
 	ofstream ofs("experiment_data.dat", ios::out | ios::app);
 	if (!ofs.is_open()) exit(1);
 
-	for (unsigned int kb=4; kb<=12; kb+=2)
+	for (unsigned int kb=6; kb<=12; kb+=2)
 	{
 		unsigned int k = (unsigned int)pow(2, kb);
 

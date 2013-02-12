@@ -81,7 +81,7 @@ namespace Signature{
 		{
 			Image::Descriptor descriptor;
 			auto bowde_copy = copyBOWDescriptrExtractor();
-			bowde_copy.compute(image.getImage(), image.getKeyPoints(), descriptor);
+			bowde_copy.compute(image.getImage(), *image.getKeyPoints(), descriptor);
 			return descriptor;
 		}
 

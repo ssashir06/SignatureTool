@@ -20,7 +20,7 @@ namespace CameraScanner
 	{
 	protected:
 		cv::Mat img_src, img_target, img_bin;
-		std::vector<cv::Vec2f> side_lines;
+		std::vector<cv::Vec2f> side_lines, side_lines_candidate;
 		Edge paper_center;
 		cv::Size small_size;
 		Edges edges, edges_learge;
@@ -35,15 +35,19 @@ namespace CameraScanner
 
 		void prepare(const cv::Mat& image);
 		cv::Mat scan();
-		cv::Mat drawSideLines() const;
-		cv::Mat drawSideLines(cv::Mat& img) const;
+		cv::Mat drawSideLines(bool with_candidates = false) const;
+		cv::Mat drawSideLines(cv::Mat& img, bool with_candidates = false) const;
+
+		Edges getPaperEdges() const;
+		Edge getPaperCenter() const;
+		ScanSpec getScanSpec() const;
 
 	protected:
 		void reset();
 		void setImageSource(const cv::Mat& image);
 		void makeBinaryColor();
 		void guessSideLines();
-		void getPaperIntersectionEdges();
+		void decideIntersectionEdges();
 		void fitToPaperCorner();
 		cv::Mat trimPaper() const;
 	};

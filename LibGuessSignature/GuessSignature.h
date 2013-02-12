@@ -10,14 +10,6 @@
 
 namespace Signature
 {
-	template<typename ArrayIn, typename ArrayOut>
-	ArrayOut convertArray(const ArrayIn& src)
-	{
-		ArrayOut out;
-		for (ArrayIn::const_iterator it=src.begin(); it!=src.end(); it++)
-			out.push_back(*it);
-		return out;
-	}
 
 	namespace Image
 	{
@@ -33,7 +25,7 @@ namespace Signature
 
 		public:
 			MatchingMachines();// default is SURF.
-			MatchingMachines(const cv::Ptr<cv::FeatureDetector>& detector, const cv::Ptr<cv::DescriptorExtractor>& extractor, const cv::Ptr<cv::DescriptorMatcher>& matcher);
+			MatchingMachines(const cv::Ptr<cv::FeatureDetector>& detector, const cv::Ptr<cv::DescriptorExtractor>& extractor, const cv::Ptr<cv::DescriptorMatcher>& matcher = new cv::FlannBasedMatcher());
 			MatchingMachines(const MatchingMachines& src);
 			MatchingMachines& operator=(const MatchingMachines& src);
 			virtual ~MatchingMachines();
@@ -48,11 +40,12 @@ namespace Signature
 		class Base
 		{
 		protected:
-			KeyPoints keypoints;
+			std::shared_ptr<KeyPoints> keypoints;
 			Descriptor descriptor;
-			MatchingMachines machines;
 			std::string file_name;
-			cv::Mat signature;
+			cv::Mat signature;//a image of written signature
+		public:
+			MatchingMachines machines;
 		public:
 			Base();
 			Base(const std::string& file_name);
@@ -63,8 +56,8 @@ namespace Signature
 
 			Descriptor getDescriptor();
 			Descriptor getDescriptor() const;
-			KeyPoints getKeyPoints();
-			KeyPoints getKeyPoints() const;
+			std::shared_ptr<KeyPoints> getKeyPoints();
+			std::shared_ptr<KeyPoints> getKeyPoints() const;
 			virtual cv::Mat getImage();
 			virtual cv::Mat getImage() const;
 

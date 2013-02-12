@@ -1,8 +1,7 @@
 #pragma once
-#include <string>
 
-static const std::string path(".\\");
-static const std::string file_info[][2] = {
+static const char* const path = ".\\";
+static const char* const file_info[][2] = {
 	{"101_ObjectCategories\\accordion\\image_0001.jpg", "accordion"},
 	{"101_ObjectCategories\\accordion\\image_0002.jpg", "accordion"},
 	{"101_ObjectCategories\\accordion\\image_0003.jpg", "accordion"},

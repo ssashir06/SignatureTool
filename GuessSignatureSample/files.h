@@ -1,9 +1,8 @@
 #pragma once
-#include <string>
 #include <opencv2/opencv.hpp>
 
-static const std::string path(".\\");
-static const std::string file_info[][3] = {
+static const char* const path = ".\\";
+static const char* const file_info[][3] = {
 	{"2012_11_13\\IMG_0001.jpg", "ラディアンサ", "山田"},
 	{"2012_11_13\\IMG_0002.jpg", "ニイシ", "山田"},
 	{"2012_11_13\\IMG_0003.jpg", "ディネス", "山田"},
@@ -70,12 +69,12 @@ static const cv::Rect trim_area[] = {
 	cv::Rect(1800, 0, 675, 190),	//集荷者
 	cv::Rect(1800, 140, 675, 190),	//検品者
 };
-#elif 1
+#elif 0
 static const cv::Rect trim_area[] = {
 	cv::Rect(1800, 30, 675, 160),	//集荷者
 	cv::Rect(1800, 170, 675, 160),	//検品者
 };
-#elif 1
+#elif 0
 static const cv::Rect trim_area[] = {
 	cv::Rect(2000, 0, 475, 190),	//集荷者
 	cv::Rect(2000, 140, 475, 190),	//検品者
