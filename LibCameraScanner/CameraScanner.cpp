@@ -242,18 +242,18 @@ namespace CameraScanner
 
 	void Reshape::makeBinaryColor()
 	{
-		Mat median;
+		Mat median, masked;
+		vector<Mat> hsv;
+
 		medianBlur(img_target, median, (int)(img_target.cols * 0.01717 * 1.5 / 2) * 2 + 1);
 		cvtColor(median, median, CV_BGR2HSV);
+		split(median, hsv);
 
 		Mat mask = Mat::zeros(median.rows + 2, median.cols + 2, CV_8UC1);
-		Scalar hsv_diff = CV_RGB(2, 20, 20);
-		floodFill(median, mask, Point(median.cols/2, median.rows/2), CV_RGB(0, 0, 0), nullptr, hsv_diff, hsv_diff, FLOODFILL_MASK_ONLY | 255<<8 | 4);
+		Scalar hsv_diff = Scalar(2);
+		floodFill(hsv[2], mask, Point(median.cols/2, median.rows/2), Scalar(), nullptr, hsv_diff, hsv_diff, FLOODFILL_MASK_ONLY | 255<<8 | 4);
 		erode(mask, mask, Mat());
-
-		Mat masked;
-		vector<Mat> hsv;
-		split(median, hsv);
+		//imshow("mask", mask);
 
 		hsv[2].copyTo(masked, Mat(mask, Rect(1, 1, median.cols, median.rows)));
 
