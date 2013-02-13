@@ -1,14 +1,15 @@
 #pragma once
-#include "stdafx.h"
 #include <opencv2/opencv.hpp>
 
 namespace CVUtil { namespace CLI
 {
 	using namespace System;
 	using namespace System::Drawing;
-	Bitmap^ convertMatToBitmap(cv::Mat& img_src);
-	std::string convertFileName(String^ file_name);
-	String^ convertFileName(const std::string& file_name);
+	Bitmap^ convertImage(cv::Mat& img_src);
+	//FIXME: not tested
+	cv::Mat convertImage(Image^ image);
+	std::string convertString(String^ file_name);
+	String^ convertString(const std::string& file_name);
 
 	namespace Control
 	{

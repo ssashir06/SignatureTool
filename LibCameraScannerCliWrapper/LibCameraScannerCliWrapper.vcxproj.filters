@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Form">
+      <UniqueIdentifier>{50fe4759-3327-4439-b7e2-872b0e5356c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cv utils">
+      <UniqueIdentifier>{9519b8c5-9f76-4341-b5b4-02d5861c1ea5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ScannedImage">
+      <UniqueIdentifier>{255bd15d-b74b-4846-aea7-3d9e575d62d6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Scan.h">
+      <Filter>Form</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cv_utils\cv_utils_cli.h">
+      <Filter>cv utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ScannedImageCV.h">
+      <Filter>ScannedImage</Filter>
+    </ClInclude>
+    <ClInclude Include="IScannedImage.h">
+      <Filter>ScannedImage</Filter>
+    </ClInclude>
+    <ClInclude Include="ScannedImagePure.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cv_utils\cv_utils_cli.cpp">
+      <Filter>cv utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Scan.cpp">
+      <Filter>Form</Filter>
+    </ClCompile>
+    <ClCompile Include="ScannedImageCV.cpp">
+      <Filter>ScannedImage</Filter>
+    </ClCompile>
+    <ClCompile Include="ScannedImagePure.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Scan.resx">
+      <Filter>リソース ファイル</Filter>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

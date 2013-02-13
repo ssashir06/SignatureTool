@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <vector>
 #include <string>
 #include <opencv2/opencv.hpp>
@@ -10,8 +9,9 @@ namespace CVUtil { namespace CLI
 	using namespace System::Drawing;
 	using namespace System::Drawing::Imaging;
 	using namespace System::Runtime::InteropServices;
+	using namespace System::IO;
 
-	Bitmap^ convertMatToBitmap(cv::Mat& img_src)
+	Bitmap^ convertImage(cv::Mat& img_src)
 	{
 		PixelFormat fmt;
 
@@ -58,7 +58,23 @@ namespace CVUtil { namespace CLI
 		return bmp;
 	}
 
-	std::string convertFileName(String^ file_name)
+	cv::Mat convertImage(Image^ image)
+	{
+		if (!image) return cv::Mat();
+
+		//FIXME
+		MemoryStream^ ms = gcnew MemoryStream();
+		image->Save(ms, ImageFormat::Bmp);
+		auto buffer_array = ms->GetBuffer();
+		pin_ptr<unsigned char>buffer_pin_ptr = &buffer_array[0];
+		unsigned char* buffer_ptr = buffer_pin_ptr;
+		cv::Mat buffer_mat = cv::Mat(1, buffer_array->Length, CV_8UC1, (void*)buffer_ptr);
+		cv::Mat image_mat;
+		cv::imdecode(buffer_mat,1, &image_mat);
+		return image_mat;
+	}
+
+	std::string convertString(String^ file_name)
 	{
 		IntPtr ptr = Marshal::StringToHGlobalAnsi(file_name);
 		std::string string_stl((char*)(void*)ptr);
@@ -66,7 +82,7 @@ namespace CVUtil { namespace CLI
 		return string_stl;
 	}
 
-	String^ convertFileName(const std::string& file_name)
+	String^ convertString(const std::string& file_name)
 	{
 		return Marshal::PtrToStringAnsi((IntPtr)(void*)file_name.c_str());
 	}
@@ -76,7 +92,7 @@ namespace CVUtil { namespace CLI
 		using namespace System::Windows::Forms;
 		System::Void showImage(cv::Mat& img_src, PictureBox^ picturebox, bool fit_to_pixture_box)
 		{
-			Bitmap^ bmp = convertMatToBitmap(img_src);
+			Bitmap^ bmp = convertImage(img_src);
 
 			switch (fit_to_pixture_box) {
 			case true:
