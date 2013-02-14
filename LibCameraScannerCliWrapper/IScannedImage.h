@@ -11,7 +11,7 @@ namespace CameraScanner {
 	public:
 		Void SaveImage();
 		Void SaveImage(String^ file_name);
-		virtual String^ ToString() override;
+		virtual String^ ToString();
 
 		[XmlIgnore]
 		property Image^ Page

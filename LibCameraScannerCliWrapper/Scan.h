@@ -15,6 +15,7 @@ namespace CameraScanner { namespace GUI {
 	using namespace System::Drawing;
 	using namespace System::Xml::Serialization;
 	using namespace System::IO;
+	using namespace System::Threading;
 	using namespace CVUtil;
 
 	public ref class Scan : public System::Windows::Forms::Form
@@ -39,12 +40,11 @@ namespace CameraScanner { namespace GUI {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::PictureBox^  pictureBox;
+	private:System::Windows::Forms::PictureBox^  pictureBox;
 	private:System::Windows::Forms::Button^  buttonScan;
 	private:System::ComponentModel::IContainer^  components;
 	private:System::Windows::Forms::StatusStrip^  statusStrip1;
 	private:System::Windows::Forms::ToolStripStatusLabel^  toolStripStatus;
-	private:System::Windows::Forms::Timer^  timerTakenWait;
 	private:System::Windows::Forms::Button^  buttonUse;
 	private:System::Windows::Forms::Button^  buttonRescan;
 	private:System::Windows::Forms::MenuStrip^  menuStrip1;
@@ -55,7 +55,7 @@ namespace CameraScanner { namespace GUI {
 	private:System::Windows::Forms::ToolStripMenuItem^  quitToolStripMenuItem;
 	private:System::Windows::Forms::CheckedListBox^  checkedListBoxImages;
 	private:System::Windows::Forms::GroupBox^  groupBox1;
-	private: System::Windows::Forms::Button^  buttonStartScan;
+	private:System::Windows::Forms::Button^  buttonStartScan;
 	private:System::Windows::Forms::Timer^  timerCapturingUpdate;
 
 	private:
@@ -72,7 +72,6 @@ namespace CameraScanner { namespace GUI {
 			this->timerCapturingUpdate = (gcnew System::Windows::Forms::Timer(this->components));
 			this->statusStrip1 = (gcnew System::Windows::Forms::StatusStrip());
 			this->toolStripStatus = (gcnew System::Windows::Forms::ToolStripStatusLabel());
-			this->timerTakenWait = (gcnew System::Windows::Forms::Timer(this->components));
 			this->buttonUse = (gcnew System::Windows::Forms::Button());
 			this->buttonRescan = (gcnew System::Windows::Forms::Button());
 			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
@@ -117,6 +116,7 @@ namespace CameraScanner { namespace GUI {
 			// 
 			// timerCapturingUpdate
 			// 
+			this->timerCapturingUpdate->Interval = 200;
 			this->timerCapturingUpdate->Tick += gcnew System::EventHandler(this, &Scan::timerCapturingUpdate_Tick);
 			// 
 			// statusStrip1
@@ -257,6 +257,7 @@ namespace CameraScanner { namespace GUI {
 			this->Margin = System::Windows::Forms::Padding(3, 4, 3, 4);
 			this->Name = L"Scan";
 			this->Text = L"Scan";
+			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &Scan::Scan_FormClosing);
 			this->Load += gcnew System::EventHandler(this, &Scan::Scan_Load);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBox))->EndInit();
 			this->statusStrip1->ResumeLayout(false);
@@ -294,6 +295,9 @@ namespace CameraScanner { namespace GUI {
 	};
 	private:RunMode current_mode;
 
+	private:Object^ lock_calcurating_scan_image;
+	private:SynchronizationContext^ original_context;
+
 	private:CameraScanner::ScanSpec* paper_spec;
 	private:CameraScanner::Reshape* scanner;
 	private:cv::VideoCapture* camera;
@@ -305,6 +309,37 @@ namespace CameraScanner { namespace GUI {
 	private:IScannedImage^ current_scan_image;
 	private:String^ xml_file_path;
 
+	//マルチスレッド用
+	private:ref class SetMessageData
+			{
+			public:
+				SetMessageData() {}
+				SetMessageData(String^ msg, Scan^ scanner) : msg(msg), scanner(scanner) {}
+				~SetMessageData() {}
+				String^ msg;
+				Scan^ scanner;
+				Void Write(Object^ obj)
+				{
+					if (scanner) scanner->toolStripStatus->Text = msg;
+				}
+			};
+	private:ref class ImageUpdateData
+			{
+			public:
+				ImageUpdateData() {}
+				ImageUpdateData(cv::Mat& img, PictureBox^ picture_box, PictureBoxSizeMode fit_to_box) : img(CVUtil::CLI::convertImage(img)), picture_box(picture_box), fit_to_box(fit_to_box) {}
+				ImageUpdateData(Image^ img, PictureBox^ picture_box, PictureBoxSizeMode fit_to_box) : img(img), picture_box(picture_box), fit_to_box(fit_to_box) {}
+				~ImageUpdateData() {}
+				Image^ img;
+				PictureBox^ picture_box;
+				PictureBoxSizeMode fit_to_box;
+				Void Draw(Object^ obj)
+				{
+					if (!picture_box) return;
+					picture_box->SizeMode = fit_to_box;
+					picture_box->Image = img;
+				}
+			};
 #pragma endregion
 #pragma region 関数
 
@@ -314,9 +349,12 @@ namespace CameraScanner { namespace GUI {
 				scanner = new CameraScanner::Reshape(*paper_spec);
 				camera = new cv::VideoCapture();
 				current_mode = RunMode::Capturinging;
+				lock_calcurating_scan_image = gcnew Object;
+				original_context = SynchronizationContext::Current;
 			}
 	private:Void quit()
 			{
+				Monitor::Enter(lock_calcurating_scan_image);// stop timerd scanning mode
 
 				switch (current_mode) {
 				case RunMode::Checking:
@@ -331,28 +369,31 @@ namespace CameraScanner { namespace GUI {
 			}
 	private:Void setMessage(String^ msg)
 			{
-				toolStripStatus->Text = msg;
+				SetMessageData^ messanger = gcnew SetMessageData(msg, this);
+				original_context->Post(gcnew SendOrPostCallback(messanger, &SetMessageData::Write), false);
 			}
-	private:Void setMessage(const wchar_t* const msg)
+	private:Void setMessage(Exception^ e)
 			{
-				setMessage(gcnew String(msg));
+				setMessage(e->Message);
 			}
 #pragma region モード切替/ボタン表示・非表示
 	private:Void startCapturinging()
 			{
 				buttonScan->Text = L"Scan";
-				timerCapturingUpdate->Enabled = true;
 				buttonScan->Visible = true;
 				buttonUse->Visible = false;
 				buttonRescan->Visible = false;
 				buttonStartScan->Visible = false;
 				current_mode = RunMode::Capturinging;
+				timerCapturingUpdate->Enabled = true;
 			}
 	private:Void stopCapturinging()
 			{
 				buttonScan->Text = L"Start previewing";
-				timerCapturingUpdate->Enabled = false;
 				current_mode = RunMode::None;
+				timerCapturingUpdate->Enabled = false;
+				Monitor::Enter(lock_calcurating_scan_image);// wait for finish scanning
+				Monitor::Exit(lock_calcurating_scan_image);
 			}
 	private:Void startChecking()
 			{
@@ -431,16 +472,24 @@ namespace CameraScanner { namespace GUI {
 				CameraScanner::trimBorder(img_trim);//bugfix for cheap camera
 				return img_trim;
 			}
-	private:Void showCapturing(bool show_lines)
+			// For multi-threading
+	private:Void showCapturing()
 			{
+				if (!Monitor::TryEnter(lock_calcurating_scan_image)) return;
+
+				static int frame;
 				if (!connect()) return;
+
+				bool show_lines = (frame == 0);
+				frame = (frame+1)%(int)(1.0 * 1000.0/timerCapturingUpdate->Interval);
+
 				cv::Mat img;
 				try {
 					img = takeShot(true);
-				} catch (const wchar_t* const msg) {
-					setMessage(msg);
+				} catch (Exception^ e) {
+					setMessage(L"Error: " + e->Message);
 					disconnect();
-					return;
+					goto end;
 				}
 
 				if (show_lines) {
@@ -448,17 +497,20 @@ namespace CameraScanner { namespace GUI {
 						scanner->prepare(img);
 						img = scanner->drawSideLines(true);
 						setMessage(L"The edges of paper are detected.");
-					} catch (const wchar_t* const msg) {
-						setMessage(msg);
+					} catch (Exception^ e) {
+						setMessage(L"Error: " + e->Message);
 					}
 				} else {
 					try {
 						scanner->drawSideLines(img);
-					} catch (const wchar_t* const msg) {
-						setMessage(msg);
+					} catch (Exception^ e) {
+						setMessage(L"Error: " + e->Message);
 					}
 				}
-				CLI::Control::showImage(img, pictureBox, true);
+				showImage(img);
+
+				end:
+				Monitor::Exit(lock_calcurating_scan_image);
 			}
 	private:template<typename T>
 				List<T>^ deepCopyList(List<T>^ src)
@@ -477,10 +529,10 @@ namespace CameraScanner { namespace GUI {
 				cv::Mat img;
 				try {
 					img = takeShot(false);
-				} catch (const wchar_t* const msg) {
-					setMessage(msg);
+				} catch (Exception^ e) {
+					setMessage(L"Error: " + e->Message);
 					disconnect();
-					throw msg;
+					throw e;
 				}
 
 				cv::Mat paper;
@@ -514,10 +566,20 @@ namespace CameraScanner { namespace GUI {
 					return nullptr;
 				}
 			}
+	private:Void showImage(cv::Mat& image)
+			{
+				ImageUpdateData^ updater = gcnew ImageUpdateData(image, pictureBox, PictureBoxSizeMode::Zoom); 
+				original_context->Post(gcnew SendOrPostCallback(updater, &ImageUpdateData::Draw), false);
+			}
+	private:Void showImage(Image^ image)
+			{
+				ImageUpdateData^ updater = gcnew ImageUpdateData(image, pictureBox, PictureBoxSizeMode::Zoom); 
+				original_context->Post(gcnew SendOrPostCallback(updater, &ImageUpdateData::Draw), false);
+			}
 	private:Void showImage()
 			{
 				if (!current_scan_image) return;
-				pictureBox->Image = getCurrentScanImage();
+				showImage(current_scan_image->Page);
 			}
 	private:Void addImage()
 			{
@@ -669,6 +731,29 @@ namespace CameraScanner { namespace GUI {
 				}
 				xml_file_path = Path::GetDirectoryName(xml_file_name);
 			}
+	private:bool confirmClosing()
+			{
+				switch (
+					MessageBox::Show(
+					L"Scanning window will be now closed. Do you want to save images?", 
+					L"Save images before closing?", 
+					MessageBoxButtons::YesNoCancel))
+				{
+				case System::Windows::Forms::DialogResult::Yes: 
+					showSaveDialog();//TODO: Check failure
+					return true;
+					break;
+				case System::Windows::Forms::DialogResult::No:
+					return true;
+					break;
+				case System::Windows::Forms::DialogResult::Cancel:
+					break;
+				default:
+					throw;
+					break;
+				}
+				return false;
+			}
 #pragma endregion
 #pragma endregion
 			// Events of controls
@@ -723,15 +808,24 @@ namespace CameraScanner { namespace GUI {
 			}
 	private:Void timerCapturingUpdate_Tick(System::Object^  sender, System::EventArgs^  e)
 			{
-				static int frame;
-				if (frame==0) showCapturing(true);
-				else showCapturing(false);
-				frame = (frame+1)%5;
+				Thread^ t = gcnew Thread(gcnew ThreadStart(this, &Scan::showCapturing));
+				t->Start();
 			}
 	private:Void Scan_Load(System::Object^  sender, System::EventArgs^  e)
 			{
 				timerCapturingUpdate->Interval = 100;
 				startCapturinging();
+			}
+	private:Void Scan_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e)
+			{
+				if (e->CloseReason == CloseReason::WindowsShutDown)
+				{
+					// TODO
+				}
+				else
+				{
+					e->Cancel = !confirmClosing();
+				}
 			}
 	private:Void openToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 			{
@@ -757,25 +851,7 @@ namespace CameraScanner { namespace GUI {
 			}
 	private:Void quitToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 			{
-				switch (
-					MessageBox::Show(
-					L"Scanning window will be now closed. Do you want to save images?", 
-					L"Save images before closing?", 
-					MessageBoxButtons::YesNoCancel))
-				{
-				case System::Windows::Forms::DialogResult::Yes: 
-					showSaveDialog();//TODO: Check failure
-					Close();
-					break;
-				case System::Windows::Forms::DialogResult::No:
-					Close();
-					break;
-				case System::Windows::Forms::DialogResult::Cancel:
-					break;
-				default:
-					throw;
-					break;
-				}
-		 }
+				if (confirmClosing()) Close();
+			}
 };
 }}
