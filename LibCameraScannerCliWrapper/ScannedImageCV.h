@@ -3,7 +3,7 @@
 #include "ScannedImagePure.h"
 #include "../LibGuessSignature/GuessSignature.h"
 
-namespace CameraScanner {
+namespace CameraScanner { namespace CLI {
 	using namespace System;
 	using namespace System::Xml::Serialization;
 
@@ -21,4 +21,4 @@ namespace CameraScanner {
 			Void set(cv::Mat value);
 		}
 	};
-}
+}}

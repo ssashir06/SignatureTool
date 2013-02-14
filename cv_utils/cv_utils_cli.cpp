@@ -3,8 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include "cv_utils_cli.h"
 
-namespace CVUtil { namespace CLI
-{
+namespace CVUtil { namespace CLI {
 	using namespace System;
 	using namespace System::Drawing;
 	using namespace System::Drawing::Imaging;

@@ -1,0 +1,11 @@
+#pragma once
+#include <list>
+#include <tuple>
+#include <iostream>
+#include <sstream>
+#include <cfloat>
+#include <cmath>
+#include <ctime>
+#include <algorithm>
+#include <map>
+#include <opencv2/opencv.hpp>

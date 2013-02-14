@@ -10,7 +10,6 @@
 
 namespace Signature
 {
-
 	namespace Image
 	{
 		typedef std::vector<cv::KeyPoint> KeyPoints;
@@ -117,23 +116,4 @@ namespace Signature
 			virtual Image::Descriptor getDescriptor(const Image::Base& image) const;
 		};
 	}
-
-	//TODO: move
-	template<typename TS>
-	class OmpStreamWrapper
-	{
-		TS* stream;
-	public:
-		OmpStreamWrapper(TS& stream) : stream(&stream) {}
-		template<typename T> TS& operator<<(T& value)
-		{
-			TS* ret;
-#pragma omp critical
-			{
-				ret = &((*stream)<<value);
-			}
-			return *ret;
-		}
-	};
-	template<typename Ts1, typename Ts2> static OmpStreamWrapper<std::basic_ostream<Ts1, Ts2> > OmpStream(std::basic_ostream<Ts1, Ts2>& stream) { return OmpStreamWrapper<std::basic_ostream<Ts1, Ts2> >(stream); }
 }

@@ -11,25 +11,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}</ProjectGuid>
+    <ProjectGuid>{65BC6625-0132-417E-87DA-5E5656C61B09}</ProjectGuid>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
-    <RootNamespace>SignatureNameEditor</RootNamespace>
+    <RootNamespace>LibGuessSignatureCliWrapper</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CLRSupport>Pure</CLRSupport>
-    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <CLRSupport>Pure</CLRSupport>
-    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -53,40 +53,24 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <CompileAsManaged>true</CompileAsManaged>
-      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_nonfree243d.lib;opencv_core243d.lib;opencv_features2d243d.lib;opencv_highgui243d.lib;opencv_imgproc243d.lib;opencv_flann243d.lib;opencv_objdetect243d.lib;opencv_calib3d243d.lib;$(OutDir)LibCameraScanner.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <EntryPointSymbol>main</EntryPointSymbol>
+      <AdditionalDependencies>opencv_nonfree243d.lib;opencv_core243d.lib;opencv_features2d243d.lib;opencv_highgui243d.lib;opencv_imgproc243d.lib;opencv_flann243d.lib;opencv_objdetect243d.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <Bscmake>
-      <PreserveSbr>true</PreserveSbr>
-    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <CompileAsManaged>true</CompileAsManaged>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_nonfree243.lib;opencv_core243.lib;opencv_features2d243.lib;opencv_highgui243.lib;opencv_imgproc243.lib;opencv_flann243.lib;opencv_objdetect243.lib;opencv_calib3d243.lib;$(OutDir)LibCameraScanner.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <EntryPointSymbol>main</EntryPointSymbol>
+      <AdditionalDependencies>opencv_nonfree243.lib;opencv_core243.lib;opencv_features2d243.lib;opencv_highgui243.lib;opencv_imgproc243.lib;opencv_flann243.lib;opencv_objdetect243.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Reference Include="*Microsoft.VisualBasic, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="*System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-    <Reference Include="*System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="*System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -94,44 +78,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.ico" />
+    <ClInclude Include="..\cv_utils\cv_utils_cli.h" />
+    <ClInclude Include="GuessSignature.h" />
+    <ClInclude Include="IGuessSignature.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\cv_utils\cv_utils_cli.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="cv_utils_cli.cpp" />
-    <ClCompile Include="SignatureImage.cpp" />
-    <ClCompile Include="SignatureNameEditor.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="GuessSignature.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\LibCameraScanner\CameraScanner.h" />
-    <ClInclude Include="..\LibGuessSignature\GuessEvalEasy.h" />
-    <ClInclude Include="..\LibGuessSignature\GuessSignature.h" />
-    <ClInclude Include="cv_utils_cli.h" />
-    <ClInclude Include="Scan.h">
-      <FileType>CppForm</FileType>
-    </ClInclude>
-    <ClInclude Include="SignatureImage.h" />
-    <ClInclude Include="SignPreview.h">
-      <FileType>CppForm</FileType>
-    </ClInclude>
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="stdafx.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="app.rc" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Scan.resx">
-      <DependentUpon>Scan.h</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SignPreview.resX">
-      <DependentUpon>SignPreview.h</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <Image Include="app.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

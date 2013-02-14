@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "ScannedImagePure.h"
 
-namespace CameraScanner
-{
+namespace CameraScanner { namespace CLI {
 	using namespace System;
 	using namespace System::Drawing::Imaging;
 	using namespace System::IO;
@@ -122,4 +121,4 @@ namespace CameraScanner
 		}
 		return nullptr;
 	}
-}
+}}

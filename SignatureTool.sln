@@ -21,12 +21,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibGuessSignature", "LibGue
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{FC631DD2-1146-498F-A92D-AA45DE96BE99}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SignatureNameEditor", "SignatureNameEditor\SignatureNameEditor.vcxproj", "{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6} = {B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}
-		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {9E183EDA-6208-4434-A7B3-94BF05B0E09A}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GuessTestWithCaltec101", "GuessTestWithCaltec101\GuessTestWithCaltec101.vcxproj", "{8A22FE31-A758-4CE8-A905-C32D086F16BD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {9E183EDA-6208-4434-A7B3-94BF05B0E09A}
@@ -40,6 +34,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{CD1BCC37-38F8-4526-9CEB-36C387979A72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraScannerCliWrapperSample", "CameraScannerCliWrapperSample\CameraScannerCliWrapperSample.csproj", "{AE9F5BA4-0D3A-40E4-A42F-582F849E6290}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibGuessSignatureCliWrapper", "LibGuessSignatureCliWrapper\LibGuessSignatureCliWrapper.vcxproj", "{65BC6625-0132-417E-87DA-5E5656C61B09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,18 +109,6 @@ Global
 		{9E183EDA-6208-4434-A7B3-94BF05B0E09A}.Release|Win32.Build.0 = Release|Win32
 		{9E183EDA-6208-4434-A7B3-94BF05B0E09A}.Release|x64.ActiveCfg = Release|x64
 		{9E183EDA-6208-4434-A7B3-94BF05B0E09A}.Release|x64.Build.0 = Release|x64
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Debug|Win32.Build.0 = Debug|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Debug|x64.ActiveCfg = Debug|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Release|Any CPU.ActiveCfg = Release|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Release|Win32.ActiveCfg = Release|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Release|Win32.Build.0 = Release|Win32
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E}.Release|x64.ActiveCfg = Release|Win32
 		{8A22FE31-A758-4CE8-A905-C32D086F16BD}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{8A22FE31-A758-4CE8-A905-C32D086F16BD}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{8A22FE31-A758-4CE8-A905-C32D086F16BD}.Debug|Mixed Platforms.Build.0 = Debug|Win32
@@ -167,6 +151,18 @@ Global
 		{AE9F5BA4-0D3A-40E4-A42F-582F849E6290}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AE9F5BA4-0D3A-40E4-A42F-582F849E6290}.Release|Win32.ActiveCfg = Release|Any CPU
 		{AE9F5BA4-0D3A-40E4-A42F-582F849E6290}.Release|x64.ActiveCfg = Release|Any CPU
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Debug|Win32.ActiveCfg = Debug|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Debug|Win32.Build.0 = Debug|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Debug|x64.ActiveCfg = Debug|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Release|Any CPU.ActiveCfg = Release|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Release|Win32.ActiveCfg = Release|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Release|Win32.Build.0 = Release|Win32
+		{65BC6625-0132-417E-87DA-5E5656C61B09}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -181,7 +177,7 @@ Global
 		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {5E290395-C7A4-467C-BA34-E17713539364}
 		{B79AFDB0-8F1B-418A-91C1-677ABFB12EBE} = {5E290395-C7A4-467C-BA34-E17713539364}
 		{8A22FE31-A758-4CE8-A905-C32D086F16BD} = {5E290395-C7A4-467C-BA34-E17713539364}
-		{D20D4101-11B7-418F-9FAC-8F323DF5ED2E} = {CD1BCC37-38F8-4526-9CEB-36C387979A72}
+		{65BC6625-0132-417E-87DA-5E5656C61B09} = {5E290395-C7A4-467C-BA34-E17713539364}
 	EndGlobalSection
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True

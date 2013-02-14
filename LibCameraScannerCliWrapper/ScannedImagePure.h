@@ -1,7 +1,6 @@
 #pragma once
 #include "IScannedImage.h"
-namespace CameraScanner
-{
+namespace CameraScanner { namespace CLI {
 	using namespace System;
 	using namespace System::Xml::Serialization;
 	using namespace System::Drawing;
@@ -49,4 +48,4 @@ namespace CameraScanner
 	protected:
 		static ImageCodecInfo^ GetEncoderInfo(ImageFormat^ format);
 	};
-}
+}}

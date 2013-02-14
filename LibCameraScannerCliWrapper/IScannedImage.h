@@ -1,5 +1,5 @@
 #pragma once
-namespace CameraScanner {
+namespace CameraScanner { namespace CLI {
 	using namespace System;
 	using namespace System::Xml::Serialization;
 	using namespace System::Drawing;
@@ -39,4 +39,4 @@ namespace CameraScanner {
 			Boolean get();
 		}
 	};
-}
+}}

@@ -4,7 +4,7 @@
 #include "LibSVM.h"
 #include "GuessKMeans.h"
 
-namespace Signature{
+namespace Signature {
 	namespace Guess {
 		class SvmBase : public KMeansBase
 		{
@@ -35,5 +35,23 @@ namespace Signature{
 		LibSVM::NodeArray buildNodeArray(const Image::Descriptor& descriptor);
 		LibSVM::ScalingSetting buildScalingSetting(const std::vector<std::pair<std::string, Image::Descriptor> >& histgrams_by_name);
 #pragma endregion
+
+		template<typename TS>
+		class OmpStreamWrapper
+		{
+			TS* stream;
+		public:
+			OmpStreamWrapper(TS& stream) : stream(&stream) {}
+			template<typename T> TS& operator<<(T& value)
+			{
+				TS* ret;
+#pragma omp critical
+				{
+					ret = &((*stream)<<value);
+				}
+				return *ret;
+			}
+		};
+		template<typename Ts1, typename Ts2> static OmpStreamWrapper<std::basic_ostream<Ts1, Ts2> > OmpStream(std::basic_ostream<Ts1, Ts2>& stream) { return OmpStreamWrapper<std::basic_ostream<Ts1, Ts2> >(stream); }
 	}
 }

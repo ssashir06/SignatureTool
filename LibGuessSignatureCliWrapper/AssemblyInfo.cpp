@@ -11,12 +11,12 @@ using namespace System::Security::Permissions;
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
 //
-[assembly:AssemblyTitleAttribute("SignatureNameEditor")];
+[assembly:AssemblyTitleAttribute("LibGuessSignatureCliWrapper")];
 [assembly:AssemblyDescriptionAttribute("")];
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
-[assembly:AssemblyProductAttribute("SignatureNameEditor")];
-[assembly:AssemblyCopyrightAttribute("Copyright (c)  2012")];
+[assembly:AssemblyProductAttribute("LibGuessSignatureCliWrapper")];
+[assembly:AssemblyCopyrightAttribute("Copyright (c)  2013")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 

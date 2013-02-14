@@ -17,6 +17,7 @@ namespace CameraScanner { namespace GUI {
 	using namespace System::IO;
 	using namespace System::Threading;
 	using namespace CVUtil;
+	using namespace CameraScanner::CLI;
 
 	public ref class Scan : public System::Windows::Forms::Form
 	{
@@ -308,6 +309,7 @@ namespace CameraScanner { namespace GUI {
 
 	private:IScannedImage^ current_scan_image;
 	private:String^ xml_file_path;
+	private:String^ xml_file_name;
 
 	//マルチスレッド用
 	private:ref class SetMessageData
@@ -342,7 +344,6 @@ namespace CameraScanner { namespace GUI {
 			};
 #pragma endregion
 #pragma region 関数
-
 	private:Void init()
 			{
 				paper_spec = new CameraScanner::ScanSpec(210, 297, 300);
@@ -599,15 +600,23 @@ namespace CameraScanner { namespace GUI {
 			{
 				SaveFileDialog^ dialog = gcnew SaveFileDialog();
 				dialog->Filter = L"Scanned Image info(*.xml)|*.xml";
+				if (xml_file_path) dialog->InitialDirectory = xml_file_path;
 				if (dialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) return nullptr;
-				else return dialog->FileName;
+				
+				xml_file_path = Path::GetDirectoryName(dialog->FileName);
+				xml_file_name = Path::GetFileName(dialog->FileName);
+				return dialog->FileName;
 			}
 	private:String^ showLoadDialog()
 			{
 				OpenFileDialog^ dialog = gcnew OpenFileDialog();
+				if (xml_file_path) dialog->InitialDirectory = xml_file_path;
 				dialog->Filter = L"Scanned Image info(*.xml)|*.xml";
 				if (dialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) return nullptr;
-				else return dialog->FileName;
+				
+				xml_file_path = Path::GetDirectoryName(dialog->FileName);
+				xml_file_name = Path::GetFileName(dialog->FileName);
+				return dialog->FileName;
 			}
 			// see http://msdn.microsoft.com/ja-jp/library/system.xml.serialization.xmlattributes.xmlignore(v=vs.100).aspx
 			//     http://msdn.microsoft.com/ja-jp/library/71s92ee1(v=vs.100).aspx
@@ -756,6 +765,25 @@ namespace CameraScanner { namespace GUI {
 			}
 #pragma endregion
 #pragma endregion
+#pragma region プロパティ
+	public:property String^ XmlFilePath
+		   {
+			   String^ get() { return xml_file_path; }
+			   Void set(String^ value) { xml_file_path = value; }
+		   }
+	public:property String^ XmlFileNameFullPath
+		   {
+			   String^ get()
+			   {
+				   if (xml_file_path && xml_file_name)
+					   return Path::Combine(xml_file_path, xml_file_name);
+				   else if (xml_file_name)
+					   return Path::Combine(Directory::GetCurrentDirectory(), xml_file_name);
+				   else
+					   return nullptr;
+			   }
+		   }
+#pragma endregion
 			// Events of controls
 	private:Void buttonScan_Click(System::Object^  sender, System::EventArgs^  e)
 			{
@@ -853,5 +881,5 @@ namespace CameraScanner { namespace GUI {
 			{
 				if (confirmClosing()) Close();
 			}
-};
+	};
 }}

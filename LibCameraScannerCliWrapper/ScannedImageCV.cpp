@@ -3,7 +3,7 @@
 #include "../cv_utils/cv_utils_cli.h"
 #include "ScannedImageCV.h"
 
-namespace CameraScanner {
+namespace CameraScanner { namespace CLI {
 	using namespace System;
 	using namespace System::Drawing::Imaging;
 
@@ -31,4 +31,4 @@ namespace CameraScanner {
 	{
 		img = CVUtil::CLI::convertImage(value);
 	}
-}
+}}
