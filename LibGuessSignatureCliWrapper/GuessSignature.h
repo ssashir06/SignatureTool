@@ -12,9 +12,10 @@ namespace Signature { namespace Guess { namespace CLI {
 	using namespace System::Collections;
 	using namespace System::Collections::Generic;
 
-	// T ... an inheritance class of Signature::Guess::Base
-	template<class T>
-	ref class Base : public IGuessSignature
+	/// <summary>
+	/// T ... an inheritance class of Signature::Guess::Base
+	/// </summary>
+	template<class T> ref class Base : public IGuessSignature
 	{
 	protected:
 		Conclusives^ training_filenames;
@@ -39,7 +40,7 @@ namespace Signature { namespace Guess { namespace CLI {
 			}
 		}
 
-		Void train()
+		Void Train()
 		{
 			std::list<Image::Conclusive> trains;
 			for each (Conclusive^ conclusive in training_filenames)
@@ -52,7 +53,7 @@ namespace Signature { namespace Guess { namespace CLI {
 			guess->train(trains);
 		}
 
-		Assessments^ match(String^ filename_of_query_image)
+		Assessments^ Match(String^ filename_of_query_image)
 		{
 			Image::Candidate query(CVUtil::CLI::convertString(filename_of_query_image));
 			Image::Candidate::Assessments assessments = guess->match(query);

@@ -111,6 +111,18 @@ namespace Signature{
 			}
 			return assessments;
 		}
+
+		void SvmOneVsAll::saveModel(const string& file_name) const
+		{
+			//TODO
+			throw new exception("not implemented!");
+		}
+
+		void SvmOneVsAll::loadModel(const string& file_name)
+		{
+			//TODO
+			throw new exception("not implemented!");
+		}
 #pragma endregion
 	}
 }

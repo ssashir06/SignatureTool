@@ -3,6 +3,8 @@
 #include <map>
 #include <opencv2/opencv.hpp>
 #include "GuessEvalEasy.h"
+#include "SaveLoadCV.h"
+using namespace CVUtil::ReadWrite;
 using namespace std;
 using namespace cv;
 
@@ -110,6 +112,32 @@ namespace Signature
 			}
 			assessments.sort();
 			return assessments;
+		}
+
+		void EvalEasy::saveModel(const string& file_name) const
+		{
+			FileStorage fs(file_name + ".xml", FileStorage::WRITE);
+			fs << "MatchingCountWeight" << matching_count_weight;
+			fs << "Machines" << (ICVSaveLoad&)machines;
+			fs << "TrainImages" << convertArray<vector<Image::Conclusive>, list<Image::Conclusive::Capsule<Image::Conclusive> > >(train_images);
+			fs.release();
+		}
+
+		void EvalEasy::loadModel(const string& file_name)
+		{
+			list<Image::Conclusive::Capsule<Image::Conclusive> > train_images_c;
+
+			FileStorage fs(file_name + ".xml", FileStorage::READ);
+			fs["MatchingCountWeight"] >> matching_count_weight;
+			fs["Machines"] >> (ICVSaveLoad&)machines;
+			fs["TrainImages"] >> train_images_c;
+
+			train_images = convertArray<list<Image::Conclusive::Capsule<Image::Conclusive> >, vector<Image::Conclusive> >(train_images_c);
+
+			vector<Image::Descriptor> train_descriptors(train_images.size());
+			int i=0;
+			for (const auto& train : train_images) train_descriptors[i++] = train.getDescriptor();
+			machines.getMatcher()->add(train_descriptors);
 		}
 	}
 }

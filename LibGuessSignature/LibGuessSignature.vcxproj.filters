@@ -11,17 +11,14 @@
     <Filter Include="StdAfx">
       <UniqueIdentifier>{944d8bf0-43ba-45d7-a270-42a856ce5991}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GuessSignature\File">
-      <UniqueIdentifier>{fcda9d94-4805-43bd-a349-00e8378a40be}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GuessSignature\Guess">
-      <UniqueIdentifier>{d90a81cb-5f12-4f1a-ac20-908f3944d745}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LIBSVMWrapper">
       <UniqueIdentifier>{69ca0902-08f4-43ce-839b-66ba61badef9}</UniqueIdentifier>
     </Filter>
     <Filter Include="SaveLoadCV">
       <UniqueIdentifier>{146d6eee-759a-4ffc-9bc8-5926addfd2d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GuessSignature\Guess Imprements">
+      <UniqueIdentifier>{d90a81cb-5f12-4f1a-ac20-908f3944d745}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,22 +29,25 @@
       <Filter>StdAfx</Filter>
     </ClCompile>
     <ClCompile Include="GuessKMeans.cpp">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClCompile>
     <ClCompile Include="GuessSvmOneVsAll.cpp">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClCompile>
     <ClCompile Include="LibSVM.cpp">
       <Filter>LIBSVMWrapper</Filter>
     </ClCompile>
     <ClCompile Include="GuessSvm.cpp">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClCompile>
     <ClCompile Include="GuessSvmOneVsOne.cpp">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClCompile>
     <ClCompile Include="GuessEvalEasy.cpp">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveLoadCV.cpp">
+      <Filter>SaveLoadCV</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,10 +58,10 @@
       <Filter>StdAfx</Filter>
     </ClInclude>
     <ClInclude Include="GuessKMeans.h">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClInclude>
     <ClInclude Include="GuessSvmOneVsAll.h">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClInclude>
     <ClInclude Include="LibSVM.h">
       <Filter>LIBSVMWrapper</Filter>
@@ -70,13 +70,13 @@
       <Filter>SaveLoadCV</Filter>
     </ClInclude>
     <ClInclude Include="GuessSvm.h">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClInclude>
     <ClInclude Include="GuessSvmOneVsOne.h">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClInclude>
     <ClInclude Include="GuessEvalEasy.h">
-      <Filter>GuessSignature\Guess</Filter>
+      <Filter>GuessSignature\Guess Imprements</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

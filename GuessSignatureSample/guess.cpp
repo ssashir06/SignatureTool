@@ -12,11 +12,12 @@
 using namespace std;
 using namespace cv;
 using namespace Signature;
+using namespace CVUtil::ReadWrite;
 
 list<Image::Conclusive > train_images;
 map<string, list<Image::Candidate> > query_image_by_name;
 
-void loadImages()
+void loadImages(bool train, bool query)
 {
 	map<string, list<pair<int, string> > > file_by_name;
 	int number_of_images = sizeof(file_info)/sizeof(*file_info);
@@ -42,8 +43,12 @@ void loadImages()
 			const auto type = file_name_group.first;
 			const auto file_name = file_name_group.second;
 
+			bool add_train = train && (i != 0);
+			bool add_query = query && (i == 0);
+			i++;
+
 			Mat img_loaded;
-			if (last_loaded.first != file_name)
+			if ((add_train || add_query) && last_loaded.first != file_name)
 			{
 				if (true)
 				{
@@ -58,12 +63,13 @@ void loadImages()
 				img_loaded = last_loaded.second;
 			}
 
-			Mat img_trim = Mat(img_loaded, trim_area[type]).clone();
-			if (i++ != 0) {
+			Mat img_trim ;
+			if (add_train || add_query)
+				img_trim = Mat(img_loaded, trim_area[type]).clone();
+			if (add_train)
 				train_images.push_back(Image::Conclusive(img_trim, name, file_name));
-			} else {
+			if (add_query)
 				query_image_by_name[name].push_back(Image::Candidate(img_trim, file_name));
-			}
 		}
 	}
 }
@@ -83,8 +89,15 @@ int main()
 	Guess::SvmOneVsOne trainer(k);
 #endif
 
-	loadImages();
-	trainer.train(train_images);
+	if (0)
+	{
+		loadImages(true, true);
+		trainer.train(train_images);
+		trainer.saveModel("test");
+	} else {
+		loadImages(false, true);
+		trainer.loadModel("test");
+	}
 
 	const string window_name = "query_name";
 	namedWindow(window_name);

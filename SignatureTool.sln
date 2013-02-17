@@ -34,8 +34,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{CD1BCC37-38F8-4526-9CEB-36C387979A72}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraScannerCliWrapperSample", "CameraScannerCliWrapperSample\CameraScannerCliWrapperSample.csproj", "{AE9F5BA4-0D3A-40E4-A42F-582F849E6290}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6} = {B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibGuessSignatureCliWrapper", "LibGuessSignatureCliWrapper\LibGuessSignatureCliWrapper.vcxproj", "{65BC6625-0132-417E-87DA-5E5656C61B09}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {9E183EDA-6208-4434-A7B3-94BF05B0E09A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

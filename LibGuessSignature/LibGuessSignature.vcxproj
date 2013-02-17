@@ -32,6 +32,7 @@
     <ClCompile Include="GuessSvmOneVsAll.cpp" />
     <ClCompile Include="LibSVM.cpp" />
     <ClCompile Include="GuessSvmOneVsOne.cpp" />
+    <ClCompile Include="SaveLoadCV.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\StdAfx\StdAfx.h" />

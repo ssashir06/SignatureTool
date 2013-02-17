@@ -13,7 +13,7 @@
 
 using namespace std;
 using namespace cv;
-using namespace CVUtil::SaveLoadCV;
+using namespace CVUtil::ReadWrite;
 
 namespace Signature{
 	namespace Guess {

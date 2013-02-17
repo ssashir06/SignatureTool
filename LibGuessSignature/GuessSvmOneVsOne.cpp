@@ -7,7 +7,7 @@
 
 using namespace cv;
 using namespace std;
-using namespace CVUtil::SaveLoadCV;
+using namespace CVUtil::ReadWrite;
 
 namespace Signature
 {
@@ -121,6 +121,18 @@ namespace Signature
 			}
 			assessments.sort();
 			return assessments;
+		}
+
+		void SvmOneVsOne::saveModel(const string& file_name) const
+		{
+			//TODO
+			throw new exception("not implemented!");
+		}
+
+		void SvmOneVsOne::loadModel(const string& file_name)
+		{
+			//TODO
+			throw new exception("not implemented!");
 		}
 	}
 }

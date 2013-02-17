@@ -25,6 +25,8 @@ namespace Signature
 			virtual void train(const std::list<Image::Conclusive >& trains);
 			virtual Image::Candidate::Assessments match(const Image::Candidate& query) const;
 
+			virtual void saveModel(const std::string& file_name) const;
+			virtual void loadModel(const std::string& file_name);
 		protected:
 			virtual void train();
 		};

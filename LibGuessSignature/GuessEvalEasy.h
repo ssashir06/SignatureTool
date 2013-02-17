@@ -9,16 +9,6 @@ namespace Signature
 		class EvalEasy : public Base
 		{
 		protected:
-			template<typename ArrayIn, typename ArrayOut>
-			static ArrayOut convertArray(const ArrayIn& src)
-			{
-				ArrayOut out;
-				for (ArrayIn::const_iterator it=src.begin(); it!=src.end(); it++)
-					out.push_back(*it);
-				return out;
-			}
-
-		protected:
 			static const int matching_count_weight_default = 100;
 			std::vector<Image::Conclusive> train_images;
 		public:
@@ -33,6 +23,9 @@ namespace Signature
 
 			virtual void train(const std::list<Image::Conclusive>& trains);
 			virtual Image::Candidate::Assessments match(const Image::Candidate& query) const;
+
+			virtual void saveModel(const std::string& file_name) const;
+			virtual void loadModel(const std::string& file_name);
 		};
 	}
 }

@@ -48,7 +48,10 @@ namespace Signature { namespace Guess { namespace CLI {
 			Conclusives^ get();
 		}
 
-		Void train();
-		Assessments^ match(String^ filename_of_query_image);
+		Void Train();
+		Assessments^ Match(String^ filename_of_query_image);
+
+		Void SaveModel(String^ filename);
+		Void LoadModel(String^ filename);
 	};
 }}}
