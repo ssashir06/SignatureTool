@@ -46,8 +46,15 @@
             this.toolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewImages = new System.Windows.Forms.DataGridView();
+            this.iDDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.takenDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.fileNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.directoryDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.mD5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.signatureCounterDataSet1 = new SignatureCountingTool.Database.SignatureCounterDataSet();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.panelTrimmingRectangle = new System.Windows.Forms.Panel();
+            this.pictureBoxDraggingBR = new System.Windows.Forms.PictureBox();
             this.comboBoxRectangleType = new System.Windows.Forms.ComboBox();
             this.buttonRemoveRectangle = new System.Windows.Forms.Button();
             this.buttonAddRectangle = new System.Windows.Forms.Button();
@@ -55,11 +62,6 @@
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.propertyGridTrim = new System.Windows.Forms.PropertyGrid();
             this.listBoxSignatures = new System.Windows.Forms.ListBox();
-            this.iDDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.takenDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.fileNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.directoryDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.mD5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -72,6 +74,8 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.panelTrimmingRectangle.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxDraggingBR)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTaken)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
@@ -244,6 +248,46 @@
             this.dataGridViewImages.TabIndex = 0;
             this.dataGridViewImages.SelectionChanged += new System.EventHandler(this.dataGridViewImages_SelectionChanged);
             // 
+            // iDDataGridViewTextBoxColumn
+            // 
+            this.iDDataGridViewTextBoxColumn.DataPropertyName = "ID";
+            this.iDDataGridViewTextBoxColumn.HeaderText = "ID";
+            this.iDDataGridViewTextBoxColumn.Name = "iDDataGridViewTextBoxColumn";
+            this.iDDataGridViewTextBoxColumn.ReadOnly = true;
+            this.iDDataGridViewTextBoxColumn.Width = 43;
+            // 
+            // takenDataGridViewTextBoxColumn
+            // 
+            this.takenDataGridViewTextBoxColumn.DataPropertyName = "Taken";
+            this.takenDataGridViewTextBoxColumn.HeaderText = "Taken";
+            this.takenDataGridViewTextBoxColumn.Name = "takenDataGridViewTextBoxColumn";
+            this.takenDataGridViewTextBoxColumn.ReadOnly = true;
+            this.takenDataGridViewTextBoxColumn.Width = 64;
+            // 
+            // fileNameDataGridViewTextBoxColumn
+            // 
+            this.fileNameDataGridViewTextBoxColumn.DataPropertyName = "FileName";
+            this.fileNameDataGridViewTextBoxColumn.HeaderText = "FileName";
+            this.fileNameDataGridViewTextBoxColumn.Name = "fileNameDataGridViewTextBoxColumn";
+            this.fileNameDataGridViewTextBoxColumn.ReadOnly = true;
+            this.fileNameDataGridViewTextBoxColumn.Width = 82;
+            // 
+            // directoryDataGridViewTextBoxColumn
+            // 
+            this.directoryDataGridViewTextBoxColumn.DataPropertyName = "Directory";
+            this.directoryDataGridViewTextBoxColumn.HeaderText = "Directory";
+            this.directoryDataGridViewTextBoxColumn.Name = "directoryDataGridViewTextBoxColumn";
+            this.directoryDataGridViewTextBoxColumn.ReadOnly = true;
+            this.directoryDataGridViewTextBoxColumn.Width = 80;
+            // 
+            // mD5DataGridViewTextBoxColumn
+            // 
+            this.mD5DataGridViewTextBoxColumn.DataPropertyName = "MD5";
+            this.mD5DataGridViewTextBoxColumn.HeaderText = "MD5";
+            this.mD5DataGridViewTextBoxColumn.Name = "mD5DataGridViewTextBoxColumn";
+            this.mD5DataGridViewTextBoxColumn.ReadOnly = true;
+            this.mD5DataGridViewTextBoxColumn.Width = 57;
+            // 
             // signatureCounterDataSet1
             // 
             this.signatureCounterDataSet1.DataSetName = "SignatureCounterDataSet";
@@ -258,6 +302,7 @@
             // 
             // splitContainer2.Panel1
             // 
+            this.splitContainer2.Panel1.Controls.Add(this.panelTrimmingRectangle);
             this.splitContainer2.Panel1.Controls.Add(this.comboBoxRectangleType);
             this.splitContainer2.Panel1.Controls.Add(this.buttonRemoveRectangle);
             this.splitContainer2.Panel1.Controls.Add(this.buttonAddRectangle);
@@ -269,6 +314,34 @@
             this.splitContainer2.Size = new System.Drawing.Size(551, 431);
             this.splitContainer2.SplitterDistance = 350;
             this.splitContainer2.TabIndex = 0;
+            // 
+            // panelTrimmingRectangle
+            // 
+            this.panelTrimmingRectangle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.panelTrimmingRectangle.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelTrimmingRectangle.Controls.Add(this.pictureBoxDraggingBR);
+            this.panelTrimmingRectangle.Cursor = System.Windows.Forms.Cursors.SizeAll;
+            this.panelTrimmingRectangle.Location = new System.Drawing.Point(36, 38);
+            this.panelTrimmingRectangle.Name = "panelTrimmingRectangle";
+            this.panelTrimmingRectangle.Size = new System.Drawing.Size(165, 121);
+            this.panelTrimmingRectangle.TabIndex = 4;
+            this.panelTrimmingRectangle.Visible = false;
+            this.panelTrimmingRectangle.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panelTrimmingRectangle_MouseMove);
+            this.panelTrimmingRectangle.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panelTrimmingRectangle_MouseUp);
+            // 
+            // pictureBoxDraggingBR
+            // 
+            this.pictureBoxDraggingBR.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBoxDraggingBR.Cursor = System.Windows.Forms.Cursors.SizeNESW;
+            this.pictureBoxDraggingBR.Image = global::SignatureCountingTool.Properties.Resources.drag;
+            this.pictureBoxDraggingBR.Location = new System.Drawing.Point(148, 104);
+            this.pictureBoxDraggingBR.Name = "pictureBoxDraggingBR";
+            this.pictureBoxDraggingBR.Size = new System.Drawing.Size(15, 15);
+            this.pictureBoxDraggingBR.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxDraggingBR.TabIndex = 0;
+            this.pictureBoxDraggingBR.TabStop = false;
+            this.pictureBoxDraggingBR.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBoxDraggingBR_MouseMove);
+            this.pictureBoxDraggingBR.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBoxDraggingBR_MouseUp);
             // 
             // comboBoxRectangleType
             // 
@@ -315,6 +388,7 @@
             this.pictureBoxTaken.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBoxTaken.TabIndex = 0;
             this.pictureBoxTaken.TabStop = false;
+            this.pictureBoxTaken.SizeChanged += new System.EventHandler(this.pictureBoxTaken_SizeChanged);
             // 
             // splitContainer3
             // 
@@ -355,41 +429,7 @@
             this.listBoxSignatures.Name = "listBoxSignatures";
             this.listBoxSignatures.Size = new System.Drawing.Size(191, 109);
             this.listBoxSignatures.TabIndex = 0;
-            // 
-            // iDDataGridViewTextBoxColumn
-            // 
-            this.iDDataGridViewTextBoxColumn.DataPropertyName = "ID";
-            this.iDDataGridViewTextBoxColumn.HeaderText = "ID";
-            this.iDDataGridViewTextBoxColumn.Name = "iDDataGridViewTextBoxColumn";
-            this.iDDataGridViewTextBoxColumn.Width = 43;
-            // 
-            // takenDataGridViewTextBoxColumn
-            // 
-            this.takenDataGridViewTextBoxColumn.DataPropertyName = "Taken";
-            this.takenDataGridViewTextBoxColumn.HeaderText = "Taken";
-            this.takenDataGridViewTextBoxColumn.Name = "takenDataGridViewTextBoxColumn";
-            this.takenDataGridViewTextBoxColumn.Width = 64;
-            // 
-            // fileNameDataGridViewTextBoxColumn
-            // 
-            this.fileNameDataGridViewTextBoxColumn.DataPropertyName = "FileName";
-            this.fileNameDataGridViewTextBoxColumn.HeaderText = "FileName";
-            this.fileNameDataGridViewTextBoxColumn.Name = "fileNameDataGridViewTextBoxColumn";
-            this.fileNameDataGridViewTextBoxColumn.Width = 82;
-            // 
-            // directoryDataGridViewTextBoxColumn
-            // 
-            this.directoryDataGridViewTextBoxColumn.DataPropertyName = "Directory";
-            this.directoryDataGridViewTextBoxColumn.HeaderText = "Directory";
-            this.directoryDataGridViewTextBoxColumn.Name = "directoryDataGridViewTextBoxColumn";
-            this.directoryDataGridViewTextBoxColumn.Width = 80;
-            // 
-            // mD5DataGridViewTextBoxColumn
-            // 
-            this.mD5DataGridViewTextBoxColumn.DataPropertyName = "MD5";
-            this.mD5DataGridViewTextBoxColumn.HeaderText = "MD5";
-            this.mD5DataGridViewTextBoxColumn.Name = "mD5DataGridViewTextBoxColumn";
-            this.mD5DataGridViewTextBoxColumn.Width = 57;
+            this.listBoxSignatures.SelectedIndexChanged += new System.EventHandler(this.listBoxSignatures_SelectedIndexChanged);
             // 
             // ImageListingForm
             // 
@@ -419,6 +459,9 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.panelTrimmingRectangle.ResumeLayout(false);
+            this.panelTrimmingRectangle.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxDraggingBR)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTaken)).EndInit();
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
@@ -463,5 +506,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn fileNameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn directoryDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn mD5DataGridViewTextBoxColumn;
+        private System.Windows.Forms.Panel panelTrimmingRectangle;
+        private System.Windows.Forms.PictureBox pictureBoxDraggingBR;
     }
 }

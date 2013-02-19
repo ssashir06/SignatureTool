@@ -7,7 +7,7 @@ namespace SignatureCountingTool.Database {
         {
             public override string ToString()
             {
-                return String.Format("({0},{1})-({2},{3})", x, y, w, h);
+                return String.Format("({0},{1})-({2},{3})", x, y, x + w, y + h);
             }
         }
 		public partial class TypeRow

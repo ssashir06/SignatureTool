@@ -43,5 +43,35 @@ namespace SignatureCountingTool
             AddSignature();
             ShowSignatureList();
         }
+
+        private void listBoxSignatures_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ShowTrimmingRectangle();
+        }
+
+        private void pictureBoxTaken_SizeChanged(object sender, EventArgs e)
+        {
+            ShowTrimmingRectangle();
+        }
+
+        private void pictureBoxDraggingBR_MouseMove(object sender, MouseEventArgs e)
+        {
+            ResizeTrimmingRectangle(e, true);
+        }
+
+        private void pictureBoxDraggingBR_MouseUp(object sender, MouseEventArgs e)
+        {
+            ResizeTrimmingRectangle(e, false);
+        }
+
+        private void panelTrimmingRectangle_MouseMove(object sender, MouseEventArgs e)
+        {
+            MoveTrimmingRectangle(e, true);
+        }
+
+        private void panelTrimmingRectangle_MouseUp(object sender, MouseEventArgs e)
+        {
+            MoveTrimmingRectangle(e, false);
+        }
     }
 }
