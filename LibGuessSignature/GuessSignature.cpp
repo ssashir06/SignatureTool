@@ -471,6 +471,14 @@ namespace Signature
 		{
 			query.names = match((const Image::Candidate)query);
 		}
+		
+		void Base::match(Image::Candidate& query, const Rect& trimming_area) const
+		{
+			Mat trimmed(query.getImage(), trimming_area);
+			Image::Candidate query_trim(trimmed);
+			match(query_trim);
+			query.names = query_trim.names;
+		}
 
 		Image::Descriptor Base::getDescriptor(const Image::Base& image) const
 		{

@@ -152,6 +152,7 @@ namespace Signature
 			virtual void train(const std::list<Image::Conclusive >& trains) = 0;
 			virtual Image::Candidate::Assessments match(const Image::Candidate& query) const = 0;
 			virtual void match(Image::Candidate& query) const;
+			virtual void match(Image::Candidate& query, const cv::Rect& trimming_area) const;
 
 			virtual void saveModel(const std::string& file_name) const = 0;
 			virtual void loadModel(const std::string& file_name) = 0;

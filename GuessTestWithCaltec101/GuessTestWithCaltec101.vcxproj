@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8A22FE31-A758-4CE8-A905-C32D086F16BD}</ProjectGuid>
     <RootNamespace>GuessTestWithCaltec101</RootNamespace>
+    <ProjectName>GuessTestWithCaltech101</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

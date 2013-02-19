@@ -4,6 +4,7 @@ namespace Signature { namespace Guess { namespace CLI {
 	using namespace System;
 	using namespace System::Collections;
 	using namespace System::Collections::Generic;
+	using namespace System::Drawing;
 	ref class Conclusive
 	{
 	protected:
@@ -50,6 +51,7 @@ namespace Signature { namespace Guess { namespace CLI {
 
 		Void Train();
 		Assessments^ Match(String^ filename_of_query_image);
+		Assessments^ Match(String^ filename_of_query_image, Rectangle^ trimming);
 
 		Void SaveModel(String^ filename);
 		Void LoadModel(String^ filename);

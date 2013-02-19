@@ -5,7 +5,7 @@
 #include "../LibCameraScanner/CameraScanner.h"
 #include "../cv_utils/cv_utils_cli.h"
 
-namespace CameraScanner { namespace GUI {
+namespace CameraScanner { namespace GUI { namespace CLI {
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
@@ -879,7 +879,7 @@ namespace CameraScanner { namespace GUI {
 			}
 	private:Void quitToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 			{
-				if (confirmClosing()) Close();
+				Close();
 			}
 	};
-}}
+}}}

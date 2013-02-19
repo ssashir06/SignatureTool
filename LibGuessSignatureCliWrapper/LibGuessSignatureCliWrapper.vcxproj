@@ -81,7 +81,6 @@
     <ClInclude Include="..\cv_utils\cv_utils_cli.h" />
     <ClInclude Include="GuessSignature.h" />
     <ClInclude Include="IGuessSignature.h" />
-    <ClInclude Include="Image.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
@@ -92,7 +91,6 @@
     </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="GuessSignature.cpp" />
-    <ClCompile Include="Image.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

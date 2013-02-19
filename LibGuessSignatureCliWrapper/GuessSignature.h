@@ -11,6 +11,7 @@ namespace Signature { namespace Guess { namespace CLI {
 	using namespace System;
 	using namespace System::Collections;
 	using namespace System::Collections::Generic;
+	using namespace System::Drawing;
 
 	/// <summary>
 	/// T ... an inheritance class of Signature::Guess::Base
@@ -57,12 +58,36 @@ namespace Signature { namespace Guess { namespace CLI {
 		{
 			Image::Candidate query(CVUtil::CLI::convertString(filename_of_query_image));
 			Image::Candidate::Assessments assessments = guess->match(query);
+			return GetCliAssessments(assessments);
+		}
+
+		Assessments^ Match(String^ filename_of_query_image, Rectangle^ trimming)
+		{
+			cv::Rect trimming_cv(trimming->X, trimming->Y, trimming->Width, trimming->Height);
+			Image::Candidate query(CVUtil::CLI::convertString(filename_of_query_image));
+			Image::Candidate::Assessments assessments = guess->match(query, trimming_cv);
+			return GetCliAssessments(assessments);
+		}
+
+		Void SaveModel(String^ filename)
+		{
+			guess->saveModel(CVUtil::CLI::convertString(filename));
+		}
+
+		Void LoadModel(String^ filename)
+		{
+			guess->loadModel(CVUtil::CLI::convertString(filename));
+		}
+	protected:
+		Assessments^ GetCliAssessments(const Image::Candidate::Assessments& assessments)
+		{
 			Assessments^ result = gcnew Assessments;
 			for (const auto& assessment : assessments)
 			{
 				Assessment^ assessment_cli = gcnew Assessment();
 				assessment_cli->name = CVUtil::CLI::convertString(assessment.name);
 				assessment_cli->Score = assessment.score;
+				assessment_cli->FileName = filename_of_query_image;
 				result->Add(assessment_cli);
 			}
 			return result;

@@ -131,6 +131,7 @@ namespace Signature
 			fs["MatchingCountWeight"] >> matching_count_weight;
 			fs["Machines"] >> (ICVSaveLoad&)machines;
 			fs["TrainImages"] >> train_images_c;
+			fs.release();
 
 			train_images = convertArray<list<Image::Conclusive::Capsule<Image::Conclusive> >, vector<Image::Conclusive> >(train_images_c);
 
