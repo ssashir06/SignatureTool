@@ -1,6 +1,6 @@
-﻿namespace SignatureCountingTool
+﻿namespace Signature.CountingTool
 {
-    partial class SignatoryEditor
+    partial class SignatoryEditorForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SignatoryEditor));
-            this.signatureCounterDataSet = new SignatureCountingTool.Database.SignatureCounterDataSet();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SignatoryEditorForm));
+            this.signatureCounterDataSet = new Signature.CountingTool.Database.SignatureCounterDataSet();
             this.signatoryBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.signatoryTableAdapter = new SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters.SignatoryTableAdapter();
-            this.tableAdapterManager = new SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters.TableAdapterManager();
+            this.signatoryTableAdapter = new Signature.CountingTool.Database.SignatureCounterDataSetTableAdapters.SignatoryTableAdapter();
+            this.tableAdapterManager = new Signature.CountingTool.Database.SignatureCounterDataSetTableAdapters.TableAdapterManager();
             this.signatoryBindingNavigator = new System.Windows.Forms.BindingNavigator(this.components);
             this.bindingNavigatorAddNewItem = new System.Windows.Forms.ToolStripButton();
             this.bindingNavigatorCountItem = new System.Windows.Forms.ToolStripLabel();
@@ -85,7 +85,7 @@
             this.tableAdapterManager.SignatureTableAdapter = null;
             this.tableAdapterManager.TrimTableAdapter = null;
             this.tableAdapterManager.TypeTableAdapter = null;
-            this.tableAdapterManager.UpdateOrder = SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters.TableAdapterManager.UpdateOrderOption.InsertUpdateDelete;
+            this.tableAdapterManager.UpdateOrder = Signature.CountingTool.Database.SignatureCounterDataSetTableAdapters.TableAdapterManager.UpdateOrderOption.InsertUpdateDelete;
             // 
             // signatoryBindingNavigator
             // 

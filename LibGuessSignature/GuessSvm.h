@@ -23,8 +23,6 @@ namespace Signature {
 			void setBestParam(const std::list<Image::Conclusive >& images, unsigned int grid = 3);
 			LibSVM::Parameter getParam() const;
 			std::list<ParamScore> crossValidation(const std::list<Image::Conclusive >& images, unsigned int grid);
-
-			virtual void train(const std::list<Image::Conclusive >& images) = 0;
 		protected:
 			virtual void train() = 0;
 			static LibSVM::Parameter buildDefaultParam();

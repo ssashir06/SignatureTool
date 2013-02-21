@@ -35,15 +35,19 @@ namespace Signature
 		{
 		}
 
-		void EvalEasy::train(const list<Image::Conclusive>& trains)
+		void EvalEasy::train(const list<Image::Conclusive>& trains, bool adding)
 		{
-			train_images = convertArray<list<Image::Conclusive>, vector<Image::Conclusive> >(trains);
+			if (!adding) {
+				train_images = convertArray<list<Image::Conclusive>, vector<Image::Conclusive> >(trains);
+				machines.getMatcher()->clear();
+			} else {
+				for (const auto& image : trains)
+					train_images.push_back(image);
+			}
 
 			vector<Image::Descriptor> descriptors;
-			for (auto& image : train_images)
+			for (auto& image : trains)
 				descriptors.push_back(image.getDescriptor());
-
-			machines.getMatcher()->clear();//TODO: make it optional
 			machines.getMatcher()->add(descriptors);
 		}
 
@@ -76,7 +80,7 @@ namespace Signature
 					distance_sum += dmatch.distance;
 
 				score += distance_sum / match_count ;
-				score += matching_count_weight * (double)(max(image_mached.getKeyPoints()->size(), query_copy.getKeyPoints()->size()) - match_count)
+				score += matching_count_weight * (double)(max(image_mached.getKeyPoints()->size(), query_copy.getKeyPoints()->size()) - match_count)//FIXME: use descriptor instead
 					/ matched.second.size();
 				scores[image_mached.name].first += score;
 				scores[image_mached.name].second++;
@@ -116,7 +120,7 @@ namespace Signature
 
 		void EvalEasy::saveModel(const string& file_name) const
 		{
-			FileStorage fs(file_name + ".xml", FileStorage::WRITE);
+			FileStorage fs(file_name, FileStorage::WRITE);
 			fs << "MatchingCountWeight" << matching_count_weight;
 			fs << "Machines" << (ICVSaveLoad&)machines;
 			fs << "TrainImages" << convertArray<vector<Image::Conclusive>, list<Image::Conclusive::Capsule<Image::Conclusive> > >(train_images);
@@ -127,7 +131,7 @@ namespace Signature
 		{
 			list<Image::Conclusive::Capsule<Image::Conclusive> > train_images_c;
 
-			FileStorage fs(file_name + ".xml", FileStorage::READ);
+			FileStorage fs(file_name, FileStorage::READ);
 			fs["MatchingCountWeight"] >> matching_count_weight;
 			fs["Machines"] >> (ICVSaveLoad&)machines;
 			fs["TrainImages"] >> train_images_c;
@@ -139,6 +143,16 @@ namespace Signature
 			int i=0;
 			for (const auto& train : train_images) train_descriptors[i++] = train.getDescriptor();
 			machines.getMatcher()->add(train_descriptors);
+		}
+
+		pair<string, string> EvalEasy::modelSuffix() const
+		{
+			return make_pair(string(".xml"), string("EvalEasy Model File"));
+		}
+
+		void EvalEasy::strip(bool remove_keypoints)
+		{
+			for (auto& image : train_images) image.strip(remove_keypoints);
 		}
 	}
 }

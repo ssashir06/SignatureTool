@@ -7,8 +7,8 @@ namespace CVUtil { namespace CLI {
 	Bitmap^ convertImage(cv::Mat& img_src);
 	//FIXME: not tested
 	cv::Mat convertImage(Image^ img_src);
-	std::string convertString(String^ file_name);
-	String^ convertString(const std::string& file_name);
+	std::string convertString(String^ str);
+	String^ convertString(const std::string& str);
 
 	namespace Control
 	{

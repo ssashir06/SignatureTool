@@ -16,16 +16,14 @@ namespace Signature { namespace Guess { namespace CLI {
 	/// <summary>
 	/// T ... an inheritance class of Signature::Guess::Base
 	/// </summary>
-	template<class T> ref class Base : public IGuessSignature
+	template<class T> public ref class Base abstract : public IGuessSignature
 	{
 	protected:
-		Conclusives^ training_filenames;
 		Guess::Base* guess;
 	public:
 		Base()
 		{
 			guess = new T();
-			assessments = gcnew Assessments();
 		}
 
 		~Base()
@@ -33,66 +31,89 @@ namespace Signature { namespace Guess { namespace CLI {
 			delete guess;
 		}
 
-		property Conclusives^ TrainingImageFiles
-		{
-			Conclusives^ get()
-			{
-				return training_filenames;
-			}
-		}
-
-		Void Train()
+		virtual Void Train(Conclusives^ trainers, Boolean adding)
 		{
 			std::list<Image::Conclusive> trains;
-			for each (Conclusive^ conclusive in training_filenames)
+			for each (Conclusive^ conclusive in trainers)
 			{
 				trains.push_back(Image::Conclusive(
 					CVUtil::CLI::convertString(conclusive->Name),
-					CVUtil::CLI::convertString(conclusive->FileName)));
+					CVUtil::CLI::convertString(conclusive->FileName),
+					conclusive->Trimming.HasValue?
+						std::make_shared<cv::Rect>(conclusive->Trimming.Value.X, conclusive->Trimming.Value.Y, conclusive->Trimming.Value.Width, conclusive->Trimming.Value.Height):
+						std::shared_ptr<cv::Rect>(nullptr)));
 			}
 
-			guess->train(trains);
+			guess->train(trains, adding);
 		}
 
-		Assessments^ Match(String^ filename_of_query_image)
+		virtual Assessments^ Match(SamplingImage^ image)
 		{
-			Image::Candidate query(CVUtil::CLI::convertString(filename_of_query_image));
-			Image::Candidate::Assessments assessments = guess->match(query);
-			return GetCliAssessments(assessments);
+			std::shared_ptr<cv::Rect> cv_rect = nullptr;
+			if (image->Trimming.HasValue)
+				cv_rect = std::make_shared<cv::Rect>(image->Trimming.Value.X, image->Trimming.Value.Y, image->Trimming.Value.Width, image->Trimming.Value.Height);
+
+			Image::Candidate query(CVUtil::CLI::convertString(image->FileName), cv_rect);
+			Image::Candidate::Assessments assessments;
+			try {
+				assessments = guess->match((const Image::Candidate)query);
+			} catch (const std::exception& e)
+			{
+				std::cerr << "Failed to call matching function: " << e.what() << std::endl;
+				throw e;
+			}
+			return GetCliAssessments(assessments, image);
 		}
 
-		Assessments^ Match(String^ filename_of_query_image, Rectangle^ trimming)
-		{
-			cv::Rect trimming_cv(trimming->X, trimming->Y, trimming->Width, trimming->Height);
-			Image::Candidate query(CVUtil::CLI::convertString(filename_of_query_image));
-			Image::Candidate::Assessments assessments = guess->match(query, trimming_cv);
-			return GetCliAssessments(assessments);
-		}
-
-		Void SaveModel(String^ filename)
+		virtual Void SaveModel(String^ filename)
 		{
 			guess->saveModel(CVUtil::CLI::convertString(filename));
 		}
 
-		Void LoadModel(String^ filename)
+		virtual Void LoadModel(String^ filename)
 		{
+			if (!guess) throw gcnew Exception("Model pointer is currently nullptr.");
 			guess->loadModel(CVUtil::CLI::convertString(filename));
 		}
+
+		virtual String^ ModelFileSuffixFilter()
+		{
+			if (!guess) return nullptr;
+			auto suffix = guess->modelSuffix();
+			return String::Format("{0} ({1})|*{1}",
+				CVUtil::CLI::convertString(suffix.second),
+				CVUtil::CLI::convertString(suffix.first));
+		}
+
+		virtual Void Strip() = 0;
 	protected:
-		Assessments^ GetCliAssessments(const Image::Candidate::Assessments& assessments)
+		Assessments^ GetCliAssessments(const Image::Candidate::Assessments& assessments, SamplingImage^ image)
 		{
 			Assessments^ result = gcnew Assessments;
 			for (const auto& assessment : assessments)
 			{
 				Assessment^ assessment_cli = gcnew Assessment();
-				assessment_cli->name = CVUtil::CLI::convertString(assessment.name);
 				assessment_cli->Score = assessment.score;
-				assessment_cli->FileName = filename_of_query_image;
+				assessment_cli->Name = CVUtil::CLI::convertString(assessment.name);
+				assessment_cli->FileName = image->FileName;
+				assessment_cli->Trimming = image->Trimming;
 				result->Add(assessment_cli);
 			}
 			return result;
 		}
 	};
 
-	typedef Base<Guess::EvalEasy> GuessSignatureEvalEasy;
+	//typedef Base<Guess::EvalEasy> GuessSignatureEvalEasy;
+	public ref class GuessSignatureEvalEasy : public Base<Guess::EvalEasy>
+	{
+	public:
+		GuessSignatureEvalEasy() : Base() {}
+		~GuessSignatureEvalEasy() {}
+
+		virtual Void Strip() override
+		{
+			if (!guess) return;
+			guess->strip(false);
+		}
+	};
 }}}

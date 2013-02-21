@@ -8,23 +8,27 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SignatureCountingTool
+namespace Signature.CountingTool
 {
     public partial class ImageListingForm : Form
     {
         public ImageListingForm()
         {
             InitializeComponent();
+            SetupTables();
         }
 
         private void ImageListingForm_Shown(object sender, EventArgs e)
         {
             Start();
+            InitializeMatchingModel();
+            (new SignatoryEditorForm()).Show(this);
         }
 
         private void addImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AddImages();
+            ShowSignatureList();
         }
 
         private void dataGridViewImages_SelectionChanged(object sender, EventArgs e)
@@ -32,15 +36,17 @@ namespace SignatureCountingTool
             ShowSelectedImage();
         }
 
-        private void editSignatoryToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            (new SignatoryEditor()).ShowDialog(this);
-        }
-
-        private void buttonAddRectangle_Click(object sender, EventArgs e)
+        private void buttonAddSignature_Click(object sender, EventArgs e)
         {
             if (SelectedImage == null) return;
             AddSignature();
+            ShowSignatureList();
+        }
+
+        private void buttonRemoveSignature_Click(object sender, EventArgs e)
+        {
+            if (listBoxSignatures.SelectedItem == null) return;
+            RemoveSignature();
             ShowSignatureList();
         }
 
@@ -72,6 +78,22 @@ namespace SignatureCountingTool
         private void panelTrimmingRectangle_MouseUp(object sender, MouseEventArgs e)
         {
             MoveTrimmingRectangle(e, false);
+        }
+
+        private void newModelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InitializeMatchingModel();
+        }
+
+        private void loadModelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadModel();
+        }
+
+        private void startMatchingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MatchSignatures();
+            ShowSignatureList();
         }
     }
 }

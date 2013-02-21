@@ -7,10 +7,11 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using SignatureCountingTool.Database;
-using SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters;
+using Signature.CountingTool.Database;
+using Signature.CountingTool.Database.SignatureCounterDataSetTableAdapters;
+using Signature.Guess.CLI;
 
-namespace SignatureCountingTool
+namespace Signature.CountingTool
 {
 	public partial class ImageListingForm
 	{
@@ -22,14 +23,15 @@ namespace SignatureCountingTool
             public SignatureCounterDataSet.TypeRow Type { get; set; }
             public override string ToString()
             {
-                return String.Format("{0}: {1}", Type.Name, Trimming.ToString());
+                return String.Format("{0}: {1} {2}", Type.Name, Trimming.ToString(), Signature.Trainer ? "a Trainer" : "Not a Trainer");
             }
         };
         #endregion
 
-        #region variables
+        #region Variable
         TableAdapterManager tables;
         Point? mouse_drag_offset = null;
+        IGuessSignature guess;
         #endregion
 
         #region Property
@@ -68,7 +70,8 @@ namespace SignatureCountingTool
 
         #endregion
 
-        void Start()
+        #region Initialize function
+		void SetupTables()
         {
             tables = new TableAdapterManager()
             {
@@ -78,14 +81,23 @@ namespace SignatureCountingTool
                 SignatoryTableAdapter = new SignatoryTableAdapter(),
                 TrimTableAdapter = new TrimTableAdapter()
             };
-			tables.ImageFileTableAdapter.Fill(signatureCounterDataSet1.ImageFile);
             tables.TrimTableAdapter.Fill(signatureCounterDataSet1.Trim);
             tables.TypeTableAdapter.Fill(signatureCounterDataSet1.Type);
+            tables.ImageFileTableAdapter.Fill(signatureCounterDataSet1.ImageFile);
             tables.SignatureTableAdapter.Fill(signatureCounterDataSet1.Signature);
+        }
 
+        void Start()
+        {
             ShowTypeList();
             ShowSignatureList();
 		}
+
+        void InitializeMatchingModel()
+        {
+            guess = new GuessSignatureEvalEasy();
+        }
+        #endregion
 
         #region Show shomething
         void ShowTypeList()
@@ -110,8 +122,7 @@ namespace SignatureCountingTool
                 return;
             }
 
-			String image_fullpath = Path.Combine(row.Directory, row.FileName);
-			Image image_loaded = Bitmap.FromFile(image_fullpath);
+			System.Drawing.Image image_loaded = Bitmap.FromFile(row.FullPath);
             pictureBoxTaken.Image = image_loaded;
 
             ShowSignatureList();
@@ -121,6 +132,8 @@ namespace SignatureCountingTool
         {
             SignatureCounterDataSet.ImageFileRow row_image_file = SelectedImage;
             if (row_image_file == null) return;
+
+            tables.UpdateAll(signatureCounterDataSet1);
 
             var query_signatures =
                 from signature in tables.SignatureTableAdapter.GetData()
@@ -288,11 +301,13 @@ namespace SignatureCountingTool
 
             var query_ids = from images in tables.ImageFileTableAdapter.GetData() select images.ID;
             int id = query_ids.Any() ? query_ids.Max() + 1 : 0;
+            List<int> files_added = new List<int>();
 
 			foreach (String filename_fullpath in dialog.FileNames)
 			{
                 tables.ImageFileTableAdapter.Insert(
-                    id++, null, Path.GetFileName(filename_fullpath), Path.GetDirectoryName(filename_fullpath), null);
+                    id, null, Path.GetFileName(filename_fullpath), Path.GetDirectoryName(filename_fullpath), null);
+                files_added.Add(id++);
 			}
 
             try
@@ -305,6 +320,26 @@ namespace SignatureCountingTool
             catch (Exception e)
             {
                 toolStripStatus.Text = e.Message;
+                return;
+            }
+
+            var type_id_aleady_used =
+                (from type in tables.TypeTableAdapter.GetData()
+                 join signature in tables.SignatureTableAdapter.GetData() on type.ID equals signature.TypeID
+                 select type.ID).Distinct().ToList();
+            var type_row_aleady_used =
+                (from type in tables.TypeTableAdapter.GetData()
+                 join type_id in type_id_aleady_used on type.ID equals type_id
+                 select type).ToList();
+            foreach (int file_id in files_added)
+            {
+                var query_image_file_row = from image in tables.ImageFileTableAdapter.GetData() where image.ID == file_id select image;
+                if (!query_image_file_row.Any()) continue;
+                SignatureCounterDataSet.ImageFileRow row_image = query_image_file_row.First();
+                foreach (var row_type in type_row_aleady_used)
+                {
+                    AddSignature(row_image, row_type);
+                }
             }
 		}
 
@@ -316,6 +351,11 @@ namespace SignatureCountingTool
             SignatureCounterDataSet.TypeRow row_type = comboBoxRectangleType.SelectedItem as SignatureCounterDataSet.TypeRow;
             if (row_type == null) return;
 
+            AddSignature(row_image, row_type);
+        }
+
+		void AddSignature(SignatureCounterDataSet.ImageFileRow row_image, SignatureCounterDataSet.TypeRow row_type)
+        {
             var query_ids = from signature in tables.SignatureTableAdapter.GetData() select signature.ID;
             int id = query_ids.Any() ? query_ids.Max() + 1 : 0;
 
@@ -338,8 +378,17 @@ namespace SignatureCountingTool
                 trim_id = AddTrimming(10, 10, 100, 100);
             }
 
-            tables.SignatureTableAdapter.Insert(id, row_image.ID, trim_id, row_type.ID);
+            tables.SignatureTableAdapter.Insert(id, row_image.ID, trim_id, row_type.ID, null, false);
             tables.SignatureTableAdapter.Fill(signatureCounterDataSet1.Signature);
+        }
+
+        void RemoveSignature()
+        {
+            SignatureInfomationForListBox signature_selected = listBoxSignatures.SelectedItem as SignatureInfomationForListBox;
+            if (signature_selected == null) return;
+
+            tables.SignatureTableAdapter.Delete(signature_selected.Signature.ID);
+            ShowSignatureList();
         }
 
         int AddTrimming(double x, double y, double w, double h)
@@ -350,6 +399,54 @@ namespace SignatureCountingTool
             tables.TrimTableAdapter.Insert(id, w, h, x, y);
             tables.TrimTableAdapter.Fill(signatureCounterDataSet1.Trim);
             return id;
+        }
+        #endregion
+
+        #region Matching Model
+        void LoadModel()
+        {
+            InitializeMatchingModel();
+
+            OpenFileDialog dialog = new OpenFileDialog()
+            {
+                Filter = guess.ModelFileSuffixFilter(),
+            };
+
+            toolStripStatus.Text = null;
+            if (dialog.ShowDialog() == DialogResult.Cancel) return;
+
+            toolStripStatus.Text = "Loading Matching Model.";
+            Refresh();
+
+            try
+            {
+                guess.LoadModel(dialog.FileName);
+            }
+            catch (Exception e)
+            {
+                toolStripStatus.Text = e.Message;
+                return;
+            }
+
+            toolStripStatus.Text = "Matching Model is loaded.";
+        }
+
+		void MatchSignatures()
+        {
+            if (guess == null)
+            {
+                MessageBox.Show("Matching Model is currently null.");
+                return;
+            }
+
+            List<SignatureCounterDataSet.SignatureRow> target = new List<SignatureCounterDataSet.SignatureRow>();
+            foreach (object obj_signature in listBoxSignatures.Items)
+            {
+                if (obj_signature as SignatureInfomationForListBox != null) target.Add((obj_signature as SignatureInfomationForListBox).Signature);
+            }
+
+            guess.Strip();
+            (new SignaturesGuessForm(guess, tables, signatureCounterDataSet1, target)).ShowDialog();
         }
         #endregion
     }

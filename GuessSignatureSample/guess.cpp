@@ -92,11 +92,11 @@ int main()
 	if (0)
 	{
 		loadImages(true, true);
-		trainer.train(train_images);
-		trainer.saveModel("test");
+		trainer.train(train_images, false);
+		trainer.saveModel("test.xml");
 	} else {
 		loadImages(false, true);
-		trainer.loadModel("test");
+		trainer.loadModel("test.xml");
 	}
 
 	const string window_name = "query_name";

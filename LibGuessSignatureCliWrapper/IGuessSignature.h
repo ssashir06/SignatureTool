@@ -5,27 +5,64 @@ namespace Signature { namespace Guess { namespace CLI {
 	using namespace System::Collections;
 	using namespace System::Collections::Generic;
 	using namespace System::Drawing;
-	ref class Conclusive
+	public ref class SamplingImage
 	{
 	protected:
-		String^ name;
 		String^ file_name;
+		Nullable<Rectangle> trimming;
 	public:
-		Conclusive()
+		SamplingImage()
 		{
 		}
-		property String^ Name
+
+		SamplingImage(String^ file_name)
+			: file_name(file_name)
 		{
-			String^ get() { return name; }
-			Void set(String^ value) { name = value; }
 		}
+
+		SamplingImage(String^ file_name, Nullable<Rectangle> trimming_area)
+			: file_name(file_name), trimming(trimming_area)
+		{
+		}
+
 		property String^ FileName
 		{
 			String^ get() { return file_name; }
 			Void set(String^ value) { file_name = value; }
 		}
+		property Nullable<Rectangle> Trimming
+		{
+			Nullable<Rectangle> get() { return trimming; }
+			Void set(Nullable<Rectangle> value) { trimming = value; }
+		}
 	};
-	ref class Assessment : public Conclusive
+	public ref class Conclusive : public SamplingImage
+	{
+	protected:
+		String^ name;
+	public:
+		Conclusive()
+			: SamplingImage()
+		{
+		}
+
+		Conclusive(String^ file_name, String^ name)
+			: SamplingImage(file_name), name(name)
+		{
+		}
+
+		Conclusive(String^ file_name, Nullable<Rectangle> trimming_area, String^ name)
+			: SamplingImage(file_name, trimming_area), name(name)
+		{
+		}
+
+		property String^ Name
+		{
+			String^ get() { return name; }
+			Void set(String^ value) { name = value; }
+		}
+	};
+	public ref class Assessment : public Conclusive
 	{
 	protected:
 		Double score;
@@ -42,18 +79,15 @@ namespace Signature { namespace Guess { namespace CLI {
 	};
 	typedef List<Conclusive^> Conclusives;
 	typedef List<Assessment^> Assessments;
-	interface class IGuessSignature
+	public interface class IGuessSignature
 	{
-		property Conclusives^ TrainingImageFiles
-		{
-			Conclusives^ get();
-		}
-
-		Void Train();
-		Assessments^ Match(String^ filename_of_query_image);
-		Assessments^ Match(String^ filename_of_query_image, Rectangle^ trimming);
+		Void Train(Conclusives^ trainers, Boolean adding);
+		Assessments^ Match(SamplingImage^ image);
 
 		Void SaveModel(String^ filename);
 		Void LoadModel(String^ filename);
+		String^ ModelFileSuffixFilter();
+
+		Void Strip();
 	};
 }}}

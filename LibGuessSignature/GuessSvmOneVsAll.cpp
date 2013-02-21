@@ -25,7 +25,7 @@ namespace Signature{
 		}
 
 		SvmOneVsAll::SvmOneVsAll(const SvmOneVsAll& src)
-			: SvmBase(src), scaling(src.scaling), models_by_name(src.models_by_name)
+			: SvmBase(src), scaling(src.scaling), models_by_name(src.models_by_name), train_images(src.train_images)
 		{
 		}
 
@@ -34,6 +34,7 @@ namespace Signature{
 			KMeansBase::operator=(src);
 			scaling = src.scaling;
 			models_by_name = src.models_by_name;
+			train_images = src.train_images;
 			return *this;
 		}
 
@@ -46,10 +47,17 @@ namespace Signature{
 			return new SvmOneVsAll(*this);
 		}
 
-		void SvmOneVsAll::train(const list<Image::Conclusive >& images)
+		void SvmOneVsAll::train(const list<Image::Conclusive >& images, bool adding)
 		{
-			setBestParam(images, 2);
-			KMeansBase::train(images);
+			if (adding) {
+				for (const auto& image : images)
+					train_images.push_back(image);
+			} else {
+				train_images = images;
+			}
+
+			setBestParam(train_images, 2);
+			KMeansBase::train(train_images);
 			train();
 		}
 
@@ -115,13 +123,24 @@ namespace Signature{
 		void SvmOneVsAll::saveModel(const string& file_name) const
 		{
 			//TODO
-			throw new exception("not implemented!");
+			throw exception("not implemented!");
 		}
 
 		void SvmOneVsAll::loadModel(const string& file_name)
 		{
 			//TODO
-			throw new exception("not implemented!");
+			throw exception("not implemented!");
+		}
+
+		pair<string, string> SvmOneVsAll::modelSuffix() const
+		{
+			//TODO
+			throw exception("not implemented!");
+		}
+
+		void SvmOneVsAll::strip(bool remove_keypoints)
+		{
+			for (auto& image : train_images) image.strip(remove_keypoints);
 		}
 #pragma endregion
 	}

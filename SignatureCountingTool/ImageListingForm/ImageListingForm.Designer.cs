@@ -1,4 +1,4 @@
-﻿namespace SignatureCountingTool
+﻿namespace Signature.CountingTool
 {
     partial class ImageListingForm
     {
@@ -32,6 +32,8 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newModelToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.loadModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -40,8 +42,6 @@
             this.scanToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.addImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.signatoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editSignatoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -51,13 +51,13 @@
             this.fileNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.directoryDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.mD5DataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.signatureCounterDataSet1 = new SignatureCountingTool.Database.SignatureCounterDataSet();
+            this.signatureCounterDataSet1 = new Signature.CountingTool.Database.SignatureCounterDataSet();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.panelTrimmingRectangle = new System.Windows.Forms.Panel();
             this.pictureBoxDraggingBR = new System.Windows.Forms.PictureBox();
             this.comboBoxRectangleType = new System.Windows.Forms.ComboBox();
-            this.buttonRemoveRectangle = new System.Windows.Forms.Button();
-            this.buttonAddRectangle = new System.Windows.Forms.Button();
+            this.buttonRemoveSignature = new System.Windows.Forms.Button();
+            this.buttonAddSignature = new System.Windows.Forms.Button();
             this.pictureBoxTaken = new System.Windows.Forms.PictureBox();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.propertyGridTrim = new System.Windows.Forms.PropertyGrid();
@@ -89,8 +89,7 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem1,
             this.fileToolStripMenuItem,
-            this.imageToolStripMenuItem,
-            this.signatoryToolStripMenuItem});
+            this.imageToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(878, 24);
@@ -108,31 +107,46 @@
             // quitToolStripMenuItem
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.quitToolStripMenuItem.Text = "Quit";
             // 
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newModelToolStripMenuItem2,
+            this.toolStripSeparator3,
             this.loadModelToolStripMenuItem,
             this.saveModelToolStripMenuItem,
             this.toolStripSeparator1,
             this.startMatchingToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
-            this.fileToolStripMenuItem.Text = "Model";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(107, 20);
+            this.fileToolStripMenuItem.Text = "Matching Model";
+            // 
+            // newModelToolStripMenuItem2
+            // 
+            this.newModelToolStripMenuItem2.Name = "newModelToolStripMenuItem2";
+            this.newModelToolStripMenuItem2.Size = new System.Drawing.Size(152, 22);
+            this.newModelToolStripMenuItem2.Text = "New";
+            this.newModelToolStripMenuItem2.Click += new System.EventHandler(this.newModelToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
             // 
             // loadModelToolStripMenuItem
             // 
             this.loadModelToolStripMenuItem.Name = "loadModelToolStripMenuItem";
             this.loadModelToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.loadModelToolStripMenuItem.Text = "Load Model";
+            this.loadModelToolStripMenuItem.Text = "Load";
+            this.loadModelToolStripMenuItem.Click += new System.EventHandler(this.loadModelToolStripMenuItem_Click);
             // 
             // saveModelToolStripMenuItem
             // 
             this.saveModelToolStripMenuItem.Name = "saveModelToolStripMenuItem";
             this.saveModelToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.saveModelToolStripMenuItem.Text = "Save Model";
+            this.saveModelToolStripMenuItem.Text = "Save";
             // 
             // toolStripSeparator1
             // 
@@ -144,6 +158,7 @@
             this.startMatchingToolStripMenuItem.Name = "startMatchingToolStripMenuItem";
             this.startMatchingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.startMatchingToolStripMenuItem.Text = "Start Matching";
+            this.startMatchingToolStripMenuItem.Click += new System.EventHandler(this.startMatchingToolStripMenuItem_Click);
             // 
             // imageToolStripMenuItem
             // 
@@ -173,23 +188,9 @@
             this.addImageToolStripMenuItem.Text = "Add";
             this.addImageToolStripMenuItem.Click += new System.EventHandler(this.addImageToolStripMenuItem_Click);
             // 
-            // signatoryToolStripMenuItem
-            // 
-            this.signatoryToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editSignatoryToolStripMenuItem});
-            this.signatoryToolStripMenuItem.Name = "signatoryToolStripMenuItem";
-            this.signatoryToolStripMenuItem.Size = new System.Drawing.Size(69, 20);
-            this.signatoryToolStripMenuItem.Text = "Signatory";
-            // 
-            // editSignatoryToolStripMenuItem
-            // 
-            this.editSignatoryToolStripMenuItem.Name = "editSignatoryToolStripMenuItem";
-            this.editSignatoryToolStripMenuItem.Size = new System.Drawing.Size(94, 22);
-            this.editSignatoryToolStripMenuItem.Text = "Edit";
-            this.editSignatoryToolStripMenuItem.Click += new System.EventHandler(this.editSignatoryToolStripMenuItem_Click);
-            // 
             // statusStrip1
             // 
+            this.statusStrip1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatus});
             this.statusStrip1.Location = new System.Drawing.Point(0, 455);
@@ -304,8 +305,8 @@
             // 
             this.splitContainer2.Panel1.Controls.Add(this.panelTrimmingRectangle);
             this.splitContainer2.Panel1.Controls.Add(this.comboBoxRectangleType);
-            this.splitContainer2.Panel1.Controls.Add(this.buttonRemoveRectangle);
-            this.splitContainer2.Panel1.Controls.Add(this.buttonAddRectangle);
+            this.splitContainer2.Panel1.Controls.Add(this.buttonRemoveSignature);
+            this.splitContainer2.Panel1.Controls.Add(this.buttonAddSignature);
             this.splitContainer2.Panel1.Controls.Add(this.pictureBoxTaken);
             // 
             // splitContainer2.Panel2
@@ -333,7 +334,7 @@
             // 
             this.pictureBoxDraggingBR.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBoxDraggingBR.Cursor = System.Windows.Forms.Cursors.SizeNESW;
-            this.pictureBoxDraggingBR.Image = global::SignatureCountingTool.Properties.Resources.drag;
+            this.pictureBoxDraggingBR.Image = global::Signature.CountingTool.Properties.Resources.drag;
             this.pictureBoxDraggingBR.Location = new System.Drawing.Point(148, 104);
             this.pictureBoxDraggingBR.Name = "pictureBoxDraggingBR";
             this.pictureBoxDraggingBR.Size = new System.Drawing.Size(15, 15);
@@ -354,26 +355,27 @@
             this.comboBoxRectangleType.Size = new System.Drawing.Size(188, 23);
             this.comboBoxRectangleType.TabIndex = 3;
             // 
-            // buttonRemoveRectangle
+            // buttonRemoveSignature
             // 
-            this.buttonRemoveRectangle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRemoveRectangle.Location = new System.Drawing.Point(275, 405);
-            this.buttonRemoveRectangle.Name = "buttonRemoveRectangle";
-            this.buttonRemoveRectangle.Size = new System.Drawing.Size(72, 23);
-            this.buttonRemoveRectangle.TabIndex = 2;
-            this.buttonRemoveRectangle.Text = "Remove";
-            this.buttonRemoveRectangle.UseVisualStyleBackColor = true;
+            this.buttonRemoveSignature.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonRemoveSignature.Location = new System.Drawing.Point(275, 405);
+            this.buttonRemoveSignature.Name = "buttonRemoveSignature";
+            this.buttonRemoveSignature.Size = new System.Drawing.Size(72, 23);
+            this.buttonRemoveSignature.TabIndex = 2;
+            this.buttonRemoveSignature.Text = "Remove";
+            this.buttonRemoveSignature.UseVisualStyleBackColor = true;
+            this.buttonRemoveSignature.Click += new System.EventHandler(this.buttonRemoveSignature_Click);
             // 
-            // buttonAddRectangle
+            // buttonAddSignature
             // 
-            this.buttonAddRectangle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonAddRectangle.Location = new System.Drawing.Point(197, 405);
-            this.buttonAddRectangle.Name = "buttonAddRectangle";
-            this.buttonAddRectangle.Size = new System.Drawing.Size(72, 23);
-            this.buttonAddRectangle.TabIndex = 1;
-            this.buttonAddRectangle.Text = "Add";
-            this.buttonAddRectangle.UseVisualStyleBackColor = true;
-            this.buttonAddRectangle.Click += new System.EventHandler(this.buttonAddRectangle_Click);
+            this.buttonAddSignature.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonAddSignature.Location = new System.Drawing.Point(197, 405);
+            this.buttonAddSignature.Name = "buttonAddSignature";
+            this.buttonAddSignature.Size = new System.Drawing.Size(72, 23);
+            this.buttonAddSignature.TabIndex = 1;
+            this.buttonAddSignature.Text = "Add";
+            this.buttonAddSignature.UseVisualStyleBackColor = true;
+            this.buttonAddSignature.Click += new System.EventHandler(this.buttonAddSignature_Click);
             // 
             // pictureBoxTaken
             // 
@@ -480,8 +482,8 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.SplitContainer splitContainer3;
-        private System.Windows.Forms.Button buttonRemoveRectangle;
-        private System.Windows.Forms.Button buttonAddRectangle;
+        private System.Windows.Forms.Button buttonRemoveSignature;
+        private System.Windows.Forms.Button buttonAddSignature;
         private System.Windows.Forms.PictureBox pictureBoxTaken;
         private System.Windows.Forms.PropertyGrid propertyGridTrim;
         private System.Windows.Forms.ListBox listBoxSignatures;
@@ -498,8 +500,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.DataGridView dataGridViewImages;
         private Database.SignatureCounterDataSet signatureCounterDataSet1;
-        private System.Windows.Forms.ToolStripMenuItem signatoryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem editSignatoryToolStripMenuItem;
         private System.Windows.Forms.ComboBox comboBoxRectangleType;
         private System.Windows.Forms.DataGridViewTextBoxColumn iDDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn takenDataGridViewTextBoxColumn;
@@ -508,5 +508,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn mD5DataGridViewTextBoxColumn;
         private System.Windows.Forms.Panel panelTrimmingRectangle;
         private System.Windows.Forms.PictureBox pictureBoxDraggingBR;
+        private System.Windows.Forms.ToolStripMenuItem newModelToolStripMenuItem2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }

@@ -50,13 +50,17 @@ namespace Signature
 			std::shared_ptr<KeyPoints> keypoints;
 			Descriptor descriptor;
 			std::string file_name;
-			cv::Mat signature;//a image of written signature
+			cv::Mat signature;//a image of written signature, be trimmed
+			std::shared_ptr<cv::Rect> trimming;
+			bool grayscale;
+			bool monochrome;
+			unsigned char monochrome_threshold;
 		public:
 			MatchingMachines machines;
 		public:
 			Base();
-			Base(const std::string& file_name);
-			Base(const cv::Mat& signature, const std::string& file_name = std::string());
+			Base(const std::string& file_name, const std::shared_ptr<cv::Rect>& rect = std::shared_ptr<cv::Rect>(nullptr));
+			Base(const cv::Mat& signature, const std::string& file_name = std::string(), const std::shared_ptr<cv::Rect>& rect = std::shared_ptr<cv::Rect>(nullptr));
 			Base(const Base& src);
 			Base& operator=(const Base& src);
 			virtual ~Base();
@@ -65,10 +69,11 @@ namespace Signature
 			Descriptor getDescriptor() const;
 			std::shared_ptr<KeyPoints> getKeyPoints();
 			std::shared_ptr<KeyPoints> getKeyPoints() const;
+			std::shared_ptr<cv::Rect> getTrimmingArea() const;
 			virtual cv::Mat getImage();
 			virtual cv::Mat getImage() const;
 
-			void strip();
+			void strip(bool remove_keypoints = true);
 
 		public:
 			virtual void saveData(cv::FileStorage& fs) const;
@@ -82,8 +87,8 @@ namespace Signature
 		public:
 			std::string name;
 			Conclusive();
-			Conclusive(const std::string& name, const std::string& file_name);
-			Conclusive(const cv::Mat& signature, const std::string& name, const std::string& file_name = std::string());
+			Conclusive(const std::string& name, const std::string& file_name, const std::shared_ptr<cv::Rect>& rect = std::shared_ptr<cv::Rect>(nullptr));
+			Conclusive(const cv::Mat& signature, const std::string& name, const std::string& file_name = std::string(), const std::shared_ptr<cv::Rect>& rect = std::shared_ptr<cv::Rect>(nullptr));
 			Conclusive(const Base& src);
 			Conclusive(const Conclusive& src);
 			Conclusive& operator=(const Conclusive& src);
@@ -120,10 +125,10 @@ namespace Signature
 			typedef std::list<Assessment> Assessments;
 			Assessments names;
 			Candidate();
-			Candidate(const std::string& file_name);
-			Candidate(const cv::Mat& signature, const std::string& file_name = std::string());
-			Candidate(std::list<Assessment> names, const std::string& file_name);
-			Candidate(const cv::Mat& signature, std::list<Assessment> names, const std::string& file_name = std::string());
+			Candidate(const std::string& file_name, const std::shared_ptr<cv::Rect>& rect = std::shared_ptr<cv::Rect>(nullptr));
+			Candidate(const cv::Mat& signature, const std::string& file_name = std::string(), const std::shared_ptr<cv::Rect>& rect = std::shared_ptr<cv::Rect>(nullptr));
+			Candidate(std::list<Assessment> names, const std::string& file_name, const std::shared_ptr<cv::Rect>& rect = std::shared_ptr<cv::Rect>(nullptr));
+			Candidate(const cv::Mat& signature, std::list<Assessment> names, const std::string& file_name = std::string(), const std::shared_ptr<cv::Rect>& rect = std::shared_ptr<cv::Rect>(nullptr));
 			Candidate(const Candidate& src);
 			Candidate& operator=(const Candidate& src);
 			Candidate(const Conclusive& src);
@@ -149,13 +154,17 @@ namespace Signature
 			Base& operator=(const Base& src);
 			virtual ~Base();
 
-			virtual void train(const std::list<Image::Conclusive >& trains) = 0;
+			virtual void train(const std::list<Image::Conclusive >& trains, bool adding) = 0;
 			virtual Image::Candidate::Assessments match(const Image::Candidate& query) const = 0;
 			virtual void match(Image::Candidate& query) const;
 			virtual void match(Image::Candidate& query, const cv::Rect& trimming_area) const;
+			virtual Image::Candidate::Assessments match(const Image::Candidate& query, const cv::Rect& trimming_area) const;
 
 			virtual void saveModel(const std::string& file_name) const = 0;
 			virtual void loadModel(const std::string& file_name) = 0;
+			virtual std::pair<std::string, std::string> modelSuffix() const = 0;
+
+			virtual void strip(bool remove_keypoints) = 0;
 		protected:
 			virtual Image::Descriptor getDescriptor(const Image::Base& image) const;
 		};

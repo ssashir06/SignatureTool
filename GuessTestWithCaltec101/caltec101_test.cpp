@@ -63,7 +63,7 @@ int main()
 
 		Guess::SvmOneVsAll trainer(k);
 
-		trainer.train(train_images);
+		trainer.train(train_images, false);
 
 		for (const auto& query_group : query_image_by_name)
 		{

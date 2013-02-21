@@ -113,22 +113,22 @@ namespace Signature
 
 #pragma region Base
 		Base::Base()
-			: keypoints(nullptr)
+			: keypoints(nullptr), grayscale(false), monochrome(false), monochrome_threshold(192)
 		{
 		}
 
-		Base::Base(const string& file_name)
-			: file_name(file_name), keypoints(nullptr)
+		Base::Base(const string& file_name, const shared_ptr<Rect>& rect)
+			: file_name(file_name), keypoints(nullptr), trimming(rect), grayscale(false), monochrome(false), monochrome_threshold(192)
 		{
 		}
 
-		Base::Base(const Mat& signature, const string& file_name)
-			: signature(signature), file_name(file_name), keypoints(nullptr)
+		Base::Base(const Mat& signature, const string& file_name, const shared_ptr<Rect>& rect)
+			: signature(signature), file_name(file_name), keypoints(nullptr), trimming(rect), grayscale(false), monochrome(false), monochrome_threshold(192)
 		{
 		}
 
 		Base::Base(const Base& src)
-			: signature(src.signature), file_name(src.file_name), descriptor(src.descriptor), keypoints(src.keypoints)
+			: signature(src.signature), file_name(src.file_name), descriptor(src.descriptor), keypoints(src.keypoints), trimming(src.trimming), grayscale(src.grayscale), monochrome(src.monochrome), monochrome_threshold(src.monochrome_threshold)
 		{
 		}
 
@@ -138,6 +138,10 @@ namespace Signature
 			file_name = src.file_name;
 			descriptor = src.descriptor;
 			keypoints = src.keypoints;
+			trimming = src.trimming;
+			grayscale = src.grayscale;
+			monochrome = src.monochrome;
+			monochrome_threshold = src.monochrome_threshold;
 			return *this;
 		}
 
@@ -184,37 +188,49 @@ namespace Signature
 		{
 			if (!signature.empty()) return signature;
 
-			if (file_name.empty()) throw "unable to open image, file name is empty";
-			Mat img = imread(file_name);
-			if (img.empty()) throw "failed to open image";
-			return signature = img;
+			signature = ((const Base*)this)->getImage();
+			return signature;
 		}
 
 		Mat Base::getImage() const
 		{
 			if (!signature.empty()) return signature;
 
-			if (file_name.empty()) throw "unable to open image, file name is empty";
-			Mat img = imread(file_name);
-			if (img.empty()) throw "failed to open image";
+			if (file_name.empty()) throw exception("unable to open image, file name is empty");
+			Mat img = imread(file_name, (grayscale || monochrome)?0:1);
+			if (img.empty()) throw exception("failed to open image");
+			if (trimming) img = Mat(img, *trimming).clone();
+			if (monochrome) threshold(img, img, monochrome_threshold, 255, THRESH_BINARY);
+
+#ifdef _DEBUG
+			cout << "Image file is loaded: " << file_name << endl;
+			if (trimming) cout << "Trimming rect is " << *trimming << endl;
+			cout << "Image size is " << img.cols << "x" << img.rows << endl;
+#endif
+
 			return img;
 		}
 
-		void Base::strip()
+		void Base::strip(bool remove_keypoints)
 		{
 			if (file_name.size())
 			{
 				getKeyPoints();
 				getDescriptor();
 				signature = cv::Mat();
+				if (remove_keypoints) keypoints = shared_ptr<KeyPoints>(nullptr);
 			}
 		}
 
 		void Base::saveData(cv::FileStorage& fs) const
 		{
-			fs << "KeyPoints" << *keypoints;
+			if (keypoints) fs << "KeyPoints" << *keypoints;
 			fs << "Descriptor" << descriptor;
 			fs << "ImageFileName" << file_name;
+			if (trimming) fs << "TrimmingRectangle" << *trimming;
+			fs << "Grayscale" << grayscale;
+			fs << "Monochrome" << monochrome;
+			fs << "MonochromeThreshold" << (int)monochrome_threshold;
 		}
 
 		void Base::save(FileStorage& fs) const
@@ -243,6 +259,26 @@ namespace Signature
 			{
 				(*it) >> file_name;
 			}
+			else if (node_name == "TrimmingRectangle")
+			{
+				vector<int> r;
+				(*it) >> r;
+				trimming = make_shared<Rect>(r[0], r[1], r[2], r[3]);
+			}
+			else if (node_name == "Grayscale")
+			{
+				(*it) >> grayscale;
+			}
+			else if (node_name == "Monochrome")
+			{
+				(*it) >> monochrome;
+			}
+			else if (node_name == "MonochromeThreshold")
+			{
+				int t;
+				(*it) >> t;
+				monochrome_threshold = (unsigned char)t;
+			}
 		}
 
 		void Base::load(const FileNode& node)
@@ -259,13 +295,13 @@ namespace Signature
 		{
 		}
 
-		Conclusive::Conclusive(const string& name, const string& file_name)
-			: Base(file_name), name(name)
+		Conclusive::Conclusive(const string& name, const string& file_name, const shared_ptr<Rect>& rect)
+			: Base(file_name, rect), name(name)
 		{
 		}
 
-		Conclusive::Conclusive(const Mat& signature, const string& name, const string& file_name)
-			: Base(signature, file_name), name(name)
+		Conclusive::Conclusive(const Mat& signature, const string& name, const string& file_name, const shared_ptr<Rect>& rect)
+			: Base(signature, file_name, rect), name(name)
 		{
 		}
 
@@ -371,23 +407,23 @@ namespace Signature
 		{
 		}
 
-		Candidate::Candidate(const string& file_name)
-			: Base(file_name)
+		Candidate::Candidate(const string& file_name, const shared_ptr<Rect>& rect)
+			: Base(file_name, rect)
 		{
 		}
 
-		Candidate::Candidate(const Mat& signature, const string& file_name)
-			: Base(signature, file_name)
+		Candidate::Candidate(const Mat& signature, const string& file_name, const shared_ptr<Rect>& rect)
+			: Base(signature, file_name, rect)
 		{
 		}
 
-		Candidate::Candidate(list<Assessment> names, const string& file_name)
-			: Base(file_name), names(names)
+		Candidate::Candidate(list<Assessment> names, const string& file_name, const shared_ptr<Rect>& rect)
+			: Base(file_name, rect), names(names)
 		{
 		}
 
-		Candidate::Candidate(const Mat& signature, list<Assessment> names, const string& file_name)
-			: Base(signature, file_name), names(names)
+		Candidate::Candidate(const Mat& signature, list<Assessment> names, const string& file_name, const shared_ptr<Rect>& rect)
+			: Base(signature, file_name, rect), names(names)
 		{
 		}
 
@@ -478,6 +514,13 @@ namespace Signature
 			Image::Candidate query_trim(trimmed);
 			match(query_trim);
 			query.names = query_trim.names;
+		}
+
+		Image::Candidate::Assessments Base::match(const Image::Candidate& query, const Rect& trimming_area) const
+		{
+			Mat trimmed(query.getImage(), trimming_area);
+			Image::Candidate query_trim(trimmed);
+			return match((const Image::Candidate)query_trim);
 		}
 
 		Image::Descriptor Base::getDescriptor(const Image::Base& image) const

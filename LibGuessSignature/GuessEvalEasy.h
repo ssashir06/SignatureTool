@@ -21,11 +21,14 @@ namespace Signature
 			EvalEasy& operator=(const EvalEasy& src);
 			virtual ~EvalEasy();
 
-			virtual void train(const std::list<Image::Conclusive>& trains);
+			virtual void train(const std::list<Image::Conclusive>& train, bool adding);
 			virtual Image::Candidate::Assessments match(const Image::Candidate& query) const;
 
 			virtual void saveModel(const std::string& file_name) const;
 			virtual void loadModel(const std::string& file_name);
+			virtual std::pair<std::string, std::string> modelSuffix() const;
+
+			virtual void strip(bool remove_keypoints);
 		};
 	}
 }

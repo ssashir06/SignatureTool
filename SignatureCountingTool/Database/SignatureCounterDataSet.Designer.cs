@@ -10,7 +10,7 @@
 
 #pragma warning disable 1591
 
-namespace SignatureCountingTool.Database {
+namespace Signature.CountingTool.Database {
     
     
     /// <summary>
@@ -38,17 +38,15 @@ namespace SignatureCountingTool.Database {
         
         private SelectedSignatoryDataTable tableSelectedSignatory;
         
-        private GuessedSignatureDataTable tableGuessedSignature;
-        
         private global::System.Data.DataRelation relationFK_Signature_Matching;
+        
+        private global::System.Data.DataRelation relationFK_Matching_Signature;
+        
+        private global::System.Data.DataRelation relationFK_ImageFile_Signature;
         
         private global::System.Data.DataRelation relationFK_Type_Signature;
         
         private global::System.Data.DataRelation relationFK_Trim_Signature;
-        
-        private global::System.Data.DataRelation relationFK_ImageFIle_Signature;
-        
-        private global::System.Data.DataRelation relationFK_Signature_GuessedSignatory;
         
         private global::System.Data.DataRelation relationSignatory_Matching;
         
@@ -104,9 +102,6 @@ namespace SignatureCountingTool.Database {
                 }
                 if ((ds.Tables["SelectedSignatory"] != null)) {
                     base.Tables.Add(new SelectedSignatoryDataTable(ds.Tables["SelectedSignatory"]));
-                }
-                if ((ds.Tables["GuessedSignature"] != null)) {
-                    base.Tables.Add(new GuessedSignatureDataTable(ds.Tables["GuessedSignature"]));
                 }
                 this.DataSetName = ds.DataSetName;
                 this.Prefix = ds.Prefix;
@@ -198,16 +193,6 @@ namespace SignatureCountingTool.Database {
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        [global::System.ComponentModel.Browsable(false)]
-        [global::System.ComponentModel.DesignerSerializationVisibility(global::System.ComponentModel.DesignerSerializationVisibility.Content)]
-        public GuessedSignatureDataTable GuessedSignature {
-            get {
-                return this.tableGuessedSignature;
-            }
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.BrowsableAttribute(true)]
         [global::System.ComponentModel.DesignerSerializationVisibilityAttribute(global::System.ComponentModel.DesignerSerializationVisibility.Visible)]
         public override global::System.Data.SchemaSerializationMode SchemaSerializationMode {
@@ -294,9 +279,6 @@ namespace SignatureCountingTool.Database {
                 if ((ds.Tables["SelectedSignatory"] != null)) {
                     base.Tables.Add(new SelectedSignatoryDataTable(ds.Tables["SelectedSignatory"]));
                 }
-                if ((ds.Tables["GuessedSignature"] != null)) {
-                    base.Tables.Add(new GuessedSignatureDataTable(ds.Tables["GuessedSignature"]));
-                }
                 this.DataSetName = ds.DataSetName;
                 this.Prefix = ds.Prefix;
                 this.Namespace = ds.Namespace;
@@ -372,17 +354,11 @@ namespace SignatureCountingTool.Database {
                     this.tableSelectedSignatory.InitVars();
                 }
             }
-            this.tableGuessedSignature = ((GuessedSignatureDataTable)(base.Tables["GuessedSignature"]));
-            if ((initTable == true)) {
-                if ((this.tableGuessedSignature != null)) {
-                    this.tableGuessedSignature.InitVars();
-                }
-            }
             this.relationFK_Signature_Matching = this.Relations["FK_Signature_Matching"];
+            this.relationFK_Matching_Signature = this.Relations["FK_Matching_Signature"];
+            this.relationFK_ImageFile_Signature = this.Relations["FK_ImageFile_Signature"];
             this.relationFK_Type_Signature = this.Relations["FK_Type_Signature"];
             this.relationFK_Trim_Signature = this.Relations["FK_Trim_Signature"];
-            this.relationFK_ImageFIle_Signature = this.Relations["FK_ImageFIle_Signature"];
-            this.relationFK_Signature_GuessedSignatory = this.Relations["FK_Signature_GuessedSignatory"];
             this.relationSignatory_Matching = this.Relations["Signatory_Matching"];
             this.relationSignature_SelectedSignatory = this.Relations["Signature_SelectedSignatory"];
             this.relationSignatory_SelectedSignatory = this.Relations["Signatory_SelectedSignatory"];
@@ -410,13 +386,25 @@ namespace SignatureCountingTool.Database {
             base.Tables.Add(this.tableType);
             this.tableSelectedSignatory = new SelectedSignatoryDataTable();
             base.Tables.Add(this.tableSelectedSignatory);
-            this.tableGuessedSignature = new GuessedSignatureDataTable();
-            base.Tables.Add(this.tableGuessedSignature);
             global::System.Data.ForeignKeyConstraint fkc;
             fkc = new global::System.Data.ForeignKeyConstraint("FK_Signature_Matching", new global::System.Data.DataColumn[] {
                         this.tableSignature.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableMatching.SignatureIDColumn});
             this.tableMatching.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.Cascade;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_Matching_Signature", new global::System.Data.DataColumn[] {
+                        this.tableMatching.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSignature.ConclusiveMatchingIDColumn});
+            this.tableSignature.Constraints.Add(fkc);
+            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
+            fkc.DeleteRule = global::System.Data.Rule.SetNull;
+            fkc.UpdateRule = global::System.Data.Rule.Cascade;
+            fkc = new global::System.Data.ForeignKeyConstraint("FK_ImageFile_Signature", new global::System.Data.DataColumn[] {
+                        this.tableImageFile.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSignature.ImageFileIDColumn});
+            this.tableSignature.Constraints.Add(fkc);
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
@@ -434,24 +422,19 @@ namespace SignatureCountingTool.Database {
             fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
             fkc.DeleteRule = global::System.Data.Rule.Cascade;
             fkc.UpdateRule = global::System.Data.Rule.Cascade;
-            fkc = new global::System.Data.ForeignKeyConstraint("FK_ImageFIle_Signature", new global::System.Data.DataColumn[] {
-                        this.tableImageFile.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableSignature.ImageFileIDColumn});
-            this.tableSignature.Constraints.Add(fkc);
-            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
-            fkc.DeleteRule = global::System.Data.Rule.Cascade;
-            fkc.UpdateRule = global::System.Data.Rule.Cascade;
-            fkc = new global::System.Data.ForeignKeyConstraint("FK_Signature_GuessedSignatory", new global::System.Data.DataColumn[] {
-                        this.tableSignature.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableGuessedSignature.SignatureIDColumn});
-            this.tableGuessedSignature.Constraints.Add(fkc);
-            fkc.AcceptRejectRule = global::System.Data.AcceptRejectRule.None;
-            fkc.DeleteRule = global::System.Data.Rule.Cascade;
-            fkc.UpdateRule = global::System.Data.Rule.Cascade;
             this.relationFK_Signature_Matching = new global::System.Data.DataRelation("FK_Signature_Matching", new global::System.Data.DataColumn[] {
                         this.tableSignature.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableMatching.SignatureIDColumn}, false);
             this.Relations.Add(this.relationFK_Signature_Matching);
+            this.relationFK_Matching_Signature = new global::System.Data.DataRelation("FK_Matching_Signature", new global::System.Data.DataColumn[] {
+                        this.tableMatching.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSignature.ConclusiveMatchingIDColumn}, false);
+            this.relationFK_Matching_Signature.Nested = true;
+            this.Relations.Add(this.relationFK_Matching_Signature);
+            this.relationFK_ImageFile_Signature = new global::System.Data.DataRelation("FK_ImageFile_Signature", new global::System.Data.DataColumn[] {
+                        this.tableImageFile.IDColumn}, new global::System.Data.DataColumn[] {
+                        this.tableSignature.ImageFileIDColumn}, false);
+            this.Relations.Add(this.relationFK_ImageFile_Signature);
             this.relationFK_Type_Signature = new global::System.Data.DataRelation("FK_Type_Signature", new global::System.Data.DataColumn[] {
                         this.tableType.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableSignature.TypeIDColumn}, false);
@@ -460,14 +443,6 @@ namespace SignatureCountingTool.Database {
                         this.tableTrim.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableSignature.TrimIDColumn}, false);
             this.Relations.Add(this.relationFK_Trim_Signature);
-            this.relationFK_ImageFIle_Signature = new global::System.Data.DataRelation("FK_ImageFIle_Signature", new global::System.Data.DataColumn[] {
-                        this.tableImageFile.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableSignature.ImageFileIDColumn}, false);
-            this.Relations.Add(this.relationFK_ImageFIle_Signature);
-            this.relationFK_Signature_GuessedSignatory = new global::System.Data.DataRelation("FK_Signature_GuessedSignatory", new global::System.Data.DataColumn[] {
-                        this.tableSignature.IDColumn}, new global::System.Data.DataColumn[] {
-                        this.tableGuessedSignature.SignatureIDColumn}, false);
-            this.Relations.Add(this.relationFK_Signature_GuessedSignatory);
             this.relationSignatory_Matching = new global::System.Data.DataRelation("Signatory_Matching", new global::System.Data.DataColumn[] {
                         this.tableSignatory.IDColumn}, new global::System.Data.DataColumn[] {
                         this.tableMatching.SignatoryIDColumn}, false);
@@ -521,12 +496,6 @@ namespace SignatureCountingTool.Database {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private bool ShouldSerializeSelectedSignatory() {
-            return false;
-        }
-        
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        private bool ShouldSerializeGuessedSignature() {
             return false;
         }
         
@@ -605,9 +574,6 @@ namespace SignatureCountingTool.Database {
         
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         public delegate void SelectedSignatoryRowChangeEventHandler(object sender, SelectedSignatoryRowChangeEvent e);
-        
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        public delegate void GuessedSignatureRowChangeEventHandler(object sender, GuessedSignatureRowChangeEvent e);
         
         /// <summary>
         ///Represents the strongly named DataTable class.
@@ -1378,8 +1344,12 @@ namespace SignatureCountingTool.Database {
                 base.Columns.Add(this.columnName);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnID}, true));
+                this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint2", new global::System.Data.DataColumn[] {
+                                this.columnName}, false));
                 this.columnID.AllowDBNull = false;
                 this.columnID.Unique = true;
+                this.columnName.AllowDBNull = false;
+                this.columnName.Unique = true;
                 this.columnName.MaxLength = 100;
             }
             
@@ -1522,6 +1492,10 @@ namespace SignatureCountingTool.Database {
             
             private global::System.Data.DataColumn columnTypeID;
             
+            private global::System.Data.DataColumn columnConclusiveMatchingID;
+            
+            private global::System.Data.DataColumn columnTrainer;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public SignatureDataTable() {
@@ -1589,6 +1563,22 @@ namespace SignatureCountingTool.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn ConclusiveMatchingIDColumn {
+                get {
+                    return this.columnConclusiveMatchingID;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public global::System.Data.DataColumn TrainerColumn {
+                get {
+                    return this.columnTrainer;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1624,21 +1614,26 @@ namespace SignatureCountingTool.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public SignatureRow AddSignatureRow(int ID, ImageFileRow parentImageFileRowByFK_ImageFIle_Signature, TrimRow parentTrimRowByFK_Trim_Signature, TypeRow parentTypeRowByFK_Type_Signature) {
+            public SignatureRow AddSignatureRow(int ID, ImageFileRow parentImageFileRowByFK_ImageFile_Signature, TrimRow parentTrimRowByFK_Trim_Signature, TypeRow parentTypeRowByFK_Type_Signature, MatchingRow parentMatchingRowByFK_Matching_Signature, bool Trainer) {
                 SignatureRow rowSignatureRow = ((SignatureRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
                         ID,
                         null,
                         null,
-                        null};
-                if ((parentImageFileRowByFK_ImageFIle_Signature != null)) {
-                    columnValuesArray[1] = parentImageFileRowByFK_ImageFIle_Signature[0];
+                        null,
+                        null,
+                        Trainer};
+                if ((parentImageFileRowByFK_ImageFile_Signature != null)) {
+                    columnValuesArray[1] = parentImageFileRowByFK_ImageFile_Signature[0];
                 }
                 if ((parentTrimRowByFK_Trim_Signature != null)) {
                     columnValuesArray[2] = parentTrimRowByFK_Trim_Signature[0];
                 }
                 if ((parentTypeRowByFK_Type_Signature != null)) {
                     columnValuesArray[3] = parentTypeRowByFK_Type_Signature[0];
+                }
+                if ((parentMatchingRowByFK_Matching_Signature != null)) {
+                    columnValuesArray[4] = parentMatchingRowByFK_Matching_Signature[0];
                 }
                 rowSignatureRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowSignatureRow);
@@ -1673,6 +1668,8 @@ namespace SignatureCountingTool.Database {
                 this.columnImageFileID = base.Columns["ImageFileID"];
                 this.columnTrimID = base.Columns["TrimID"];
                 this.columnTypeID = base.Columns["TypeID"];
+                this.columnConclusiveMatchingID = base.Columns["ConclusiveMatchingID"];
+                this.columnTrainer = base.Columns["Trainer"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1686,6 +1683,10 @@ namespace SignatureCountingTool.Database {
                 base.Columns.Add(this.columnTrimID);
                 this.columnTypeID = new global::System.Data.DataColumn("TypeID", typeof(int), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnTypeID);
+                this.columnConclusiveMatchingID = new global::System.Data.DataColumn("ConclusiveMatchingID", typeof(int), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnConclusiveMatchingID);
+                this.columnTrainer = new global::System.Data.DataColumn("Trainer", typeof(bool), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnTrainer);
                 this.Constraints.Add(new global::System.Data.UniqueConstraint("Constraint1", new global::System.Data.DataColumn[] {
                                 this.columnID}, true));
                 this.columnID.AllowDBNull = false;
@@ -1693,6 +1694,7 @@ namespace SignatureCountingTool.Database {
                 this.columnImageFileID.AllowDBNull = false;
                 this.columnTrimID.AllowDBNull = false;
                 this.columnTypeID.AllowDBNull = false;
+                this.columnTrainer.AllowDBNull = false;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -2704,281 +2706,6 @@ namespace SignatureCountingTool.Database {
         }
         
         /// <summary>
-        ///Represents the strongly named DataTable class.
-        ///</summary>
-        [global::System.Serializable()]
-        [global::System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")]
-        public partial class GuessedSignatureDataTable : global::System.Data.TypedTableBase<GuessedSignatureRow> {
-            
-            private global::System.Data.DataColumn columnSignatureID;
-            
-            private global::System.Data.DataColumn columnAddToTrainerGroup;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GuessedSignatureDataTable() {
-                this.TableName = "GuessedSignature";
-                this.BeginInit();
-                this.InitClass();
-                this.EndInit();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            internal GuessedSignatureDataTable(global::System.Data.DataTable table) {
-                this.TableName = table.TableName;
-                if ((table.CaseSensitive != table.DataSet.CaseSensitive)) {
-                    this.CaseSensitive = table.CaseSensitive;
-                }
-                if ((table.Locale.ToString() != table.DataSet.Locale.ToString())) {
-                    this.Locale = table.Locale;
-                }
-                if ((table.Namespace != table.DataSet.Namespace)) {
-                    this.Namespace = table.Namespace;
-                }
-                this.Prefix = table.Prefix;
-                this.MinimumCapacity = table.MinimumCapacity;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected GuessedSignatureDataTable(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context) : 
-                    base(info, context) {
-                this.InitVars();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public global::System.Data.DataColumn SignatureIDColumn {
-                get {
-                    return this.columnSignatureID;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public global::System.Data.DataColumn AddToTrainerGroupColumn {
-                get {
-                    return this.columnAddToTrainerGroup;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            [global::System.ComponentModel.Browsable(false)]
-            public int Count {
-                get {
-                    return this.Rows.Count;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GuessedSignatureRow this[int index] {
-                get {
-                    return ((GuessedSignatureRow)(this.Rows[index]));
-                }
-            }
-            
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public event GuessedSignatureRowChangeEventHandler GuessedSignatureRowChanging;
-            
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public event GuessedSignatureRowChangeEventHandler GuessedSignatureRowChanged;
-            
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public event GuessedSignatureRowChangeEventHandler GuessedSignatureRowDeleting;
-            
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public event GuessedSignatureRowChangeEventHandler GuessedSignatureRowDeleted;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public void AddGuessedSignatureRow(GuessedSignatureRow row) {
-                this.Rows.Add(row);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GuessedSignatureRow AddGuessedSignatureRow(SignatureRow parentSignatureRowByFK_Signature_GuessedSignatory, bool AddToTrainerGroup) {
-                GuessedSignatureRow rowGuessedSignatureRow = ((GuessedSignatureRow)(this.NewRow()));
-                object[] columnValuesArray = new object[] {
-                        null,
-                        AddToTrainerGroup};
-                if ((parentSignatureRowByFK_Signature_GuessedSignatory != null)) {
-                    columnValuesArray[0] = parentSignatureRowByFK_Signature_GuessedSignatory[0];
-                }
-                rowGuessedSignatureRow.ItemArray = columnValuesArray;
-                this.Rows.Add(rowGuessedSignatureRow);
-                return rowGuessedSignatureRow;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GuessedSignatureRow FindBySignatureID(int SignatureID) {
-                return ((GuessedSignatureRow)(this.Rows.Find(new object[] {
-                            SignatureID})));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public override global::System.Data.DataTable Clone() {
-                GuessedSignatureDataTable cln = ((GuessedSignatureDataTable)(base.Clone()));
-                cln.InitVars();
-                return cln;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override global::System.Data.DataTable CreateInstance() {
-                return new GuessedSignatureDataTable();
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            internal void InitVars() {
-                this.columnSignatureID = base.Columns["SignatureID"];
-                this.columnAddToTrainerGroup = base.Columns["AddToTrainerGroup"];
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            private void InitClass() {
-                this.columnSignatureID = new global::System.Data.DataColumn("SignatureID", typeof(int), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnSignatureID);
-                this.columnAddToTrainerGroup = new global::System.Data.DataColumn("AddToTrainerGroup", typeof(bool), null, global::System.Data.MappingType.Element);
-                base.Columns.Add(this.columnAddToTrainerGroup);
-                this.Constraints.Add(new global::System.Data.UniqueConstraint("GuessedSignatoryKey1", new global::System.Data.DataColumn[] {
-                                this.columnSignatureID}, true));
-                this.columnSignatureID.AllowDBNull = false;
-                this.columnSignatureID.Unique = true;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GuessedSignatureRow NewGuessedSignatureRow() {
-                return ((GuessedSignatureRow)(this.NewRow()));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override global::System.Data.DataRow NewRowFromBuilder(global::System.Data.DataRowBuilder builder) {
-                return new GuessedSignatureRow(builder);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override global::System.Type GetRowType() {
-                return typeof(GuessedSignatureRow);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override void OnRowChanged(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowChanged(e);
-                if ((this.GuessedSignatureRowChanged != null)) {
-                    this.GuessedSignatureRowChanged(this, new GuessedSignatureRowChangeEvent(((GuessedSignatureRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override void OnRowChanging(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowChanging(e);
-                if ((this.GuessedSignatureRowChanging != null)) {
-                    this.GuessedSignatureRowChanging(this, new GuessedSignatureRowChangeEvent(((GuessedSignatureRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override void OnRowDeleted(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowDeleted(e);
-                if ((this.GuessedSignatureRowDeleted != null)) {
-                    this.GuessedSignatureRowDeleted(this, new GuessedSignatureRowChangeEvent(((GuessedSignatureRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            protected override void OnRowDeleting(global::System.Data.DataRowChangeEventArgs e) {
-                base.OnRowDeleting(e);
-                if ((this.GuessedSignatureRowDeleting != null)) {
-                    this.GuessedSignatureRowDeleting(this, new GuessedSignatureRowChangeEvent(((GuessedSignatureRow)(e.Row)), e.Action));
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public void RemoveGuessedSignatureRow(GuessedSignatureRow row) {
-                this.Rows.Remove(row);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public static global::System.Xml.Schema.XmlSchemaComplexType GetTypedTableSchema(global::System.Xml.Schema.XmlSchemaSet xs) {
-                global::System.Xml.Schema.XmlSchemaComplexType type = new global::System.Xml.Schema.XmlSchemaComplexType();
-                global::System.Xml.Schema.XmlSchemaSequence sequence = new global::System.Xml.Schema.XmlSchemaSequence();
-                SignatureCounterDataSet ds = new SignatureCounterDataSet();
-                global::System.Xml.Schema.XmlSchemaAny any1 = new global::System.Xml.Schema.XmlSchemaAny();
-                any1.Namespace = "http://www.w3.org/2001/XMLSchema";
-                any1.MinOccurs = new decimal(0);
-                any1.MaxOccurs = decimal.MaxValue;
-                any1.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
-                sequence.Items.Add(any1);
-                global::System.Xml.Schema.XmlSchemaAny any2 = new global::System.Xml.Schema.XmlSchemaAny();
-                any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1";
-                any2.MinOccurs = new decimal(1);
-                any2.ProcessContents = global::System.Xml.Schema.XmlSchemaContentProcessing.Lax;
-                sequence.Items.Add(any2);
-                global::System.Xml.Schema.XmlSchemaAttribute attribute1 = new global::System.Xml.Schema.XmlSchemaAttribute();
-                attribute1.Name = "namespace";
-                attribute1.FixedValue = ds.Namespace;
-                type.Attributes.Add(attribute1);
-                global::System.Xml.Schema.XmlSchemaAttribute attribute2 = new global::System.Xml.Schema.XmlSchemaAttribute();
-                attribute2.Name = "tableTypeName";
-                attribute2.FixedValue = "GuessedSignatureDataTable";
-                type.Attributes.Add(attribute2);
-                type.Particle = sequence;
-                global::System.Xml.Schema.XmlSchema dsSchema = ds.GetSchemaSerializable();
-                if (xs.Contains(dsSchema.TargetNamespace)) {
-                    global::System.IO.MemoryStream s1 = new global::System.IO.MemoryStream();
-                    global::System.IO.MemoryStream s2 = new global::System.IO.MemoryStream();
-                    try {
-                        global::System.Xml.Schema.XmlSchema schema = null;
-                        dsSchema.Write(s1);
-                        for (global::System.Collections.IEnumerator schemas = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator(); schemas.MoveNext(); ) {
-                            schema = ((global::System.Xml.Schema.XmlSchema)(schemas.Current));
-                            s2.SetLength(0);
-                            schema.Write(s2);
-                            if ((s1.Length == s2.Length)) {
-                                s1.Position = 0;
-                                s2.Position = 0;
-                                for (; ((s1.Position != s1.Length) 
-                                            && (s1.ReadByte() == s2.ReadByte())); ) {
-                                    ;
-                                }
-                                if ((s1.Position == s1.Length)) {
-                                    return type;
-                                }
-                            }
-                        }
-                    }
-                    finally {
-                        if ((s1 != null)) {
-                            s1.Close();
-                        }
-                        if ((s2 != null)) {
-                            s2.Close();
-                        }
-                    }
-                }
-                xs.Add(dsSchema);
-                return type;
-            }
-        }
-        
-        /// <summary>
         ///Represents strongly named DataRow class.
         ///</summary>
         public partial class ImageFileRow : global::System.Data.DataRow {
@@ -3118,11 +2845,11 @@ namespace SignatureCountingTool.Database {
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public SignatureRow[] GetSignatureRows() {
-                if ((this.Table.ChildRelations["FK_ImageFIle_Signature"] == null)) {
+                if ((this.Table.ChildRelations["FK_ImageFile_Signature"] == null)) {
                     return new SignatureRow[0];
                 }
                 else {
-                    return ((SignatureRow[])(base.GetChildRows(this.Table.ChildRelations["FK_ImageFIle_Signature"])));
+                    return ((SignatureRow[])(base.GetChildRows(this.Table.ChildRelations["FK_ImageFile_Signature"])));
                 }
             }
         }
@@ -3206,6 +2933,17 @@ namespace SignatureCountingTool.Database {
                     this.SetParentRow(value, this.Table.ParentRelations["Signatory_Matching"]);
                 }
             }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public SignatureRow[] GetSignatureRows() {
+                if ((this.Table.ChildRelations["FK_Matching_Signature"] == null)) {
+                    return new SignatureRow[0];
+                }
+                else {
+                    return ((SignatureRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Matching_Signature"])));
+                }
+            }
         }
         
         /// <summary>
@@ -3237,28 +2975,11 @@ namespace SignatureCountingTool.Database {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public string Name {
                 get {
-                    try {
-                        return ((string)(this[this.tableSignatory.NameColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("テーブル \'Signatory\' にある列 \'Name\' の値は DBNull です。", e);
-                    }
+                    return ((string)(this[this.tableSignatory.NameColumn]));
                 }
                 set {
                     this[this.tableSignatory.NameColumn] = value;
                 }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public bool IsNameNull() {
-                return this.IsNull(this.tableSignatory.NameColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public void SetNameNull() {
-                this[this.tableSignatory.NameColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3344,6 +3065,55 @@ namespace SignatureCountingTool.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public int ConclusiveMatchingID {
+                get {
+                    try {
+                        return ((int)(this[this.tableSignature.ConclusiveMatchingIDColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("テーブル \'Signature\' にある列 \'ConclusiveMatchingID\' の値は DBNull です。", e);
+                    }
+                }
+                set {
+                    this[this.tableSignature.ConclusiveMatchingIDColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public bool Trainer {
+                get {
+                    return ((bool)(this[this.tableSignature.TrainerColumn]));
+                }
+                set {
+                    this[this.tableSignature.TrainerColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public MatchingRow MatchingRow {
+                get {
+                    return ((MatchingRow)(this.GetParentRow(this.Table.ParentRelations["FK_Matching_Signature"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_Matching_Signature"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
+            public ImageFileRow ImageFileRow {
+                get {
+                    return ((ImageFileRow)(this.GetParentRow(this.Table.ParentRelations["FK_ImageFile_Signature"])));
+                }
+                set {
+                    this.SetParentRow(value, this.Table.ParentRelations["FK_ImageFile_Signature"]);
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
             public TypeRow TypeRow {
                 get {
                     return ((TypeRow)(this.GetParentRow(this.Table.ParentRelations["FK_Type_Signature"])));
@@ -3366,24 +3136,14 @@ namespace SignatureCountingTool.Database {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public ImageFileRow ImageFIleRow {
-                get {
-                    return ((ImageFileRow)(this.GetParentRow(this.Table.ParentRelations["FK_ImageFIle_Signature"])));
-                }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK_ImageFIle_Signature"]);
-                }
+            public bool IsConclusiveMatchingIDNull() {
+                return this.IsNull(this.tableSignature.ConclusiveMatchingIDColumn);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GuessedSignatureRow[] GetGuessedSignatureRows() {
-                if ((this.Table.ChildRelations["FK_Signature_GuessedSignatory"] == null)) {
-                    return new GuessedSignatureRow[0];
-                }
-                else {
-                    return ((GuessedSignatureRow[])(base.GetChildRows(this.Table.ChildRelations["FK_Signature_GuessedSignatory"])));
-                }
+            public void SetConclusiveMatchingIDNull() {
+                this[this.tableSignature.ConclusiveMatchingIDColumn] = global::System.Convert.DBNull;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -3643,71 +3403,6 @@ namespace SignatureCountingTool.Database {
         }
         
         /// <summary>
-        ///Represents strongly named DataRow class.
-        ///</summary>
-        public partial class GuessedSignatureRow : global::System.Data.DataRow {
-            
-            private GuessedSignatureDataTable tableGuessedSignature;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            internal GuessedSignatureRow(global::System.Data.DataRowBuilder rb) : 
-                    base(rb) {
-                this.tableGuessedSignature = ((GuessedSignatureDataTable)(this.Table));
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public int SignatureID {
-                get {
-                    return ((int)(this[this.tableGuessedSignature.SignatureIDColumn]));
-                }
-                set {
-                    this[this.tableGuessedSignature.SignatureIDColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public bool AddToTrainerGroup {
-                get {
-                    try {
-                        return ((bool)(this[this.tableGuessedSignature.AddToTrainerGroupColumn]));
-                    }
-                    catch (global::System.InvalidCastException e) {
-                        throw new global::System.Data.StrongTypingException("テーブル \'GuessedSignature\' にある列 \'AddToTrainerGroup\' の値は DBNull です。", e);
-                    }
-                }
-                set {
-                    this[this.tableGuessedSignature.AddToTrainerGroupColumn] = value;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public SignatureRow SignatureRow {
-                get {
-                    return ((SignatureRow)(this.GetParentRow(this.Table.ParentRelations["FK_Signature_GuessedSignatory"])));
-                }
-                set {
-                    this.SetParentRow(value, this.Table.ParentRelations["FK_Signature_GuessedSignatory"]);
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public bool IsAddToTrainerGroupNull() {
-                return this.IsNull(this.tableGuessedSignature.AddToTrainerGroupColumn);
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public void SetAddToTrainerGroupNull() {
-                this[this.tableGuessedSignature.AddToTrainerGroupColumn] = global::System.Convert.DBNull;
-            }
-        }
-        
-        /// <summary>
         ///Row event argument class
         ///</summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
@@ -3944,43 +3639,9 @@ namespace SignatureCountingTool.Database {
                 }
             }
         }
-        
-        /// <summary>
-        ///Row event argument class
-        ///</summary>
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-        public class GuessedSignatureRowChangeEvent : global::System.EventArgs {
-            
-            private GuessedSignatureRow eventRow;
-            
-            private global::System.Data.DataRowAction eventAction;
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GuessedSignatureRowChangeEvent(GuessedSignatureRow row, global::System.Data.DataRowAction action) {
-                this.eventRow = row;
-                this.eventAction = action;
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public GuessedSignatureRow Row {
-                get {
-                    return this.eventRow;
-                }
-            }
-            
-            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
-            public global::System.Data.DataRowAction Action {
-                get {
-                    return this.eventAction;
-                }
-            }
-        }
     }
 }
-namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
+namespace Signature.CountingTool.Database.SignatureCounterDataSetTableAdapters {
     
     
     /// <summary>
@@ -4142,7 +3803,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitConnection() {
             this._connection = new global::System.Data.SqlServerCe.SqlCeConnection();
-            this._connection.ConnectionString = global::SignatureCountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
+            this._connection.ConnectionString = global::Signature.CountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4489,7 +4150,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitConnection() {
             this._connection = new global::System.Data.SqlServerCe.SqlCeConnection();
-            this._connection.ConnectionString = global::SignatureCountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
+            this._connection.ConnectionString = global::Signature.CountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4785,7 +4446,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitConnection() {
             this._connection = new global::System.Data.SqlServerCe.SqlCeConnection();
-            this._connection.ConnectionString = global::SignatureCountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
+            this._connection.ConnectionString = global::Signature.CountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -4880,7 +4541,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         public virtual int Insert(int ID, string Name) {
             this.Adapter.InsertCommand.Parameters[0].Value = ((int)(ID));
             if ((Name == null)) {
-                this.Adapter.InsertCommand.Parameters[1].Value = global::System.DBNull.Value;
+                throw new global::System.ArgumentNullException("Name");
             }
             else {
                 this.Adapter.InsertCommand.Parameters[1].Value = ((string)(Name));
@@ -4908,7 +4569,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         public virtual int Update(int ID, string Name, int Original_ID) {
             this.Adapter.UpdateCommand.Parameters[0].Value = ((int)(ID));
             if ((Name == null)) {
-                this.Adapter.UpdateCommand.Parameters[1].Value = global::System.DBNull.Value;
+                throw new global::System.ArgumentNullException("Name");
             }
             else {
                 this.Adapter.UpdateCommand.Parameters[1].Value = ((string)(Name));
@@ -5064,6 +4725,8 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
             tableMapping.ColumnMappings.Add("ImageFileID", "ImageFileID");
             tableMapping.ColumnMappings.Add("TrimID", "TrimID");
             tableMapping.ColumnMappings.Add("TypeID", "TypeID");
+            tableMapping.ColumnMappings.Add("ConclusiveMatchingID", "ConclusiveMatchingID");
+            tableMapping.ColumnMappings.Add("Trainer", "Trainer");
             this._adapter.TableMappings.Add(tableMapping);
             this._adapter.DeleteCommand = new global::System.Data.SqlServerCe.SqlCeCommand();
             this._adapter.DeleteCommand.Connection = this.Connection;
@@ -5072,22 +4735,28 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
             this._adapter.DeleteCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@Original_ID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "ID", global::System.Data.DataRowVersion.Original, null));
             this._adapter.InsertCommand = new global::System.Data.SqlServerCe.SqlCeCommand();
             this._adapter.InsertCommand.Connection = this.Connection;
-            this._adapter.InsertCommand.CommandText = "INSERT INTO [Signature] ([ID], [ImageFileID], [TrimID], [TypeID]) VALUES (@ID, @I" +
-                "mageFileID, @TrimID, @TypeID)";
+            this._adapter.InsertCommand.CommandText = "INSERT INTO [Signature] ([ID], [ImageFileID], [TrimID], [TypeID], [ConclusiveMatc" +
+                "hingID], [Trainer]) VALUES (@ID, @ImageFileID, @TrimID, @TypeID, @ConclusiveMatc" +
+                "hingID, @Trainer)";
             this._adapter.InsertCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@ID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "ID", global::System.Data.DataRowVersion.Current, null));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@ImageFileID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "ImageFileID", global::System.Data.DataRowVersion.Current, null));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@TrimID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "TrimID", global::System.Data.DataRowVersion.Current, null));
             this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@TypeID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "TypeID", global::System.Data.DataRowVersion.Current, null));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@ConclusiveMatchingID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "ConclusiveMatchingID", global::System.Data.DataRowVersion.Current, null));
+            this._adapter.InsertCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@Trainer", global::System.Data.SqlDbType.Bit, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "Trainer", global::System.Data.DataRowVersion.Current, null));
             this._adapter.UpdateCommand = new global::System.Data.SqlServerCe.SqlCeCommand();
             this._adapter.UpdateCommand.Connection = this.Connection;
             this._adapter.UpdateCommand.CommandText = "UPDATE [Signature] SET [ID] = @ID, [ImageFileID] = @ImageFileID, [TrimID] = @Trim" +
-                "ID, [TypeID] = @TypeID WHERE (([ID] = @Original_ID))";
+                "ID, [TypeID] = @TypeID, [ConclusiveMatchingID] = @ConclusiveMatchingID, [Trainer" +
+                "] = @Trainer WHERE (([ID] = @Original_ID))";
             this._adapter.UpdateCommand.CommandType = global::System.Data.CommandType.Text;
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@ID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "ID", global::System.Data.DataRowVersion.Current, null));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@ImageFileID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "ImageFileID", global::System.Data.DataRowVersion.Current, null));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@TrimID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "TrimID", global::System.Data.DataRowVersion.Current, null));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@TypeID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "TypeID", global::System.Data.DataRowVersion.Current, null));
+            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@ConclusiveMatchingID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "ConclusiveMatchingID", global::System.Data.DataRowVersion.Current, null));
+            this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@Trainer", global::System.Data.SqlDbType.Bit, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "Trainer", global::System.Data.DataRowVersion.Current, null));
             this._adapter.UpdateCommand.Parameters.Add(new global::System.Data.SqlServerCe.SqlCeParameter("@Original_ID", global::System.Data.SqlDbType.Int, 0, global::System.Data.ParameterDirection.Input, true, 0, 0, "ID", global::System.Data.DataRowVersion.Original, null));
         }
         
@@ -5095,7 +4764,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitConnection() {
             this._connection = new global::System.Data.SqlServerCe.SqlCeConnection();
-            this._connection.ConnectionString = global::SignatureCountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
+            this._connection.ConnectionString = global::Signature.CountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5104,7 +4773,8 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
             this._commandCollection = new global::System.Data.SqlServerCe.SqlCeCommand[1];
             this._commandCollection[0] = new global::System.Data.SqlServerCe.SqlCeCommand();
             this._commandCollection[0].Connection = this.Connection;
-            this._commandCollection[0].CommandText = "SELECT            Signature.*\r\nFROM              Signature";
+            this._commandCollection[0].CommandText = "SELECT            ID, ImageFileID, TrimID, TypeID, ConclusiveMatchingID, Trainer\r" +
+                "\nFROM              Signature";
             this._commandCollection[0].CommandType = global::System.Data.CommandType.Text;
         }
         
@@ -5187,11 +4857,18 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Insert, true)]
-        public virtual int Insert(int ID, int ImageFileID, int TrimID, int TypeID) {
+        public virtual int Insert(int ID, int ImageFileID, int TrimID, int TypeID, global::System.Nullable<int> ConclusiveMatchingID, bool Trainer) {
             this.Adapter.InsertCommand.Parameters[0].Value = ((int)(ID));
             this.Adapter.InsertCommand.Parameters[1].Value = ((int)(ImageFileID));
             this.Adapter.InsertCommand.Parameters[2].Value = ((int)(TrimID));
             this.Adapter.InsertCommand.Parameters[3].Value = ((int)(TypeID));
+            if ((ConclusiveMatchingID.HasValue == true)) {
+                this.Adapter.InsertCommand.Parameters[4].Value = ((int)(ConclusiveMatchingID.Value));
+            }
+            else {
+                this.Adapter.InsertCommand.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            this.Adapter.InsertCommand.Parameters[5].Value = ((bool)(Trainer));
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.InsertCommand.Connection.State;
             if (((this.Adapter.InsertCommand.Connection.State & global::System.Data.ConnectionState.Open) 
                         != global::System.Data.ConnectionState.Open)) {
@@ -5212,12 +4889,19 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Update, true)]
-        public virtual int Update(int ID, int ImageFileID, int TrimID, int TypeID, int Original_ID) {
+        public virtual int Update(int ID, int ImageFileID, int TrimID, int TypeID, global::System.Nullable<int> ConclusiveMatchingID, bool Trainer, int Original_ID) {
             this.Adapter.UpdateCommand.Parameters[0].Value = ((int)(ID));
             this.Adapter.UpdateCommand.Parameters[1].Value = ((int)(ImageFileID));
             this.Adapter.UpdateCommand.Parameters[2].Value = ((int)(TrimID));
             this.Adapter.UpdateCommand.Parameters[3].Value = ((int)(TypeID));
-            this.Adapter.UpdateCommand.Parameters[4].Value = ((int)(Original_ID));
+            if ((ConclusiveMatchingID.HasValue == true)) {
+                this.Adapter.UpdateCommand.Parameters[4].Value = ((int)(ConclusiveMatchingID.Value));
+            }
+            else {
+                this.Adapter.UpdateCommand.Parameters[4].Value = global::System.DBNull.Value;
+            }
+            this.Adapter.UpdateCommand.Parameters[5].Value = ((bool)(Trainer));
+            this.Adapter.UpdateCommand.Parameters[6].Value = ((int)(Original_ID));
             global::System.Data.ConnectionState previousConnectionState = this.Adapter.UpdateCommand.Connection.State;
             if (((this.Adapter.UpdateCommand.Connection.State & global::System.Data.ConnectionState.Open) 
                         != global::System.Data.ConnectionState.Open)) {
@@ -5238,8 +4922,8 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         [global::System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")]
         [global::System.ComponentModel.DataObjectMethodAttribute(global::System.ComponentModel.DataObjectMethodType.Update, true)]
-        public virtual int Update(int ImageFileID, int TrimID, int TypeID, int Original_ID) {
-            return this.Update(Original_ID, ImageFileID, TrimID, TypeID, Original_ID);
+        public virtual int Update(int ImageFileID, int TrimID, int TypeID, global::System.Nullable<int> ConclusiveMatchingID, bool Trainer, int Original_ID) {
+            return this.Update(Original_ID, ImageFileID, TrimID, TypeID, ConclusiveMatchingID, Trainer, Original_ID);
         }
     }
     
@@ -5401,7 +5085,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitConnection() {
             this._connection = new global::System.Data.SqlServerCe.SqlCeConnection();
-            this._connection.ConnectionString = global::SignatureCountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
+            this._connection.ConnectionString = global::Signature.CountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -5699,7 +5383,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitConnection() {
             this._connection = new global::System.Data.SqlServerCe.SqlCeConnection();
-            this._connection.ConnectionString = global::SignatureCountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
+            this._connection.ConnectionString = global::Signature.CountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -6006,7 +5690,7 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private void InitConnection() {
             this._connection = new global::System.Data.SqlServerCe.SqlCeConnection();
-            this._connection.ConnectionString = global::SignatureCountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
+            this._connection.ConnectionString = global::Signature.CountingTool.Properties.Settings.Default.signature_counter_ConnectionString;
         }
         
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -6393,12 +6077,30 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private int UpdateUpdatedRows(SignatureCounterDataSet dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allChangedRows, global::System.Collections.Generic.List<global::System.Data.DataRow> allAddedRows) {
             int result = 0;
+            if ((this._signatoryTableAdapter != null)) {
+                global::System.Data.DataRow[] updatedRows = dataSet.Signatory.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
+                updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
+                if (((updatedRows != null) 
+                            && (0 < updatedRows.Length))) {
+                    result = (result + this._signatoryTableAdapter.Update(updatedRows));
+                    allChangedRows.AddRange(updatedRows);
+                }
+            }
             if ((this._imageFileTableAdapter != null)) {
                 global::System.Data.DataRow[] updatedRows = dataSet.ImageFile.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
                 updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
                 if (((updatedRows != null) 
                             && (0 < updatedRows.Length))) {
                     result = (result + this._imageFileTableAdapter.Update(updatedRows));
+                    allChangedRows.AddRange(updatedRows);
+                }
+            }
+            if ((this._matchingTableAdapter != null)) {
+                global::System.Data.DataRow[] updatedRows = dataSet.Matching.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
+                updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
+                if (((updatedRows != null) 
+                            && (0 < updatedRows.Length))) {
+                    result = (result + this._matchingTableAdapter.Update(updatedRows));
                     allChangedRows.AddRange(updatedRows);
                 }
             }
@@ -6420,30 +6122,12 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
                     allChangedRows.AddRange(updatedRows);
                 }
             }
-            if ((this._signatoryTableAdapter != null)) {
-                global::System.Data.DataRow[] updatedRows = dataSet.Signatory.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
-                updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
-                if (((updatedRows != null) 
-                            && (0 < updatedRows.Length))) {
-                    result = (result + this._signatoryTableAdapter.Update(updatedRows));
-                    allChangedRows.AddRange(updatedRows);
-                }
-            }
             if ((this._signatureTableAdapter != null)) {
                 global::System.Data.DataRow[] updatedRows = dataSet.Signature.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
                 updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
                 if (((updatedRows != null) 
                             && (0 < updatedRows.Length))) {
                     result = (result + this._signatureTableAdapter.Update(updatedRows));
-                    allChangedRows.AddRange(updatedRows);
-                }
-            }
-            if ((this._matchingTableAdapter != null)) {
-                global::System.Data.DataRow[] updatedRows = dataSet.Matching.Select(null, null, global::System.Data.DataViewRowState.ModifiedCurrent);
-                updatedRows = this.GetRealUpdatedRows(updatedRows, allAddedRows);
-                if (((updatedRows != null) 
-                            && (0 < updatedRows.Length))) {
-                    result = (result + this._matchingTableAdapter.Update(updatedRows));
                     allChangedRows.AddRange(updatedRows);
                 }
             }
@@ -6466,11 +6150,27 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")]
         private int UpdateInsertedRows(SignatureCounterDataSet dataSet, global::System.Collections.Generic.List<global::System.Data.DataRow> allAddedRows) {
             int result = 0;
+            if ((this._signatoryTableAdapter != null)) {
+                global::System.Data.DataRow[] addedRows = dataSet.Signatory.Select(null, null, global::System.Data.DataViewRowState.Added);
+                if (((addedRows != null) 
+                            && (0 < addedRows.Length))) {
+                    result = (result + this._signatoryTableAdapter.Update(addedRows));
+                    allAddedRows.AddRange(addedRows);
+                }
+            }
             if ((this._imageFileTableAdapter != null)) {
                 global::System.Data.DataRow[] addedRows = dataSet.ImageFile.Select(null, null, global::System.Data.DataViewRowState.Added);
                 if (((addedRows != null) 
                             && (0 < addedRows.Length))) {
                     result = (result + this._imageFileTableAdapter.Update(addedRows));
+                    allAddedRows.AddRange(addedRows);
+                }
+            }
+            if ((this._matchingTableAdapter != null)) {
+                global::System.Data.DataRow[] addedRows = dataSet.Matching.Select(null, null, global::System.Data.DataViewRowState.Added);
+                if (((addedRows != null) 
+                            && (0 < addedRows.Length))) {
+                    result = (result + this._matchingTableAdapter.Update(addedRows));
                     allAddedRows.AddRange(addedRows);
                 }
             }
@@ -6490,27 +6190,11 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
                     allAddedRows.AddRange(addedRows);
                 }
             }
-            if ((this._signatoryTableAdapter != null)) {
-                global::System.Data.DataRow[] addedRows = dataSet.Signatory.Select(null, null, global::System.Data.DataViewRowState.Added);
-                if (((addedRows != null) 
-                            && (0 < addedRows.Length))) {
-                    result = (result + this._signatoryTableAdapter.Update(addedRows));
-                    allAddedRows.AddRange(addedRows);
-                }
-            }
             if ((this._signatureTableAdapter != null)) {
                 global::System.Data.DataRow[] addedRows = dataSet.Signature.Select(null, null, global::System.Data.DataViewRowState.Added);
                 if (((addedRows != null) 
                             && (0 < addedRows.Length))) {
                     result = (result + this._signatureTableAdapter.Update(addedRows));
-                    allAddedRows.AddRange(addedRows);
-                }
-            }
-            if ((this._matchingTableAdapter != null)) {
-                global::System.Data.DataRow[] addedRows = dataSet.Matching.Select(null, null, global::System.Data.DataViewRowState.Added);
-                if (((addedRows != null) 
-                            && (0 < addedRows.Length))) {
-                    result = (result + this._matchingTableAdapter.Update(addedRows));
                     allAddedRows.AddRange(addedRows);
                 }
             }
@@ -6540,27 +6224,11 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
                     allChangedRows.AddRange(deletedRows);
                 }
             }
-            if ((this._matchingTableAdapter != null)) {
-                global::System.Data.DataRow[] deletedRows = dataSet.Matching.Select(null, null, global::System.Data.DataViewRowState.Deleted);
-                if (((deletedRows != null) 
-                            && (0 < deletedRows.Length))) {
-                    result = (result + this._matchingTableAdapter.Update(deletedRows));
-                    allChangedRows.AddRange(deletedRows);
-                }
-            }
             if ((this._signatureTableAdapter != null)) {
                 global::System.Data.DataRow[] deletedRows = dataSet.Signature.Select(null, null, global::System.Data.DataViewRowState.Deleted);
                 if (((deletedRows != null) 
                             && (0 < deletedRows.Length))) {
                     result = (result + this._signatureTableAdapter.Update(deletedRows));
-                    allChangedRows.AddRange(deletedRows);
-                }
-            }
-            if ((this._signatoryTableAdapter != null)) {
-                global::System.Data.DataRow[] deletedRows = dataSet.Signatory.Select(null, null, global::System.Data.DataViewRowState.Deleted);
-                if (((deletedRows != null) 
-                            && (0 < deletedRows.Length))) {
-                    result = (result + this._signatoryTableAdapter.Update(deletedRows));
                     allChangedRows.AddRange(deletedRows);
                 }
             }
@@ -6580,11 +6248,27 @@ namespace SignatureCountingTool.Database.SignatureCounterDataSetTableAdapters {
                     allChangedRows.AddRange(deletedRows);
                 }
             }
+            if ((this._matchingTableAdapter != null)) {
+                global::System.Data.DataRow[] deletedRows = dataSet.Matching.Select(null, null, global::System.Data.DataViewRowState.Deleted);
+                if (((deletedRows != null) 
+                            && (0 < deletedRows.Length))) {
+                    result = (result + this._matchingTableAdapter.Update(deletedRows));
+                    allChangedRows.AddRange(deletedRows);
+                }
+            }
             if ((this._imageFileTableAdapter != null)) {
                 global::System.Data.DataRow[] deletedRows = dataSet.ImageFile.Select(null, null, global::System.Data.DataViewRowState.Deleted);
                 if (((deletedRows != null) 
                             && (0 < deletedRows.Length))) {
                     result = (result + this._imageFileTableAdapter.Update(deletedRows));
+                    allChangedRows.AddRange(deletedRows);
+                }
+            }
+            if ((this._signatoryTableAdapter != null)) {
+                global::System.Data.DataRow[] deletedRows = dataSet.Signatory.Select(null, null, global::System.Data.DataViewRowState.Deleted);
+                if (((deletedRows != null) 
+                            && (0 < deletedRows.Length))) {
+                    result = (result + this._signatoryTableAdapter.Update(deletedRows));
                     allChangedRows.AddRange(deletedRows);
                 }
             }

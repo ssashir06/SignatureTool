@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SignatureCountingTool
+namespace Signature.CountingTool
 {
-    public partial class SignatoryEditor : Form
+    public partial class SignatoryEditorForm : Form
     {
-        public SignatoryEditor()
+        public SignatoryEditorForm()
         {
             InitializeComponent();
         }
@@ -24,9 +24,8 @@ namespace SignatureCountingTool
             {
                 signatoryBindingSource.EndEdit();
             }
-            catch (ConstraintException exp)
+            catch (Exception exp)
             {
-                MessageBox.Show(exp.Message);
                 toolStripStatus.Text = exp.Message;
                 return;
             }

@@ -73,17 +73,17 @@ namespace CVUtil { namespace CLI {
 		return image_mat;
 	}
 
-	std::string convertString(String^ file_name)
+	std::string convertString(String^ str)
 	{
-		IntPtr ptr = Marshal::StringToHGlobalAnsi(file_name);
+		IntPtr ptr = Marshal::StringToHGlobalAnsi(str);
 		std::string string_stl((char*)(void*)ptr);
 		Marshal::FreeHGlobal(ptr);
 		return string_stl;
 	}
 
-	String^ convertString(const std::string& file_name)
+	String^ convertString(const std::string& str)
 	{
-		return Marshal::PtrToStringAnsi((IntPtr)(void*)file_name.c_str());
+		return Marshal::PtrToStringAnsi((IntPtr)(void*)str.c_str());
 	}
 
 	namespace Control
