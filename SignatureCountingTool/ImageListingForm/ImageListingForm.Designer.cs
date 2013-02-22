@@ -36,11 +36,6 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.addImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newModelToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.loadModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.startMatchingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.signatoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -145,51 +140,16 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newModelToolStripMenuItem2,
-            this.toolStripSeparator3,
-            this.loadModelToolStripMenuItem,
-            this.saveModelToolStripMenuItem,
-            this.toolStripSeparator1,
             this.startMatchingToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(107, 20);
-            this.fileToolStripMenuItem.Text = "Matching Model";
-            // 
-            // newModelToolStripMenuItem2
-            // 
-            this.newModelToolStripMenuItem2.Name = "newModelToolStripMenuItem2";
-            this.newModelToolStripMenuItem2.Size = new System.Drawing.Size(152, 22);
-            this.newModelToolStripMenuItem2.Text = "New";
-            this.newModelToolStripMenuItem2.Click += new System.EventHandler(this.newModelToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
-            // 
-            // loadModelToolStripMenuItem
-            // 
-            this.loadModelToolStripMenuItem.Name = "loadModelToolStripMenuItem";
-            this.loadModelToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.loadModelToolStripMenuItem.Text = "Load";
-            this.loadModelToolStripMenuItem.Click += new System.EventHandler(this.loadModelToolStripMenuItem_Click);
-            // 
-            // saveModelToolStripMenuItem
-            // 
-            this.saveModelToolStripMenuItem.Name = "saveModelToolStripMenuItem";
-            this.saveModelToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.saveModelToolStripMenuItem.Text = "Save";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(70, 20);
+            this.fileToolStripMenuItem.Text = "Matching";
             // 
             // startMatchingToolStripMenuItem
             // 
             this.startMatchingToolStripMenuItem.Name = "startMatchingToolStripMenuItem";
             this.startMatchingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.startMatchingToolStripMenuItem.Text = "Start Matching";
+            this.startMatchingToolStripMenuItem.Text = "Start";
             this.startMatchingToolStripMenuItem.Click += new System.EventHandler(this.startMatchingToolStripMenuItem_Click);
             // 
             // signatoryToolStripMenuItem
@@ -203,7 +163,7 @@
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(94, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
@@ -259,7 +219,6 @@
             this.dataGridViewImages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewImages.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridViewImages.Location = new System.Drawing.Point(0, 0);
-            this.dataGridViewImages.MultiSelect = false;
             this.dataGridViewImages.Name = "dataGridViewImages";
             this.dataGridViewImages.ReadOnly = true;
             this.dataGridViewImages.RowTemplate.Height = 21;
@@ -466,6 +425,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "ImageListingForm";
             this.Text = "ImageListingForm";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImageListingForm_FormClosing);
             this.Shown += new System.EventHandler(this.ImageListingForm_Shown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -510,9 +470,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem loadModelToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveModelToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem startMatchingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem imageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem scanToolStripMenuItem;
@@ -523,8 +480,6 @@
         private System.Windows.Forms.ComboBox comboBoxRectangleType;
         private System.Windows.Forms.Panel panelTrimmingRectangle;
         private System.Windows.Forms.PictureBox pictureBoxDraggingBR;
-        private System.Windows.Forms.ToolStripMenuItem newModelToolStripMenuItem2;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem signatoryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.DataGridViewTextBoxColumn iDDataGridViewTextBoxColumn;

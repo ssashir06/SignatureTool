@@ -21,31 +21,38 @@ namespace Signature.CountingTool
         private void ImageListingForm_Shown(object sender, EventArgs e)
         {
             Start();
-            InitializeMatchingModel();
         }
 
         private void addImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AddImageFiles();
             ShowSignatureList();
+            ShowSelectedImage();
+            tables.ImageFileTableAdapter.Fill(signatureCounterDataSet1.ImageFile);
         }
 
         private void scanToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AddScanedImages();
             ShowSignatureList();
+            ShowSelectedImage();
+            tables.ImageFileTableAdapter.Fill(signatureCounterDataSet1.ImageFile);
         }
 
         private void dataGridViewImages_SelectionChanged(object sender, EventArgs e)
         {
+            ShowSignatureList();
             ShowSelectedImage();
+            ShowTrimmingRectangle();
         }
 
         private void buttonAddSignature_Click(object sender, EventArgs e)
         {
-            if (SelectedImage == null) return;
+            if (!SelectedImages.Any()) return;
             AddSignature();
             ShowSignatureList();
+            ShowSelectedImage();
+            ShowTrimmingRectangle();
         }
 
         private void buttonRemoveSignature_Click(object sender, EventArgs e)
@@ -53,10 +60,13 @@ namespace Signature.CountingTool
             if (listBoxSignatures.SelectedItem == null) return;
             RemoveSignature();
             ShowSignatureList();
+            ShowSelectedImage();
+            ShowTrimmingRectangle();
         }
 
         private void listBoxSignatures_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ShowSelectedImage();
             ShowTrimmingRectangle();
         }
 
@@ -85,18 +95,10 @@ namespace Signature.CountingTool
             MoveTrimmingRectangle(e, false);
         }
 
-        private void newModelToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            InitializeMatchingModel();
-        }
-
-        private void loadModelToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            LoadModel();
-        }
-
         private void startMatchingToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Validate();
+            tables.UpdateAll(signatureCounterDataSet1);
             MatchSignatures();
             ShowSignatureList();
         }
@@ -109,12 +111,18 @@ namespace Signature.CountingTool
         private void dataGridViewImages_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
         {
             Validate();
+            signatureCounterDataSet1.Clear();
             tables.UpdateAll(signatureCounterDataSet1);
             tables.SignatureTableAdapter.Fill(signatureCounterDataSet1.Signature);
 
             ShowSignatureList();
             ShowSelectedImage();
             ShowTrimmingRectangle();
+        }
+
+        private void ImageListingForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveModel();
         }
     }
 }

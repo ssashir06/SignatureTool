@@ -33,11 +33,11 @@
             this.toolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.startMatchingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridViewSignatures = new System.Windows.Forms.DataGridView();
             this.guessRowForDataGridViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.startMatchingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSignatures)).BeginInit();
@@ -83,6 +83,18 @@
             this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
             this.toolStripMenuItem1.Text = "File";
             // 
+            // startMatchingToolStripMenuItem
+            // 
+            this.startMatchingToolStripMenuItem.Name = "startMatchingToolStripMenuItem";
+            this.startMatchingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.startMatchingToolStripMenuItem.Text = "Start Matching";
+            this.startMatchingToolStripMenuItem.Click += new System.EventHandler(this.startMatchingToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            // 
             // quitToolStripMenuItem
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
@@ -103,22 +115,11 @@
             this.dataGridViewSignatures.RowTemplate.Height = 21;
             this.dataGridViewSignatures.Size = new System.Drawing.Size(566, 564);
             this.dataGridViewSignatures.TabIndex = 2;
+            this.dataGridViewSignatures.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewSignatures_CellValueChanged);
             // 
             // guessRowForDataGridViewBindingSource
             // 
             this.guessRowForDataGridViewBindingSource.DataSource = typeof(Signature.CountingTool.SignaturesGuessForm.GuessRowForDataGridView);
-            // 
-            // startMatchingToolStripMenuItem
-            // 
-            this.startMatchingToolStripMenuItem.Name = "startMatchingToolStripMenuItem";
-            this.startMatchingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.startMatchingToolStripMenuItem.Text = "Start Matching";
-            this.startMatchingToolStripMenuItem.Click += new System.EventHandler(this.startMatchingToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // SignaturesGuessForm
             // 

@@ -81,13 +81,26 @@ namespace Signature { namespace Guess { namespace CLI {
 			guess->loadModel(CVUtil::CLI::convertString(filename));
 		}
 
-		virtual String^ ModelFileSuffixFilter()
+		virtual property String^ ModelFileSuffixFilter
 		{
-			if (!guess) return nullptr;
-			auto suffix = guess->modelSuffix();
-			return String::Format("{0} ({1})|*{1}",
-				CVUtil::CLI::convertString(suffix.second),
-				CVUtil::CLI::convertString(suffix.first));
+			String^ get()
+			{
+				if (!guess) return nullptr;
+				auto suffix = guess->modelSuffix();
+				return String::Format("{0} ({1})|*{1}",
+					CVUtil::CLI::convertString(suffix.second),
+					CVUtil::CLI::convertString(suffix.first));
+			}
+		}
+
+		virtual property String^ ModelFileSuffix
+		{
+			String^ get()
+			{
+				if (!guess) return nullptr;
+				auto suffix = guess->modelSuffix();
+				return CVUtil::CLI::convertString(suffix.first);
+			}
 		}
 
 		virtual Void Strip() = 0;

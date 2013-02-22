@@ -47,17 +47,17 @@ namespace Signature.CountingTool
 
                 ApplyToTrailer = false;
                 Assessments = new List<AssessmentCapsule>();
-                SignatureRow = signature;
-                ImageFileRow = image;
-                TrimRow = trimming;
+                SignatureID = signature.ID;
+                ImageFileID = image.ID;
+                TrimID = trimming.ID;
             }
 
             [Browsable(false)]
-            public SignatureCounterDataSet.SignatureRow SignatureRow { get; protected set; }
+            public int SignatureID { get; protected set; }
             [Browsable(false)]
-            public SignatureCounterDataSet.ImageFileRow ImageFileRow { get; protected set; }
+            public int ImageFileID { get; protected set; }
             [Browsable(false)]
-            public SignatureCounterDataSet.TrimRow TrimRow { get; protected set; }
+            public int TrimID { get; protected set; }
             [Browsable(false)]
             public List<AssessmentCapsule> Assessments { get; set; }
 
@@ -97,6 +97,18 @@ namespace Signature.CountingTool
             ShowGuessedList();
         }
 
+        private void dataGridViewSignatures_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridViewColumn column = dataGridViewSignatures.Columns[e.ColumnIndex];
+            DataGridViewRow row = dataGridViewSignatures.Rows[e.RowIndex];
+            DataGridViewCell cell = row.Cells[e.ColumnIndex];
+            if (column.Name == "Signatory")
+            {
+                row.Cells["Determine"].Value = true;
+                row.Cells["ApplyToTrailer"].Value = true;
+            }
+        }
+
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
@@ -109,7 +121,7 @@ namespace Signature.CountingTool
             SetDeterminedMatchingID();
 
 			List<Conclusive> conclusives;
-			List<SignatureCounterDataSet.SignatureRow> signature_new_trainers;
+			List<int> signature_new_trainers;
 			int deneied;
 			GetTrainTargets(out conclusives, out signature_new_trainers, out deneied);
 
@@ -119,11 +131,15 @@ namespace Signature.CountingTool
                 {
                     case DialogResult.Yes:
                         if (!Train(conclusives)) return;
-                        foreach (SignatureCounterDataSet.SignatureRow signature in signature_new_trainers)
+						var query_signature =
+							(from signature in tables.SignatureTableAdapter.GetData()
+                             join signiture_id in signature_new_trainers on signature.ID equals signiture_id
+                             select signature).ToList();
+                        foreach (SignatureCounterDataSet.SignatureRow row_signature in query_signature)
                         {
-                            signature.Trainer = true;
-                            tables.SignatureTableAdapter.Update(signature);
+                            row_signature.Trainer = true;
                         }
+                        tables.SignatureTableAdapter.Update(query_signature.ToArray());
 						
                         break;
                     case DialogResult.Cancel:
@@ -244,10 +260,18 @@ namespace Signature.CountingTool
 
                 if (row_guessed.Assessments.Any())
                 {
-                    if (!row_guessed.SignatureRow.IsConclusiveMatchingIDNull())
-                        combo_box.Value = row_guessed.SignatureRow.ConclusiveMatchingID;
+                    var query_signature = from signature in tables.SignatureTableAdapter.GetData() where signature.ID == row_guessed.SignatureID select signature;
+                    if (query_signature.Any() && !query_signature.First().IsConclusiveMatchingIDNull())
+                        combo_box.Value = query_signature.First().ConclusiveMatchingID;
                     else
                         combo_box.Value = row_guessed.Assessments.First().ComboBoxValue;
+                }
+
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    String column_name = dataGridViewSignatures.Columns[cell.ColumnIndex].Name;
+                    if (column_name == "ApplyToTrailer" || column_name == "Determine")
+                        cell.Value = false;
                 }
             }
         }
@@ -263,12 +287,12 @@ namespace Signature.CountingTool
                 tables.MatchingTableAdapter.Delete(matching.ID);
         }
 
-		void GetTrainTargets(out List<Conclusive> conclusives, out List<SignatureCounterDataSet.SignatureRow> signature_new_trainers, out int denied_count)
+		void GetTrainTargets(out List<Conclusive> conclusives, out List<int> signature_new_trainers, out int denied_count)
         {
             Validate();
 
             conclusives = new List<Conclusive>();
-            signature_new_trainers = new List<SignatureCounterDataSet.SignatureRow>();
+            signature_new_trainers = new List<int>();
             denied_count = 0;
 
             foreach (DataGridViewRow row in dataGridViewSignatures.Rows)
@@ -286,14 +310,21 @@ namespace Signature.CountingTool
                 SignatureCounterDataSet.MatchingRow row_matching = query_matchings.First();
                 int signatory_id = row_matching.SignatoryID;
 
+                var query_signature_detail =
+                    (from signature in tables.SignatureTableAdapter.GetData()
+                     join image in tables.ImageFileTableAdapter.GetData() on signature.ImageFileID equals image.ID
+                     join trim in tables.TrimTableAdapter.GetData() on signature.TrimID equals trim.ID
+                     where signature.ID == row_guessed.SignatureID
+                     select new { Signature = signature, Image = image, Trimming = trim }).ToList();
+
                 if (use_as_trainer.Value as bool? != true)
                 {
                     continue;
                 }
-                else if (determine.Value as bool? == true && !row_guessed.SignatureRow.Trainer)
+                else if (determine.Value as bool? == true && query_signature_detail.Any() && !query_signature_detail.First().Signature.Trainer)
                 {
-                    conclusives.Add(new Conclusive(row_guessed.ImageFileRow.FullPath, (Rectangle)row_guessed.TrimRow, signatory_id.ToString()));
-                    signature_new_trainers.Add(row_guessed.SignatureRow);
+                    conclusives.Add(new Conclusive(query_signature_detail.First().Image.FullPath, (Rectangle)query_signature_detail.First().Trimming, signatory_id.ToString()));
+                    signature_new_trainers.Add(query_signature_detail.First().Signature.ID);
                 }
                 else
                 {
@@ -335,12 +366,16 @@ namespace Signature.CountingTool
 
                 if (determine.Value as bool? == true && combo_box.Value as int? != null)
                 {
-                    row_guessed.SignatureRow.ConclusiveMatchingID = (combo_box.Value as int?).Value;
-                    changed.Add(row_guessed.SignatureRow);
+                    var query_signature =
+                        (from signature in tables.SignatureTableAdapter.GetData()
+                         where signature.ID == row_guessed.SignatureID
+                         select signature).ToList();
+                    if (!query_signature.Any()) continue;
+
+                    query_signature.First().ConclusiveMatchingID = (combo_box.Value as int?).Value;
+                    changed.Add(query_signature.First());
                 }
             }
-
-            tables.SignatureTableAdapter.Update(changed.ToArray());
         }
         #endregion
     }

@@ -86,7 +86,8 @@ namespace Signature { namespace Guess { namespace CLI {
 
 		Void SaveModel(String^ filename);
 		Void LoadModel(String^ filename);
-		String^ ModelFileSuffixFilter();
+		property String^ ModelFileSuffixFilter { String^ get(); }
+		property String^ ModelFileSuffix { String^ get(); }
 
 		Void Strip();
 	};

@@ -18,8 +18,9 @@ namespace Signature.CountingTool
 	public partial class ImageListingForm
 	{
         #region Definetion of class/signature
-        protected class SignatureInfomationForListBox
+        protected class SignatureInfomationForListBox // FIXME: Rowを保持し続けると異常が発生する(フォームの反応がなくなり，終了する)
         {
+            public SignatureCounterDataSet.ImageFileRow ImageFile { get; set; }
             public SignatureCounterDataSet.SignatureRow Signature { get; set; }
             public SignatureCounterDataSet.TrimRow Trimming { get; set; }
             public SignatureCounterDataSet.TypeRow Type { get; set; }
@@ -35,28 +36,36 @@ namespace Signature.CountingTool
         Point? mouse_drag_offset = null;
         IGuessSignature guess;
         SignatoryEditorForm signatory_editor;
+        const String model_file_name_wo_suffix = "modeldata";
         #endregion
 
         #region Property
-        SignatureCounterDataSet.ImageFileRow SelectedImage
+		List<SignatureCounterDataSet.ImageFileRow> SelectedImages
         {
             get
             {
-                if (dataGridViewImages.SelectedRows.Count == 0) return null;
-
-                DataRowView row_view = dataGridViewImages.SelectedRows[0].DataBoundItem as DataRowView;
-                if (row_view == null) return null;
-
-                SignatureCounterDataSet.ImageFileRow row_image_file = row_view.Row as SignatureCounterDataSet.ImageFileRow;
-                return row_image_file;
+                List<SignatureCounterDataSet.ImageFileRow> rows = new List<SignatureCounterDataSet.ImageFileRow>();
+                foreach (DataGridViewRow image in dataGridViewImages.SelectedRows)
+                {
+                    DataRowView row_view = image.DataBoundItem as DataRowView;
+                    if (row_view == null) continue;
+                    SignatureCounterDataSet.ImageFileRow row_image = row_view.Row as SignatureCounterDataSet.ImageFileRow;
+                    if (row_image == null) continue;
+                    rows.Add(row_image);
+                }
+                return rows;
             }
         }
-
         SignatureInfomationForListBox SelectedSignature
         {
             get
             {
-                return listBoxSignatures.SelectedItem as SignatureInfomationForListBox;
+                if (listBoxSignatures.SelectedItems.Count == 0) return null;
+
+                SignatureInfomationForListBox signature_info = listBoxSignatures.SelectedItem as SignatureInfomationForListBox;
+                if (signature_info == null) return null;
+
+                return signature_info;
             }
         }
 
@@ -94,11 +103,6 @@ namespace Signature.CountingTool
             ShowSignatureList();
             ShowSignatoryEditorForm();
 		}
-
-        void InitializeMatchingModel()
-        {
-            guess = new GuessSignatureEvalEasy();
-        }
         #endregion
 
         #region Show shomething
@@ -128,53 +132,57 @@ namespace Signature.CountingTool
             comboBoxRectangleType.EndUpdate();
         }
 
-        void ShowSelectedImage()
-        {
-            SignatureCounterDataSet.ImageFileRow row = SelectedImage;
-            if (row == null)
-            {
-                pictureBoxTaken.Image = null;
-                return;
-            }
-
-			System.Drawing.Image image_loaded = Bitmap.FromFile(row.FullPath);
-            pictureBoxTaken.Image = image_loaded;
-
-            ShowSignatureList();
-        }
-
         void ShowSignatureList()
         {
-            SignatureCounterDataSet.ImageFileRow row_image_file = SelectedImage;
-            if (row_image_file == null)
-            {
-                listBoxSignatures.Items.Clear();
-                return;
-            }
-
             tables.UpdateAll(signatureCounterDataSet1);
 
-            var query_signatures =
-                from signature in tables.SignatureTableAdapter.GetData()
-                join triming in tables.TrimTableAdapter.GetData() on signature.TrimID equals triming.ID
-                join type in tables.TypeTableAdapter.GetData() on signature.TypeID equals type.ID
-                where signature.ImageFileID == row_image_file.ID
-                select new SignatureInfomationForListBox()
-                {
-                    Signature = signature,
-                    Trimming = triming,
-                    Type = type
-                };
+            SignatureInfomationForListBox last_selected = SelectedSignature;
+			int? select_index = null;
 
             listBoxSignatures.BeginUpdate();
             listBoxSignatures.Items.Clear();
-            foreach (var signature in query_signatures)
-            {
-                listBoxSignatures.Items.Add(signature);
-            }
-            listBoxSignatures.EndUpdate();
 
-            ShowTrimmingRectangle();
+            foreach (SignatureCounterDataSet.ImageFileRow image in SelectedImages)
+            {
+                var query_signatures =
+					from signature in tables.SignatureTableAdapter.GetData()
+					join trimming in tables.TrimTableAdapter.GetData() on signature.TrimID equals trimming.ID
+					join type in tables.TypeTableAdapter.GetData() on signature.TypeID equals type.ID
+					where signature.ImageFileID == image.ID
+                    select new SignatureInfomationForListBox()
+                    {
+                        Signature = signature,
+                        ImageFile = image,
+                        Trimming = trimming,
+                        Type = type
+                    };
+
+                foreach (var signature_info in query_signatures)
+                {
+                    if (last_selected != null && signature_info.Signature.ID == last_selected.Signature.ID)
+                        select_index = listBoxSignatures.Items.Count;
+                    listBoxSignatures.Items.Add(signature_info);
+                }
+            }
+
+            listBoxSignatures.EndUpdate();
+            if (select_index.HasValue) listBoxSignatures.SelectedIndex = select_index.Value;
+
+        }
+
+        void ShowSelectedImage()
+        {
+            pictureBoxTaken.Image = null;
+
+            if (SelectedSignature != null)
+            {
+                pictureBoxTaken.Image = Bitmap.FromFile(SelectedSignature.ImageFile.FullPath);
+            }
+            else if (SelectedImages.Any())
+            {
+                pictureBoxTaken.Image = Bitmap.FromFile(SelectedImages[0].FullPath);
+            }
+
         }
 
         void ShowTrimmingRectangle()
@@ -336,6 +344,8 @@ namespace Signature.CountingTool
 
         void AddImages(List<String> file_names)
 		{
+            listBoxSignatures.Items.Clear();
+
             var query_ids = from images in tables.ImageFileTableAdapter.GetData() select images.ID;
             int id = query_ids.Any() ? query_ids.Max() + 1 : 0;
             List<int> files_added = new List<int>();
@@ -346,19 +356,6 @@ namespace Signature.CountingTool
                     id, null, Path.GetFileName(filename_fullpath), Path.GetDirectoryName(filename_fullpath), null);
                 files_added.Add(id++);
 			}
-
-            try
-            {
-                Validate();
-                dataGridViewImages.EndEdit();
-                signatureCounterDataSet1.Signature.Clear();
-                tables.ImageFileTableAdapter.Fill(signatureCounterDataSet1.ImageFile);
-            }
-            catch (Exception e)
-            {
-                toolStripStatus.Text = e.Message;
-                return;
-            }
 
             var type_id_aleady_used =
                 (from type in tables.TypeTableAdapter.GetData()
@@ -382,13 +379,13 @@ namespace Signature.CountingTool
 
         void AddSignature()
         {
-            SignatureCounterDataSet.ImageFileRow row_image = SelectedImage;
-            if (row_image == null) return;
-
             SignatureCounterDataSet.TypeRow row_type = comboBoxRectangleType.SelectedItem as SignatureCounterDataSet.TypeRow;
             if (row_type == null) return;
 
-            AddSignature(row_image, row_type);
+            foreach (SignatureCounterDataSet.ImageFileRow row_image in SelectedImages)
+            {
+                AddSignature(row_image, row_type);
+            }
         }
 
 		void AddSignature(SignatureCounterDataSet.ImageFileRow row_image, SignatureCounterDataSet.TypeRow row_type)
@@ -438,41 +435,9 @@ namespace Signature.CountingTool
         #endregion
 
         #region Matching Model
-        void LoadModel()
-        {
-            InitializeMatchingModel();
-
-            OpenFileDialog dialog = new OpenFileDialog()
-            {
-                Filter = guess.ModelFileSuffixFilter(),
-            };
-
-            toolStripStatus.Text = null;
-            if (dialog.ShowDialog() == DialogResult.Cancel) return;
-
-            toolStripStatus.Text = "Loading Matching Model.";
-            Refresh();
-
-            try
-            {
-                guess.LoadModel(dialog.FileName);
-            }
-            catch (Exception e)
-            {
-                toolStripStatus.Text = e.Message;
-                return;
-            }
-
-            toolStripStatus.Text = "Matching Model is loaded.";
-        }
-
 		void MatchSignatures()
         {
-            if (guess == null)
-            {
-                MessageBox.Show("Matching Model is currently null.");
-                return;
-            }
+            if (guess == null && !LoadModel()) return;
 
             List<SignatureCounterDataSet.SignatureRow> target = new List<SignatureCounterDataSet.SignatureRow>();
             foreach (object obj_signature in listBoxSignatures.Items)
@@ -482,6 +447,51 @@ namespace Signature.CountingTool
 
             guess.Strip();
             (new SignaturesGuessForm(guess, tables, target)).ShowDialog();
+        }
+
+		bool LoadModel()
+        {
+            toolStripStatus.Text = "Loading Model Data.";
+            Refresh();
+            guess = new GuessSignatureEvalEasy();
+            String model_data = Path.ChangeExtension(model_file_name_wo_suffix, guess.ModelFileSuffix);
+            if (File.Exists(model_data))
+            {
+                try
+                {
+                    guess.LoadModel(model_data);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Unable to load model data." + e.Message);
+                    toolStripStatus.Text = null;
+                    guess = null;
+                    return false;
+                }
+                toolStripStatus.Text = "Model Data is loaded.";
+                Refresh();
+            }
+            return true;
+        }
+
+        bool SaveModel()
+        {
+            if (guess == null) return false;
+            String model_data = Path.ChangeExtension(model_file_name_wo_suffix, guess.ModelFileSuffix);
+            toolStripStatus.Text = "Saving Model Data.";
+            Refresh();
+            try
+            {
+                guess.SaveModel(model_data);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Unable to save model data: " + model_data + "\n" + e.Message);
+                toolStripStatus.Text = null;
+                return false;
+            }
+            toolStripStatus.Text = "Model Data is saved.";
+            return true;
         }
         #endregion
     }
