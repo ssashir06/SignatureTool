@@ -194,7 +194,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Database\signature_counter.sdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\drag.png" />
   </ItemGroup>

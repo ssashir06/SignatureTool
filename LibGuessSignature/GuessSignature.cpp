@@ -199,14 +199,28 @@ namespace Signature
 			if (file_name.empty()) throw exception("unable to open image, file name is empty");
 			Mat img = imread(file_name, (grayscale || monochrome)?0:1);
 			if (img.empty()) throw exception("failed to open image");
-			if (trimming) img = Mat(img, *trimming).clone();
-			if (monochrome) threshold(img, img, monochrome_threshold, 255, THRESH_BINARY);
 
 #ifdef _DEBUG
-			cout << "Image file is loaded: " << file_name << endl;
-			if (trimming) cout << "Trimming rect is " << *trimming << endl;
-			cout << "Image size is " << img.cols << "x" << img.rows << endl;
+			cout << "Image file is loaded: " << file_name << "\t(" << img.cols << " x " << img.rows << ")" << endl;
 #endif
+
+			if (trimming) {
+				Rect r(*trimming);
+				if (r.x < 0) { r.width += r.x; r.x = 0; }
+				if (r.y < 0) { r.height += r.y; r.y = 0; }
+				if (r.x + r.width > img.cols) r.width = img.cols - r.x;
+				if (r.y + r.height > img.rows) r.height = img.rows - r.y;
+
+#ifdef _DEBUG
+				cout << "Original trimming rect is " << *trimming << endl;
+				cout << "Resized trimming rect is " << r << endl;
+#endif
+				if (r.x < 0 || r.y < 0 || r.width < 0 || r.height < 0) throw exception("Trimming rect is wrong.");
+				if (r.width == 0 || r.height == 0) throw exception("Trimming rect size is zero.");
+
+				img = Mat(img, r).clone();
+			}
+			if (monochrome) threshold(img, img, monochrome_threshold, 255, THRESH_BINARY);
 
 			return img;
 		}

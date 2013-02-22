@@ -32,12 +32,12 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridViewSignatures = new System.Windows.Forms.DataGridView();
             this.guessRowForDataGridViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.modelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.additionalTrainingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.startMatchingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSignatures)).BeginInit();
@@ -66,13 +66,29 @@
             // 
             this.menuStrip1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem1,
-            this.modelToolStripMenuItem});
+            this.toolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(566, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.startMatchingToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.quitToolStripMenuItem});
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
+            this.toolStripMenuItem1.Text = "File";
+            // 
+            // quitToolStripMenuItem
+            // 
+            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.quitToolStripMenuItem.Text = "Quit";
+            this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
             // 
             // dataGridViewSignatures
             // 
@@ -92,34 +108,17 @@
             // 
             this.guessRowForDataGridViewBindingSource.DataSource = typeof(Signature.CountingTool.SignaturesGuessForm.GuessRowForDataGridView);
             // 
-            // modelToolStripMenuItem
+            // startMatchingToolStripMenuItem
             // 
-            this.modelToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.additionalTrainingToolStripMenuItem});
-            this.modelToolStripMenuItem.Name = "modelToolStripMenuItem";
-            this.modelToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
-            this.modelToolStripMenuItem.Text = "Model";
+            this.startMatchingToolStripMenuItem.Name = "startMatchingToolStripMenuItem";
+            this.startMatchingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.startMatchingToolStripMenuItem.Text = "Start Matching";
+            this.startMatchingToolStripMenuItem.Click += new System.EventHandler(this.startMatchingToolStripMenuItem_Click);
             // 
-            // additionalTrainingToolStripMenuItem
+            // toolStripSeparator1
             // 
-            this.additionalTrainingToolStripMenuItem.Name = "additionalTrainingToolStripMenuItem";
-            this.additionalTrainingToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-            this.additionalTrainingToolStripMenuItem.Text = "Start Additional Training";
-            this.additionalTrainingToolStripMenuItem.Click += new System.EventHandler(this.additionalTrainingToolStripMenuItem_Click);
-            // 
-            // quitToolStripMenuItem
-            // 
-            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.quitToolStripMenuItem.Text = "Quit";
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.quitToolStripMenuItem});
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
-            this.toolStripMenuItem1.Text = "File";
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // SignaturesGuessForm
             // 
@@ -134,6 +133,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "SignaturesGuessForm";
             this.Text = "Signatures";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SignaturesGuessForm_FormClosing);
             this.Shown += new System.EventHandler(this.SignaturesGuessForm_Shown);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -155,7 +155,7 @@
         private System.Windows.Forms.BindingSource guessRowForDataGridViewBindingSource;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem modelToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem additionalTrainingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem startMatchingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

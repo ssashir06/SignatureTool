@@ -22,12 +22,17 @@ namespace Signature.CountingTool
         {
             Start();
             InitializeMatchingModel();
-            (new SignatoryEditorForm()).Show(this);
         }
 
         private void addImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AddImages();
+            AddImageFiles();
+            ShowSignatureList();
+        }
+
+        private void scanToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddScanedImages();
             ShowSignatureList();
         }
 
@@ -94,6 +99,22 @@ namespace Signature.CountingTool
         {
             MatchSignatures();
             ShowSignatureList();
+        }
+
+        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowSignatoryEditorForm();
+        }
+
+        private void dataGridViewImages_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
+        {
+            Validate();
+            tables.UpdateAll(signatureCounterDataSet1);
+            tables.SignatureTableAdapter.Fill(signatureCounterDataSet1.Signature);
+
+            ShowSignatureList();
+            ShowSelectedImage();
+            ShowTrimmingRectangle();
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Signature { namespace Guess { namespace CLI {
 	using namespace System::Collections;
 	using namespace System::Collections::Generic;
 	using namespace System::Drawing;
+	using namespace System::Runtime::InteropServices;
 
 	/// <summary>
 	/// T ... an inheritance class of Signature::Guess::Base
@@ -59,7 +60,11 @@ namespace Signature { namespace Guess { namespace CLI {
 				assessments = guess->match((const Image::Candidate)query);
 			} catch (const std::exception& e)
 			{
-				std::cerr << "Failed to call matching function: " << e.what() << std::endl;
+				//FIXME
+				throw gcnew Exception("Matching error has occourd: " + CVUtil::CLI::convertString(e.what()));
+			} catch (SEHException^ e)
+			{
+				//FIXME
 				throw e;
 			}
 			return GetCliAssessments(assessments, image);

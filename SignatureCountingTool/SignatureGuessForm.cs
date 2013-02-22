@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Runtime.InteropServices;
 using Signature.CountingTool.Database;
 using Signature.CountingTool.Database.SignatureCounterDataSetTableAdapters;
 using Signature.Guess.CLI;
@@ -20,8 +21,10 @@ namespace Signature.CountingTool
         {
             public int? Rank { get; set; }
             public String Name { get; set; }
-            public String ComboBoxText { get { return String.Format("{0}: {1}", Rank != null ? Rank.Value.ToString() : "*", Name); } }
             public int SignatoryID { get; set; }
+            public int MatchingID { get; set; }
+            public String ComboBoxText { get { return String.Format("{0}: {1}", Rank != null ? Rank.Value.ToString() : "*", Name); } }
+            public int ComboBoxValue { get { return MatchingID; } set { MatchingID = value; } }
         }
         class GuessRowForDataGridView
         {
@@ -44,7 +47,6 @@ namespace Signature.CountingTool
 
                 ApplyToTrailer = false;
                 Assessments = new List<AssessmentCapsule>();
-                SelectedAssessment = null;
                 SignatureRow = signature;
                 ImageFileRow = image;
                 TrimRow = trimming;
@@ -58,51 +60,95 @@ namespace Signature.CountingTool
             public SignatureCounterDataSet.TrimRow TrimRow { get; protected set; }
             [Browsable(false)]
             public List<AssessmentCapsule> Assessments { get; set; }
-            [Browsable(false)]
-            public int? SelectedAssessment { get; set; }
 
 			[DisplayName("Signature Preview")]
             public System.Drawing.Image SignatureImage { get; protected set; }
 			[DisplayName("Use as a Trainer")]
             public Boolean ApplyToTrailer { get; set; }
+			[DisplayName("Determine")]
+            public Boolean Determine { get; set; }
         }
 
         #region Variables
         IGuessSignature guess;
         TableAdapterManager tables;
-        SignatureCounterDataSet dataset;
         List<SignatureCounterDataSet.SignatureRow> target_signature;
         #endregion
 
-        public SignaturesGuessForm(IGuessSignature guess, TableAdapterManager table_adapter, SignatureCounterDataSet dataset, List<SignatureCounterDataSet.SignatureRow> target)
+        public SignaturesGuessForm(IGuessSignature guess, TableAdapterManager table_adapter, List<SignatureCounterDataSet.SignatureRow> target)
         {
             InitializeComponent();
 
             this.guess = guess;
             this.tables = table_adapter;
-            this.dataset = dataset;
             this.target_signature = target;
         }
 
+        #region Events
         private void SignaturesGuessForm_Shown(object sender, EventArgs e)
         {
+            toolStripStatus.Text = "Matching is not started yet.";
             ShowGuessedList();
         }
 
-        private void additionalTrainingToolStripMenuItem_Click(object sender, EventArgs e)
+        private void startMatchingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StartTraining();
+            Match();
+            ShowGuessedList();
         }
 
-        #region Functions
-        void ShowGuessedList()
+        private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            List<GuessRowForDataGridView> matches = new List<GuessRowForDataGridView>();
+            Close();
+        }
 
+        private void SignaturesGuessForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason != CloseReason.UserClosing) return;
+
+            SetDeterminedMatchingID();
+
+			List<Conclusive> conclusives;
+			List<SignatureCounterDataSet.SignatureRow> signature_new_trainers;
+			int deneied;
+			GetTrainTargets(out conclusives, out signature_new_trainers, out deneied);
+
+            if (conclusives.Any())
+            {
+                switch (MessageBox.Show("Start training: " + conclusives.Count().ToString() + " signature(s)\n", Text, MessageBoxButtons.YesNoCancel))
+                {
+                    case DialogResult.Yes:
+                        if (!Train(conclusives)) return;
+                        foreach (SignatureCounterDataSet.SignatureRow signature in signature_new_trainers)
+                        {
+                            signature.Trainer = true;
+                            tables.SignatureTableAdapter.Update(signature);
+                        }
+						
+                        break;
+                    case DialogResult.Cancel:
+                        return;
+                    case DialogResult.No:
+                        break;
+                }
+            }
+        }
+        #endregion
+
+        #region Functions
+		void Match()
+        {
             toolStripStatus.Text = "Matching....";
             Refresh();
 
-            List<int> query_all_signatory_ids = (from signatory in tables.SignatoryTableAdapter.GetData() select signatory.ID).ToList();
+            foreach (var row_signature in target_signature) CleanMatchingRows(row_signature);
+
+            List<int> all_signatory_ids = (
+                from signatory in tables.SignatoryTableAdapter.GetData()
+                select signatory.ID).ToList();
+
+            var query_matching_ids = from matching in tables.MatchingTableAdapter.GetData() select matching.ID;
+            int matching_id = query_matching_ids.Any() ? query_matching_ids.Max() + 1 : 0;
 
             foreach (SignatureCounterDataSet.SignatureRow signature in target_signature)
             {
@@ -115,104 +161,186 @@ namespace Signature.CountingTool
                     where signature.ImageFileID == image.ID
                     select image;
 
-                GuessRowForDataGridView row = new GuessRowForDataGridView(signature, query_trimming.First(), query_image.First());
+                if (!query_image.Any() || !query_trimming.Any()) continue;
+                SignatureCounterDataSet.ImageFileRow row_image = query_image.First();
+                SignatureCounterDataSet.TrimRow row_trim = query_trimming.First();
 
                 List<int> suggested_signatory_ids = new List<int>();
-                List<Assessment> assessments = guess.Match(new SamplingImage(row.ImageFileRow.FullPath, (Rectangle)row.TrimRow));
+                List<Assessment> assessments = guess.Match(new SamplingImage(row_image.FullPath, (Rectangle)row_trim));
 				SignatureCounterDataSet.SignatoryDataTable signatories = tables.SignatoryTableAdapter.GetData();
 
                 int ranking = 0;
+                List<int> added_signatory_ids = new List<int>();
                 foreach (Assessment assessment in assessments)
                 {
-                    var query_signatory =
-                        from signatory in signatories
-                        where signatory.ID.ToString() == assessment.Name // signatory.ID.ToString()を識別ラベルとして使用する
-                        select signatory;
-                    if (!query_signatory.Any()) continue;
+					int signatory_id;
+                    if (!int.TryParse(assessment.Name, out signatory_id)) continue;// signatory.ID.ToString()を識別ラベルとして使用する
 
-                    row.Assessments.Add(new AssessmentCapsule()
-                    {
-                        Rank = ranking++,
-                        Name = query_signatory.First().Name,
-                        SignatoryID = query_signatory.First().ID,
-                    });
-                    suggested_signatory_ids.Add(query_signatory.First().ID);
+                    tables.MatchingTableAdapter.Insert(matching_id++, signatory_id, signature.ID, ranking++);
+                    added_signatory_ids.Add(signatory_id);
                 }
 
-                IEnumerable<int> missing_signatory_ids = query_all_signatory_ids.Except(suggested_signatory_ids);
-                foreach (int missing_signatory_id in missing_signatory_ids)
+                foreach (int not_added_signatory_id in all_signatory_ids.Except(added_signatory_ids))
                 {
-                    var query_signatory = from signatory in signatories where signatory.ID == missing_signatory_id select signatory;
-                    if (!query_signatory.Any()) continue;// not expected
-
-                    row.Assessments.Add(new AssessmentCapsule()
-                        {
-                            Rank = null,
-                            Name = query_signatory.First().Name,
-                            SignatoryID = query_signatory.First().ID,
-                        });
+                    tables.MatchingTableAdapter.Insert(matching_id++, not_added_signatory_id, signature.ID, null);
                 }
-
-                matches.Add(row);
-            }
-            dataGridViewSignatures.DataSource = matches;
-
-            dataGridViewSignatures.Columns.Add(new DataGridViewComboBoxColumn()
-            {
-                Name = "Signatory",
-                ValueMember = "SignatoryID",
-                DisplayMember = "ComboBoxText"
-            });
-            foreach (DataGridViewRow row in dataGridViewSignatures.Rows)
-            {
-                GuessRowForDataGridView row_guessed = row.DataBoundItem as GuessRowForDataGridView;
-                DataGridViewComboBoxCell combo_box = row.Cells["Signatory"] as DataGridViewComboBoxCell;
-                if (row_guessed == null || combo_box == null) continue;
-
-                combo_box.DataSource = row_guessed.Assessments;
-                combo_box.ValueMember = "SignatoryID";
-                combo_box.DisplayMember = "ComboBoxText";
-
-				if (row_guessed.Assessments.Any())
-                    combo_box.Value = row_guessed.Assessments.First().SignatoryID;
             }
 
             toolStripStatus.Text = "Matching jobs are finished.";
         }
 
-		void StartTraining()
+        void ShowGuessedList()
+        {
+            List<GuessRowForDataGridView> matches = new List<GuessRowForDataGridView>();
+            foreach (SignatureCounterDataSet.SignatureRow signature in target_signature)
+            {
+                var query_signature_detail =
+                    from image in tables.ImageFileTableAdapter.GetData()
+                    join trimming in tables.TrimTableAdapter.GetData() on signature.TrimID equals trimming.ID
+                    where image.ID == signature.ImageFileID
+                    select new { Signature = signature, Trimming = trimming, Image = image };
+                if (!query_signature_detail.Any()) continue;
+                var signature_detail = query_signature_detail.First();
+
+                GuessRowForDataGridView row = new GuessRowForDataGridView(signature_detail.Signature, signature_detail.Trimming, signature_detail.Image);
+
+                var query_matching =
+                    from matching in tables.MatchingTableAdapter.GetData()
+                    join signatory in tables.SignatoryTableAdapter.GetData() on matching.SignatoryID equals signatory.ID
+                    where matching.SignatureID == signature.ID
+                    orderby matching.IsRankNull() ? int.MaxValue : matching.Rank
+                    select new { Matching = matching, Signatory = signatory };
+                foreach (var details in query_matching)
+                {
+                    row.Assessments.Add(new AssessmentCapsule()
+                    {
+                        Name = details.Signatory.Name,
+                        Rank = details.Matching.IsRankNull() ? null : (Nullable<int>)details.Matching.Rank,
+                        SignatoryID = details.Signatory.ID,
+						MatchingID = details.Matching.ID,
+                    });
+                }
+                matches.Add(row);
+			}
+            dataGridViewSignatures.DataSource = matches;
+
+            const String guess_select_column = "Signatory";
+			if (dataGridViewSignatures.Columns[guess_select_column] == null)
+                dataGridViewSignatures.Columns.Add(new DataGridViewComboBoxColumn()
+                {
+                    Name = guess_select_column,
+                    ValueMember = "ComboBoxValue",
+                    DisplayMember = "ComboBoxText",
+                });
+            foreach (DataGridViewRow row in dataGridViewSignatures.Rows)
+            {
+                GuessRowForDataGridView row_guessed = row.DataBoundItem as GuessRowForDataGridView;
+                DataGridViewComboBoxCell combo_box = row.Cells[guess_select_column] as DataGridViewComboBoxCell;
+                if (row_guessed == null || combo_box == null) continue;
+
+                combo_box.DataSource = row_guessed.Assessments;
+                combo_box.ValueMember = "ComboBoxValue";
+                combo_box.DisplayMember = "ComboBoxText";
+
+                if (row_guessed.Assessments.Any())
+                {
+                    if (!row_guessed.SignatureRow.IsConclusiveMatchingIDNull())
+                        combo_box.Value = row_guessed.SignatureRow.ConclusiveMatchingID;
+                    else
+                        combo_box.Value = row_guessed.Assessments.First().ComboBoxValue;
+                }
+            }
+        }
+
+        void CleanMatchingRows(SignatureCounterDataSet.SignatureRow row_signature)
+        {
+            var query_matching =
+                from matching in tables.MatchingTableAdapter.GetData()
+                where matching.SignatureID == row_signature.ID
+                select matching;
+
+            foreach (var matching in query_matching)
+                tables.MatchingTableAdapter.Delete(matching.ID);
+        }
+
+		void GetTrainTargets(out List<Conclusive> conclusives, out List<SignatureCounterDataSet.SignatureRow> signature_new_trainers, out int denied_count)
         {
             Validate();
 
-            List<Conclusive> conclusives = new List<Conclusive>();
-            List<SignatureCounterDataSet.SignatureRow> signature_new_trainers = new List<SignatureCounterDataSet.SignatureRow>();
+            conclusives = new List<Conclusive>();
+            signature_new_trainers = new List<SignatureCounterDataSet.SignatureRow>();
+            denied_count = 0;
 
             foreach (DataGridViewRow row in dataGridViewSignatures.Rows)
             {
                 GuessRowForDataGridView row_guessed = row.DataBoundItem as GuessRowForDataGridView;
                 DataGridViewComboBoxCell combo_box = row.Cells["Signatory"] as DataGridViewComboBoxCell;
                 DataGridViewCell use_as_trainer = row.Cells["ApplyToTrailer"];
+                DataGridViewCell determine = row.Cells["Determine"];
                 if (row_guessed == null || combo_box == null) continue;
 
-                if (use_as_trainer.Value as bool? == true && !row_guessed.SignatureRow.Trainer)
+                // signatory.IDを識別ラベルとして使用する
+				int? matching_id = combo_box.Value as int?;
+                var query_matchings = from matching in tables.MatchingTableAdapter.GetData() where matching.ID == matching_id select matching;
+                if (!query_matchings.Any()) continue;
+                SignatureCounterDataSet.MatchingRow row_matching = query_matchings.First();
+                int signatory_id = row_matching.SignatoryID;
+
+                if (use_as_trainer.Value as bool? != true)
                 {
-                    conclusives.Add(new Conclusive(row_guessed.ImageFileRow.FullPath, (Rectangle)row_guessed.TrimRow, combo_box.Value.ToString()));// signatory.ID.ToString()を識別ラベルとして使用する
+                    continue;
+                }
+                else if (determine.Value as bool? == true && !row_guessed.SignatureRow.Trainer)
+                {
+                    conclusives.Add(new Conclusive(row_guessed.ImageFileRow.FullPath, (Rectangle)row_guessed.TrimRow, signatory_id.ToString()));
                     signature_new_trainers.Add(row_guessed.SignatureRow);
+                }
+                else
+                {
+                    denied_count++;
+                }
+            }
+        }
+
+		bool Train(List<Conclusive> conclusives)
+        {
+            try
+            {
+                toolStripStatus.Text = "Training is started.";
+                Refresh();
+                guess.Train(conclusives, true);
+                toolStripStatus.Text = "Training is finished.";
+            }
+            catch (SEHException exp)
+            {
+                MessageBox.Show("Failed to train: \n" + exp.Message);
+                toolStripStatus.Text = "Training was failed.";
+                return false;
+            }
+            return true;
+        }
+
+		void SetDeterminedMatchingID()
+        {
+            Validate();
+
+            List<SignatureCounterDataSet.SignatureRow> changed = new List<SignatureCounterDataSet.SignatureRow>();
+
+            foreach (DataGridViewRow row in dataGridViewSignatures.Rows)
+            {
+                GuessRowForDataGridView row_guessed = row.DataBoundItem as GuessRowForDataGridView;
+                DataGridViewComboBoxCell combo_box = row.Cells["Signatory"] as DataGridViewComboBoxCell;
+                DataGridViewCell determine = row.Cells["Determine"];
+                if (row_guessed == null || combo_box == null) continue;
+
+                if (determine.Value as bool? == true && combo_box.Value as int? != null)
+                {
+                    row_guessed.SignatureRow.ConclusiveMatchingID = (combo_box.Value as int?).Value;
+                    changed.Add(row_guessed.SignatureRow);
                 }
             }
 
-            if (!conclusives.Any()) return;
-
-            toolStripStatus.Text = "Training is started.";
-            Refresh();
-            guess.Train(conclusives, true);
-            toolStripStatus.Text = "Training is finished.";
-
-            foreach (SignatureCounterDataSet.SignatureRow signature in signature_new_trainers)
-            {
-                signature.Trainer = true;
-                tables.SignatureTableAdapter.Update(signature);
-            }
+            tables.SignatureTableAdapter.Update(changed.ToArray());
         }
         #endregion
     }

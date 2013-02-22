@@ -35,7 +35,6 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 		/// </summary>
 		~Scan()
 		{
-			quit();
 			if (components)
 			{
 				delete components;
@@ -50,7 +49,7 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 	private:System::Windows::Forms::Button^  buttonRescan;
 	private:System::Windows::Forms::MenuStrip^  menuStrip1;
 	private:System::Windows::Forms::ToolStripMenuItem^  fileToolStripMenuItem;
-	private:System::Windows::Forms::ToolStripMenuItem^  openToolStripMenuItem;
+
 	private:System::Windows::Forms::ToolStripMenuItem^  saveToolStripMenuItem;
 	private:System::Windows::Forms::ToolStripSeparator^  toolStripSeparator1;
 	private:System::Windows::Forms::ToolStripMenuItem^  quitToolStripMenuItem;
@@ -77,7 +76,6 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 			this->buttonRescan = (gcnew System::Windows::Forms::Button());
 			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
 			this->fileToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->openToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->saveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->toolStripSeparator1 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->quitToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
@@ -172,35 +170,28 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 			// 
 			// fileToolStripMenuItem
 			// 
-			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(4) {this->openToolStripMenuItem, 
-				this->saveToolStripMenuItem, this->toolStripSeparator1, this->quitToolStripMenuItem});
+			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(3) {this->saveToolStripMenuItem, 
+				this->toolStripSeparator1, this->quitToolStripMenuItem});
 			this->fileToolStripMenuItem->Name = L"fileToolStripMenuItem";
 			this->fileToolStripMenuItem->Size = System::Drawing::Size(40, 22);
 			this->fileToolStripMenuItem->Text = L"File";
 			// 
-			// openToolStripMenuItem
-			// 
-			this->openToolStripMenuItem->Name = L"openToolStripMenuItem";
-			this->openToolStripMenuItem->Size = System::Drawing::Size(106, 22);
-			this->openToolStripMenuItem->Text = L"Open";
-			this->openToolStripMenuItem->Click += gcnew System::EventHandler(this, &Scan::openToolStripMenuItem_Click);
-			// 
 			// saveToolStripMenuItem
 			// 
 			this->saveToolStripMenuItem->Name = L"saveToolStripMenuItem";
-			this->saveToolStripMenuItem->Size = System::Drawing::Size(106, 22);
+			this->saveToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->saveToolStripMenuItem->Text = L"Save";
 			this->saveToolStripMenuItem->Click += gcnew System::EventHandler(this, &Scan::saveToolStripMenuItem_Click);
 			// 
 			// toolStripSeparator1
 			// 
 			this->toolStripSeparator1->Name = L"toolStripSeparator1";
-			this->toolStripSeparator1->Size = System::Drawing::Size(103, 6);
+			this->toolStripSeparator1->Size = System::Drawing::Size(149, 6);
 			// 
 			// quitToolStripMenuItem
 			// 
 			this->quitToolStripMenuItem->Name = L"quitToolStripMenuItem";
-			this->quitToolStripMenuItem->Size = System::Drawing::Size(106, 22);
+			this->quitToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->quitToolStripMenuItem->Text = L"Quit";
 			this->quitToolStripMenuItem->Click += gcnew System::EventHandler(this, &Scan::quitToolStripMenuItem_Click);
 			// 
@@ -298,6 +289,7 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 
 	private:Object^ lock_calcurating_scan_image;
 	private:SynchronizationContext^ original_context;
+	private:Thread^ thread_capturing;
 
 	private:CameraScanner::ScanSpec* paper_spec;
 	private:CameraScanner::Reshape* scanner;
@@ -307,9 +299,9 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 	private:static int preview_width = 640;
 	private:static int preview_height = 480;
 
+	private:List<IScannedImage^>^ scanned_images;
 	private:IScannedImage^ current_scan_image;
-	private:String^ xml_file_path;
-	private:String^ xml_file_name;
+	private:String^ image_directory;
 
 	//マルチスレッド用
 	private:ref class SetMessageData
@@ -355,7 +347,8 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 			}
 	private:Void quit()
 			{
-				Monitor::Enter(lock_calcurating_scan_image);// stop timerd scanning mode
+				if (thread_capturing) thread_capturing->Abort();
+				timerCapturingUpdate->Enabled = false;
 
 				switch (current_mode) {
 				case RunMode::Checking:
@@ -596,161 +589,64 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 			}
 #pragma endregion
 #pragma region Save/Load
-	private:String^ showSaveDialog()
+	private:bool showDirectoryDialog()
 			{
-				SaveFileDialog^ dialog = gcnew SaveFileDialog();
-				dialog->Filter = L"Scanned Image info(*.xml)|*.xml";
-				if (xml_file_path) dialog->InitialDirectory = xml_file_path;
-				if (dialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) return nullptr;
-				
-				xml_file_path = Path::GetDirectoryName(dialog->FileName);
-				xml_file_name = Path::GetFileName(dialog->FileName);
-				return dialog->FileName;
+				FolderBrowserDialog^ folder_dialog = gcnew FolderBrowserDialog();
+				if (folder_dialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) return false;
+				image_directory = folder_dialog->SelectedPath;
+				return true;
 			}
-	private:String^ showLoadDialog()
+	private:bool saveImages()
 			{
-				OpenFileDialog^ dialog = gcnew OpenFileDialog();
-				if (xml_file_path) dialog->InitialDirectory = xml_file_path;
-				dialog->Filter = L"Scanned Image info(*.xml)|*.xml";
-				if (dialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) return nullptr;
-				
-				xml_file_path = Path::GetDirectoryName(dialog->FileName);
-				xml_file_name = Path::GetFileName(dialog->FileName);
-				return dialog->FileName;
-			}
-			// see http://msdn.microsoft.com/ja-jp/library/system.xml.serialization.xmlattributes.xmlignore(v=vs.100).aspx
-			//     http://msdn.microsoft.com/ja-jp/library/71s92ee1(v=vs.100).aspx
-	private:Void saveImages(String^ xml_file_name)
-			{
-				xml_file_path = Path::GetDirectoryName(xml_file_name);
-				List<ScannedImageCV^ >^ items = gcnew List<ScannedImageCV^ >();
+				List<IScannedImage^>^ failure_list = gcnew List<IScannedImage^>();
+				if (image_directory == nullptr || !Directory::Exists(image_directory)) image_directory = Directory::GetCurrentDirectory();
+				scanned_images = gcnew List<IScannedImage^>();
 				for each (Object^ item in checkedListBoxImages->CheckedItems)
 				{
-					ScannedImageCV^ image = dynamic_cast<ScannedImageCV^>(item);
+					IScannedImage^ image = dynamic_cast<IScannedImage^>(item);
 					if (!image) continue;
 
 					if (image->NeedToBeSaved) 
 					{
 						try {
-							image->ImagePath = xml_file_path;
+							image->ImagePath = image_directory;
 							image->SaveImage();
 						} catch (UnauthorizedAccessException^ e) {
-							throw e;
+							failure_list->Add(image);
+							continue;
 						} catch (PathTooLongException^ e) {
-							throw e;
+							failure_list->Add(image);
+							continue;
 						} catch (DirectoryNotFoundException^ e) {
-							throw e;
+							failure_list->Add(image);
+							continue;
 						}
 					}
 
-					items->Add(image);
+					scanned_images->Add(image);
 				}
 
-				array<ScannedImageCV^ >^ images = items->ToArray();
-				XmlSerializer^ xs = gcnew XmlSerializer(images->GetType());
-				StreamWriter^ fs = nullptr;
-				bool succeeded = true;
-				try
-				{
-					//TODO: use Path::GetTempFileName() instead
-					fs = (gcnew FileInfo(xml_file_name))->CreateText();
-					xs->Serialize(fs, images);
+				if (failure_list->Count > 0) {
+					String^ message = String::Format("{0} image(s) was not saved.");
+					for each (IScannedImage^ image in failure_list)
+					{
+						message += String::Format("\n{0}\t{1}", image->TimeTaken, image->FileName);
+					}
+					MessageBox::Show(message);
+					return false;
 				}
-				catch (UnauthorizedAccessException^ e)
-				{
-					succeeded = false;
-					MessageBox::Show(e->Message);
-				}
-				catch (DirectoryNotFoundException^ e)
-				{
-					succeeded = false;
-					MessageBox::Show(e->Message);
-				}
-				catch (IOException^ e)
-				{
-					succeeded = false;
-					MessageBox::Show(e->Message);
-				}
-				catch (Exception^ e)
-				{
-					// unexpected!
-					succeeded = false;
-					MessageBox::Show(e->Message);
-					throw e;
-				}
-				finally
-				{
-					if (fs != nullptr) fs->Close();
-				}
-				if (!succeeded)
-				{
-					// TODO
-				}
+				return true;
 			}
-	private:Void loadImages(String^ xml_file_name)
-			{
-				XmlSerializer^ xs = gcnew XmlSerializer(array<ScannedImageCV^ >::typeid);
-				FileStream^ fs = nullptr;
-				array<ScannedImageCV^ >^ items = nullptr;
-				bool succeeded = true;
-				try
-				{
-					fs = File::OpenRead(xml_file_name);
-					items = dynamic_cast<array<ScannedImageCV^ >^ >(xs->Deserialize(fs));
-				}
-				catch (UnauthorizedAccessException^ e)
-				{
-					succeeded = false;
-					MessageBox::Show(e->Message);
-				}
-				catch (DirectoryNotFoundException^ e)
-				{
-					succeeded = false;
-					MessageBox::Show(e->Message);
-				}
-				catch (IOException^ e)
-				{
-					succeeded = false;
-					MessageBox::Show(e->Message);
-				}
-				catch (InvalidOperationException^ e)
-				{
-					succeeded = false;
-					MessageBox::Show(e->Message);
-				}
-				catch (Exception^ e)
-				{
-					// unexpected!
-					succeeded = false;
-					MessageBox::Show(e->Message);
-					throw e;
-				}
-				finally
-				{
-					fs->Close();
-				}
-				if (!succeeded)
-				{
-					//TODO
-				}
-
-				checkedListBoxImages->Items->Clear();
-				for each (IScannedImage^ image in items) {
-					checkedListBoxImages->Items->Add(image, true);
-				}
-				xml_file_path = Path::GetDirectoryName(xml_file_name);
-			}
-	private:bool confirmClosing()
+	private:bool confirmClosingAndSave()
 			{
 				switch (
 					MessageBox::Show(
-					L"Scanning window will be now closed. Do you want to save images?", 
-					L"Save images before closing?", 
-					MessageBoxButtons::YesNoCancel))
+						L"Scanning window will be now closed. Do you want to save images?", 
+						L"Save images before closing?", 
+						MessageBoxButtons::YesNoCancel))
 				{
 				case System::Windows::Forms::DialogResult::Yes: 
-					showSaveDialog();//TODO: Check failure
-					return true;
+					return showDirectoryDialog() && saveImages();
 					break;
 				case System::Windows::Forms::DialogResult::No:
 					return true;
@@ -764,25 +660,17 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 				return false;
 			}
 #pragma endregion
-#pragma endregion
 #pragma region プロパティ
-	public:property String^ XmlFilePath
+	public:property List<IScannedImage^>^ ScannedImages
 		   {
-			   String^ get() { return xml_file_path; }
-			   Void set(String^ value) { xml_file_path = value; }
+			   List<IScannedImage^>^ get() { return scanned_images; }
 		   }
-	public:property String^ XmlFileNameFullPath
+	public:property String^ ImageDirectory
 		   {
-			   String^ get()
-			   {
-				   if (xml_file_path && xml_file_name)
-					   return Path::Combine(xml_file_path, xml_file_name);
-				   else if (xml_file_name)
-					   return Path::Combine(Directory::GetCurrentDirectory(), xml_file_name);
-				   else
-					   return nullptr;
-			   }
+			   String^ get() { return image_directory; }
+			   Void set(String^ value) { image_directory = value; }
 		   }
+#pragma endregion
 #pragma endregion
 			// Events of controls
 	private:Void buttonScan_Click(System::Object^  sender, System::EventArgs^  e)
@@ -836,8 +724,9 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 			}
 	private:Void timerCapturingUpdate_Tick(System::Object^  sender, System::EventArgs^  e)
 			{
-				Thread^ t = gcnew Thread(gcnew ThreadStart(this, &Scan::showCapturing));
-				t->Start();
+				if (thread_capturing != nullptr && thread_capturing->IsAlive) return;
+				thread_capturing = gcnew Thread(gcnew ThreadStart(this, &Scan::showCapturing));
+				thread_capturing->Start();
 			}
 	private:Void Scan_Load(System::Object^  sender, System::EventArgs^  e)
 			{
@@ -848,34 +737,19 @@ namespace CameraScanner { namespace GUI { namespace CLI {
 			{
 				if (e->CloseReason == CloseReason::WindowsShutDown)
 				{
-					// TODO
+					saveImages();
 				}
 				else
 				{
-					e->Cancel = !confirmClosing();
+					if (!confirmClosingAndSave()) e->Cancel = true;
 				}
-			}
-	private:Void openToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
-			{
-				String^ file_name = showLoadDialog();
-				if (!file_name) return;
-
-				try {
-					loadImages(file_name);
-				} catch (String^ msg) {
-					setMessage(L"Failed to load file: " + msg);
-				}
+				if (!e->Cancel)
+					quit();
 			}
 	private:Void saveToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 			{
-				String^ file_name = showSaveDialog();
-				if (!file_name) return;
-
-				try {
-					saveImages(file_name);
-				} catch (String^ msg) {
-					setMessage(L"Failed to save file: " + msg);
-				}
+				if (!showDirectoryDialog()) return;
+				saveImages();
 			}
 	private:Void quitToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e)
 			{
