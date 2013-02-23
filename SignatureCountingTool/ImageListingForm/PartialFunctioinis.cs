@@ -493,6 +493,66 @@ namespace Signature.CountingTool
             toolStripStatus.Text = "Model Data is saved.";
             return true;
         }
+
+		// TOOD: xml spreadsheet での出力
+        void ExportSummary()
+        {
+			SaveFileDialog dialog = new SaveFileDialog()
+            {
+                Filter = "CSV File|*.csv",
+            };
+            if (dialog.ShowDialog() == DialogResult.Cancel) return;
+
+            StreamWriter fs = null;
+            try
+            {
+                fs = new FileInfo(dialog.FileName).CreateText();
+                foreach (DataGridViewRow row in dataGridViewImages.SelectedRows)
+                {
+                    DataRowView row_view = row.DataBoundItem as DataRowView;
+                    if (row_view == null) continue;
+                    SignatureCounterDataSet.ImageFileRow row_image = row_view.Row as SignatureCounterDataSet.ImageFileRow;
+                    if (row_image == null) continue;
+
+                    var query_image_detail =
+                        from matching in tables.MatchingTableAdapter.GetData()
+                        join signature in tables.SignatureTableAdapter.GetData() on matching.SignatureID equals signature.ID
+                        join signatory in tables.SignatoryTableAdapter.GetData() on matching.SignatoryID equals signatory.ID
+                        where !signature.IsConclusiveMatchingIDNull() && signature.ConclusiveMatchingID == matching.ID
+                        select new { Signature = signature, Matching = matching, Signatory = signatory };
+                    foreach (var matchings in query_image_detail)
+                    {
+                        //TODO: ,のエスケープ
+						//TODO: UTF-8を出力するとExcelで開けない
+                        fs.WriteLine(String.Format("{0},{1},{2}", row_image.FullPath, matchings.Signatory.ID, matchings.Signatory.Name));
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                MessageBox.Show(String.Format("Unable to open file:\n{0}", e.Message));
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                MessageBox.Show(String.Format("Directory name is wrong:\n{0}", e.Message));
+            }
+            catch (IOException e)
+            {
+                MessageBox.Show(String.Format("IO error:\n{0}", e.Message));
+            }
+            catch (InvalidOperationException e)
+            {
+                MessageBox.Show(String.Format("Operation error:\n{0}", e.Message));
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Exporting file is failed:\n" + e.Message);
+            }
+            finally
+            {
+				if (fs!=null) fs.Close();
+            }
+        }
         #endregion
     }
 }

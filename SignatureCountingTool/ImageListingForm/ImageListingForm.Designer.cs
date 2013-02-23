@@ -59,6 +59,8 @@
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.propertyGridTrim = new System.Windows.Forms.PropertyGrid();
             this.listBoxSignatures = new System.Windows.Forms.ListBox();
+            this.exportToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -97,6 +99,8 @@
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportToolStripMenuItem2,
+            this.toolStripSeparator1,
             this.quitToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
@@ -105,8 +109,9 @@
             // quitToolStripMenuItem
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.quitToolStripMenuItem.Text = "Quit";
+            this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
             // 
             // imageToolStripMenuItem
             // 
@@ -148,7 +153,7 @@
             // startMatchingToolStripMenuItem
             // 
             this.startMatchingToolStripMenuItem.Name = "startMatchingToolStripMenuItem";
-            this.startMatchingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.startMatchingToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
             this.startMatchingToolStripMenuItem.Text = "Start";
             this.startMatchingToolStripMenuItem.Click += new System.EventHandler(this.startMatchingToolStripMenuItem_Click);
             // 
@@ -412,6 +417,18 @@
             this.listBoxSignatures.TabIndex = 0;
             this.listBoxSignatures.SelectedIndexChanged += new System.EventHandler(this.listBoxSignatures_SelectedIndexChanged);
             // 
+            // exportToolStripMenuItem2
+            // 
+            this.exportToolStripMenuItem2.Name = "exportToolStripMenuItem2";
+            this.exportToolStripMenuItem2.Size = new System.Drawing.Size(160, 22);
+            this.exportToolStripMenuItem2.Text = "Export summary";
+            this.exportToolStripMenuItem2.Click += new System.EventHandler(this.exportToolStripMenuItem2_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(157, 6);
+            // 
             // ImageListingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -424,7 +441,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "ImageListingForm";
-            this.Text = "ImageListingForm";
+            this.Text = "ImageListing";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImageListingForm_FormClosing);
             this.Shown += new System.EventHandler(this.ImageListingForm_Shown);
             this.menuStrip1.ResumeLayout(false);
@@ -487,5 +504,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn fileNameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn directoryDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn mD5DataGridViewTextBoxColumn;
+        private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

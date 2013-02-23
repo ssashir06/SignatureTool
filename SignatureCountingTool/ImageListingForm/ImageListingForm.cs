@@ -111,7 +111,7 @@ namespace Signature.CountingTool
         private void dataGridViewImages_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
         {
             Validate();
-            signatureCounterDataSet1.Clear();
+            //signatureCounterDataSet1.Clear();
             tables.UpdateAll(signatureCounterDataSet1);
             tables.SignatureTableAdapter.Fill(signatureCounterDataSet1.Signature);
 
@@ -123,6 +123,16 @@ namespace Signature.CountingTool
         private void ImageListingForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             SaveModel();
+        }
+
+        private void quitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void exportToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            ExportSummary();
         }
     }
 }

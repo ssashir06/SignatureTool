@@ -355,8 +355,6 @@ namespace Signature.CountingTool
         {
             Validate();
 
-            List<SignatureCounterDataSet.SignatureRow> changed = new List<SignatureCounterDataSet.SignatureRow>();
-
             foreach (DataGridViewRow row in dataGridViewSignatures.Rows)
             {
                 GuessRowForDataGridView row_guessed = row.DataBoundItem as GuessRowForDataGridView;
@@ -371,11 +369,14 @@ namespace Signature.CountingTool
                          where signature.ID == row_guessed.SignatureID
                          select signature).ToList();
                     if (!query_signature.Any()) continue;
+                    SignatureCounterDataSet.SignatureRow row_signature = query_signature.First();
 
-                    query_signature.First().ConclusiveMatchingID = (combo_box.Value as int?).Value;
-                    changed.Add(query_signature.First());
+                    row_signature.ConclusiveMatchingID = (combo_box.Value as int?).Value;
+                    tables.SignatureTableAdapter.Update(row_signature);
                 }
             }
+
+            ShowGuessedList();
         }
         #endregion
     }

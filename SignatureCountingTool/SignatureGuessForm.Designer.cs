@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -37,11 +36,9 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridViewSignatures = new System.Windows.Forms.DataGridView();
-            this.guessRowForDataGridViewBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSignatures)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.guessRowForDataGridViewBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -117,10 +114,6 @@
             this.dataGridViewSignatures.TabIndex = 2;
             this.dataGridViewSignatures.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewSignatures_CellValueChanged);
             // 
-            // guessRowForDataGridViewBindingSource
-            // 
-            this.guessRowForDataGridViewBindingSource.DataSource = typeof(Signature.CountingTool.SignaturesGuessForm.GuessRowForDataGridView);
-            // 
             // SignaturesGuessForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -141,7 +134,6 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewSignatures)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.guessRowForDataGridViewBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -153,7 +145,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatus;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.DataGridView dataGridViewSignatures;
-        private System.Windows.Forms.BindingSource guessRowForDataGridViewBindingSource;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem startMatchingToolStripMenuItem;
