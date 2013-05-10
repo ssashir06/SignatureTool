@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+
+my ($preview) = @ARGV;
+
+my $fh;
+unless ($preview) {
+	open(GNUPLOT, "| `which gnuplot`") or die "$!";
+	$fh = *GNUPLOT;
+
+} else {
+	$fh = *STDOUT;
+}
+
+my @target = ();
+for (my $i=0; $i<12; $i++) { push(@target, 2**$i); }
+
+my $rotate_count = 5;
+my $angle = 30;#360/$rotate_count;
+
+print $fh <<_EOS_ unless $preview;
+set terminal canvas standalone mousing jsdir "js" size 800,@{[$rotate_count * 800]}
+set output 'cross_validation_caltec_101.html'
+_EOS_
+
+print $fh "set multiplot layout @{[ $rotate_count + 0 ]},1\n";
+print $fh "set view 0, 0\n";
+
+while ($rotate_count--)
+{
+	print $fh <<_EOS_;
+set title "Cross-validation score"
+
+set logscale xy 2
+set xtics auto
+set ytics auto
+set xrange [*:*]
+set yrange [*:*]
+
+set autoscale z
+set zrange [] reverse
+set palette defined (0 "red", 0.5 "green", 1 "blue")
+
+set xlabel "C"
+set ylabel "gamma"
+set zlabel "score"
+
+_EOS_
+
+
+	print $fh "splot ";
+	foreach my $k (@target)
+	{
+		print $fh "\"< grep '^$k\t' 'cross_validation_grids.dat'\" using 4:5:2 palette z title \"k=$k\"";
+		print $fh "," unless ($k eq $target[$#target]);
+	}
+	print $fh "\n";
+
+	print $fh "set view 80, @{[ 15 + $angle * $rotate_count ]}\n" unless ($rotate_count==0);
+}
+
+print $fh "unset multiplot\n";
+print $fh "pause 1\n" if $preview;
+
+close($fh);

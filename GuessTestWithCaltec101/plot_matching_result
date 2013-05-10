@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+my ($preview) = @ARGV;
+
+my $fh;
+unless ($preview) {
+	open(GNUPLOT, "| `which gnuplot`") or die "$!";
+	$fh = *GNUPLOT;
+
+} else {
+	$fh = *STDOUT;
+}
+
+my @target = ();
+for (my $i=0; $i<12; $i++) { push(@target, 2**$i); }
+
+print $fh <<_EOS_ unless $preview;
+set terminal canvas standalone mousing jsdir "js" size 1000,600
+set output 'score_caltec_101.html'
+_EOS_
+
+print $fh <<_EOS_;
+set xtic rotate by -90
+_EOS_
+
+print $fh "plot ";
+foreach my $k (16)
+{
+	print $fh "\"<grep '^$k\t' experiment_data.dat\" using 4:xticlabels(2) with imp notitle";
+	print $fh ",";# unless ($k eq $target[$#target]);
+}
+foreach my $k (@target)
+{
+	print $fh "\"<grep '^$k\t' experiment_data.dat\" using 3:xticlabels(2) with boxes title \"k=$k\"";
+	print $fh "," unless ($k eq $target[$#target]);
+}
+print $fh "\n";
+
+print $fh "pause 1\n" if $preview;
+
+close($fh);
