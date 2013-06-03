@@ -21,7 +21,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibGuessSignature", "LibGue
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{FC631DD2-1146-498F-A92D-AA45DE96BE99}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GuessTestWithCaltec101", "GuessTestWithCaltec101\GuessTestWithCaltec101.vcxproj", "{8A22FE31-A758-4CE8-A905-C32D086F16BD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GuessTestWithCaltech101", "GuessTestWithCaltec101\GuessTestWithCaltec101.vcxproj", "{8A22FE31-A758-4CE8-A905-C32D086F16BD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {9E183EDA-6208-4434-A7B3-94BF05B0E09A}
 	EndProjectSection
@@ -44,6 +44,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibGuessSignatureCliWrapper
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignatureCountingTool", "SignatureCountingTool\SignatureCountingTool.csproj", "{6BF54391-AB21-4A06-9AA3-7B5C3ED9EF39}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B635C2B1-40D6-43F3-83F8-6F4CD50E17C6} = {B635C2B1-40D6-43F3-83F8-6F4CD50E17C6}
+		{9E183EDA-6208-4434-A7B3-94BF05B0E09A} = {9E183EDA-6208-4434-A7B3-94BF05B0E09A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -22,9 +22,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>14</ApplicationRevision>
+    <ApplicationVersion>0.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -65,6 +66,24 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>F87F56D64A94CE0A72DE19A65A07095F7DC68C70</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>SignatureCountingTool_一時キー.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
@@ -144,6 +163,7 @@
     <None Include="Database\SignatureCounterDataSet.xss">
       <DependentUpon>SignatureCounterDataSet.xsd</DependentUpon>
     </None>
+    <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -153,6 +173,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="SignatureCountingTool_一時キー.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -161,10 +182,12 @@
     <ProjectReference Include="..\LibCameraScannerCliWrapper\LibCameraScannerCliWrapper.vcxproj">
       <Project>{8b6000ba-e5e2-4346-b313-fb22ba1f7780}</Project>
       <Name>LibCameraScannerCliWrapper</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
     <ProjectReference Include="..\LibGuessSignatureCliWrapper\LibGuessSignatureCliWrapper.vcxproj">
       <Project>{65bc6625-0132-417e-87da-5e5656c61b09}</Project>
       <Name>LibGuessSignatureCliWrapper</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -188,6 +211,11 @@
       <ProductName>SQL Server Compact 4.0 SP1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.VisualBasic.PowerPacks.10.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Visual Basic PowerPacks 10.0</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
@@ -196,11 +224,54 @@
     <Content Include="Database\signature_counter.sdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Dll\opencv_calib3d243.dll" />
+    <Content Include="Dll\opencv_contrib243.dll" />
+    <Content Include="Dll\opencv_core243.dll" />
+    <Content Include="Dll\opencv_features2d243.dll" />
+    <Content Include="Dll\opencv_ffmpeg243.dll" />
+    <Content Include="Dll\opencv_flann243.dll" />
+    <Content Include="Dll\opencv_gpu243.dll" />
+    <Content Include="Dll\opencv_highgui243.dll" />
+    <Content Include="Dll\opencv_imgproc243.dll" />
+    <Content Include="Dll\opencv_legacy243.dll" />
+    <Content Include="Dll\opencv_ml243.dll" />
+    <Content Include="Dll\opencv_nonfree243.dll" />
+    <Content Include="Dll\opencv_objdetect243.dll" />
+    <Content Include="Dll\opencv_photo243.dll" />
+    <Content Include="Dll\opencv_stitching243.dll" />
+    <Content Include="Dll\opencv_ts243.dll" />
+    <Content Include="Dll\opencv_video243.dll" />
+    <Content Include="Dll\opencv_videostab243.dll" />
+    <Content Include="Dll\phonon4.dll" />
+    <Content Include="Dll\Qt3Support4.dll" />
+    <Content Include="Dll\QtCLucene4.dll" />
+    <Content Include="Dll\QtCore4.dll" />
+    <Content Include="Dll\QtDeclarative4.dll" />
+    <Content Include="Dll\QtDesigner4.dll" />
+    <Content Include="Dll\QtDesignerComponents4.dll" />
+    <Content Include="Dll\QtGui4.dll" />
+    <Content Include="Dll\QtHelp4.dll" />
+    <Content Include="Dll\QtMultimedia4.dll" />
+    <Content Include="Dll\QtNetwork4.dll" />
+    <Content Include="Dll\QtOpenGL4.dll" />
+    <Content Include="Dll\QtScript4.dll" />
+    <Content Include="Dll\QtScriptTools4.dll" />
+    <Content Include="Dll\QtSql4.dll" />
+    <Content Include="Dll\QtSvg4.dll" />
+    <Content Include="Dll\QtTest4.dll" />
+    <Content Include="Dll\QtWebKit4.dll" />
+    <Content Include="Dll\QtXml4.dll" />
+    <Content Include="Dll\QtXmlPatterns4.dll" />
+    <Content Include="Dll\tbb.dll" />
+    <Content Include="Dll\tbbmalloc.dll" />
+    <Content Include="Dll\tbbmalloc_proxy.dll" />
+    <Content Include="Dll\tbb_preview.dll" />
     <None Include="Resources\drag.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\DataSources\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
