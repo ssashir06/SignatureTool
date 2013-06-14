@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -22,7 +24,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>14</ApplicationRevision>
+    <ApplicationRevision>22</ApplicationRevision>
     <ApplicationVersion>0.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -37,6 +39,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -46,6 +49,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -225,47 +229,88 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Dll\opencv_calib3d243.dll" />
+    <Content Include="Dll\opencv_calib3d243d.dll" />
     <Content Include="Dll\opencv_contrib243.dll" />
+    <Content Include="Dll\opencv_contrib243d.dll" />
     <Content Include="Dll\opencv_core243.dll" />
+    <Content Include="Dll\opencv_core243d.dll" />
     <Content Include="Dll\opencv_features2d243.dll" />
+    <Content Include="Dll\opencv_features2d243d.dll" />
     <Content Include="Dll\opencv_ffmpeg243.dll" />
     <Content Include="Dll\opencv_flann243.dll" />
+    <Content Include="Dll\opencv_flann243d.dll" />
     <Content Include="Dll\opencv_gpu243.dll" />
+    <Content Include="Dll\opencv_gpu243d.dll" />
     <Content Include="Dll\opencv_highgui243.dll" />
+    <Content Include="Dll\opencv_highgui243d.dll" />
     <Content Include="Dll\opencv_imgproc243.dll" />
+    <Content Include="Dll\opencv_imgproc243d.dll" />
     <Content Include="Dll\opencv_legacy243.dll" />
+    <Content Include="Dll\opencv_legacy243d.dll" />
     <Content Include="Dll\opencv_ml243.dll" />
+    <Content Include="Dll\opencv_ml243d.dll" />
     <Content Include="Dll\opencv_nonfree243.dll" />
+    <Content Include="Dll\opencv_nonfree243d.dll" />
     <Content Include="Dll\opencv_objdetect243.dll" />
+    <Content Include="Dll\opencv_objdetect243d.dll" />
     <Content Include="Dll\opencv_photo243.dll" />
+    <Content Include="Dll\opencv_photo243d.dll" />
     <Content Include="Dll\opencv_stitching243.dll" />
+    <Content Include="Dll\opencv_stitching243d.dll" />
     <Content Include="Dll\opencv_ts243.dll" />
+    <Content Include="Dll\opencv_ts243d.dll" />
     <Content Include="Dll\opencv_video243.dll" />
+    <Content Include="Dll\opencv_video243d.dll" />
     <Content Include="Dll\opencv_videostab243.dll" />
+    <Content Include="Dll\opencv_videostab243d.dll" />
     <Content Include="Dll\phonon4.dll" />
+    <Content Include="Dll\phonond4.dll" />
     <Content Include="Dll\Qt3Support4.dll" />
+    <Content Include="Dll\Qt3Supportd4.dll" />
     <Content Include="Dll\QtCLucene4.dll" />
+    <Content Include="Dll\QtCLucened4.dll" />
     <Content Include="Dll\QtCore4.dll" />
+    <Content Include="Dll\QtCored4.dll" />
     <Content Include="Dll\QtDeclarative4.dll" />
+    <Content Include="Dll\QtDeclaratived4.dll" />
     <Content Include="Dll\QtDesigner4.dll" />
     <Content Include="Dll\QtDesignerComponents4.dll" />
+    <Content Include="Dll\QtDesignerComponentsd4.dll" />
+    <Content Include="Dll\QtDesignerd4.dll" />
     <Content Include="Dll\QtGui4.dll" />
+    <Content Include="Dll\QtGuid4.dll" />
     <Content Include="Dll\QtHelp4.dll" />
+    <Content Include="Dll\QtHelpd4.dll" />
     <Content Include="Dll\QtMultimedia4.dll" />
+    <Content Include="Dll\QtMultimediad4.dll" />
     <Content Include="Dll\QtNetwork4.dll" />
+    <Content Include="Dll\QtNetworkd4.dll" />
     <Content Include="Dll\QtOpenGL4.dll" />
+    <Content Include="Dll\QtOpenGLd4.dll" />
     <Content Include="Dll\QtScript4.dll" />
+    <Content Include="Dll\QtScriptd4.dll" />
     <Content Include="Dll\QtScriptTools4.dll" />
+    <Content Include="Dll\QtScriptToolsd4.dll" />
     <Content Include="Dll\QtSql4.dll" />
+    <Content Include="Dll\QtSqld4.dll" />
     <Content Include="Dll\QtSvg4.dll" />
+    <Content Include="Dll\QtSvgd4.dll" />
     <Content Include="Dll\QtTest4.dll" />
+    <Content Include="Dll\QtTestd4.dll" />
     <Content Include="Dll\QtWebKit4.dll" />
+    <Content Include="Dll\QtWebKitd4.dll" />
     <Content Include="Dll\QtXml4.dll" />
+    <Content Include="Dll\QtXmld4.dll" />
     <Content Include="Dll\QtXmlPatterns4.dll" />
+    <Content Include="Dll\QtXmlPatternsd4.dll" />
     <Content Include="Dll\tbb.dll" />
     <Content Include="Dll\tbbmalloc.dll" />
+    <Content Include="Dll\tbbmalloc_debug.dll" />
     <Content Include="Dll\tbbmalloc_proxy.dll" />
+    <Content Include="Dll\tbbmalloc_proxy_debug.dll" />
+    <Content Include="Dll\tbb_debug.dll" />
     <Content Include="Dll\tbb_preview.dll" />
+    <Content Include="Dll\tbb_preview_debug.dll" />
     <None Include="Resources\drag.png" />
   </ItemGroup>
   <ItemGroup>

@@ -46,7 +46,7 @@ namespace Signature
 			}
 
 			vector<Image::Descriptor> descriptors;
-			for (auto& image : trains)
+			for (auto& image : train_images)
 				descriptors.push_back(image.getDescriptor());
 			machines.getMatcher()->add(descriptors);
 		}

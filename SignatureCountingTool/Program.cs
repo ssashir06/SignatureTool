@@ -10,18 +10,16 @@ namespace Signature.CountingTool
 {
     static class Program
     {
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool SetDllDirectory(string lpPathName);
-
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
         [STAThread]
         static void Main()
         {
-			string directory = Path.Combine(Directory.GetCurrentDirectory(), @"Dll");
-            bool set = SetDllDirectory(directory);
+            string directory = 
+                Environment.GetEnvironmentVariable("PATH") + ";" + 
+                Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), @"Dll");
+            Environment.SetEnvironmentVariable("PATH", directory);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
