@@ -88,7 +88,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_nonfree243d.lib;opencv_core243d.lib;opencv_features2d243d.lib;opencv_highgui243d.lib;opencv_imgproc243d.lib;opencv_flann243d.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_nonfree245d.lib;opencv_core245d.lib;opencv_features2d245d.lib;opencv_highgui245d.lib;opencv_imgproc245d.lib;opencv_flann245d.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>perl update_image_list.pl &gt; files.h</Command>
@@ -104,7 +104,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opencv_nonfree243d.lib;opencv_core243d.lib;opencv_features2d243d.lib;opencv_highgui243d.lib;opencv_imgproc243d.lib;opencv_flann243d.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_nonfree245d.lib;opencv_core245d.lib;opencv_features2d245d.lib;opencv_highgui245d.lib;opencv_imgproc245d.lib;opencv_flann245d.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>perl update_image_list.pl &gt; files.h</Command>
@@ -124,7 +124,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opencv_nonfree243.lib;opencv_core243.lib;opencv_features2d243.lib;opencv_highgui243.lib;opencv_imgproc243.lib;opencv_flann243.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_nonfree245.lib;opencv_core245.lib;opencv_features2d245.lib;opencv_highgui245.lib;opencv_imgproc245.lib;opencv_flann245.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>perl update_image_list.pl &gt; files.h</Command>
@@ -144,7 +144,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opencv_nonfree243.lib;opencv_core243.lib;opencv_features2d243.lib;opencv_highgui243.lib;opencv_imgproc243.lib;opencv_flann243.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_nonfree245.lib;opencv_core245.lib;opencv_features2d245.lib;opencv_highgui245.lib;opencv_imgproc245.lib;opencv_flann245.lib;libsvm.lib;$(OutDir)LibGuessSignature.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>perl update_image_list.pl &gt; files.h</Command>

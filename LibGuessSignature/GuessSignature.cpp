@@ -128,7 +128,11 @@ namespace Signature
 		}
 
 		Base::Base(const Base& src)
-			: signature(src.signature), file_name(src.file_name), descriptor(src.descriptor), keypoints(src.keypoints), trimming(src.trimming), grayscale(src.grayscale), monochrome(src.monochrome), monochrome_threshold(src.monochrome_threshold)
+			: 
+				signature(src.signature), file_name(src.file_name), descriptor(src.descriptor), keypoints(src.keypoints), trimming(src.trimming), 
+				grayscale(src.grayscale), monochrome(src.monochrome), monochrome_threshold(src.monochrome_threshold),
+				machines(src.machines)
+				//machines()
 		{
 		}
 
@@ -142,6 +146,8 @@ namespace Signature
 			grayscale = src.grayscale;
 			monochrome = src.monochrome;
 			monochrome_threshold = src.monochrome_threshold;
+			machines = src.machines;
+			//machines = MatchingMachines();
 			return *this;
 		}
 
